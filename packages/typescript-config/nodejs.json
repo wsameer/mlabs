@@ -1,0 +1,9 @@
+{
+  "display": "Backend Node.js",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "allowImportingTsExtensions": false
+  }
+}
