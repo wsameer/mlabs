@@ -23,6 +23,8 @@
     "clean:full": "turbo run clean && rm -rf node_modules .turbo"
   },
   "devDependencies": {
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.8.8",

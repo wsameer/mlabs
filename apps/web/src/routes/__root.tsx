@@ -1,20 +1,26 @@
 import { AppSidebar } from "@/components/AppSidebar";
-import { createRootRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createRootRoute } from "@tanstack/react-router";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@workspace/ui/components/breadcrumb";
 import { Separator } from "@workspace/ui/components/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
-import { Suspense } from "react";
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
 
 function RootComponent() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Open settings with Cmd+, (Mac) or Ctrl+, (Windows/Linux)
   // TODO
@@ -47,6 +53,17 @@ function RootComponent() {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="#">All Inboxes</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Inbox</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           {Array.from({ length: 24 }).map((_, index) => (
@@ -57,14 +74,6 @@ function RootComponent() {
           ))}
         </div>
       </SidebarInset>
-      {import.meta.env.DEV && (
-        <Suspense fallback={null}>
-          <TanStackRouterDevtools
-            initialIsOpen={false}
-            position="bottom-right"
-          />
-        </Suspense>
-      )}
     </SidebarProvider>
   );
 }
