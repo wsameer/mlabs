@@ -4,7 +4,6 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { Settings2 } from "lucide-react";
 
 import { NavItem } from "./NavItem";
 import { PRIMARY_NAVIGATION_OPTIONS } from "./constants";
@@ -13,8 +12,6 @@ export function AppBottombar() {
   const router = useRouterState();
   const navigate = useNavigate();
   const currentPath = router.location.pathname;
-  const lastNavItem =
-    PRIMARY_NAVIGATION_OPTIONS[PRIMARY_NAVIGATION_OPTIONS.length - 1];
   const navRef = useRef(null);
 
   return (
@@ -24,7 +21,7 @@ export function AppBottombar() {
       id="app-bottom-bar"
     >
       <nav className="flex items-center justify-between rounded-full bg-zinc-800 p-2 shadow-lg dark:bg-zinc-200">
-        {PRIMARY_NAVIGATION_OPTIONS.slice(0, -1).map((item) => {
+        {PRIMARY_NAVIGATION_OPTIONS.map((item) => {
           const Icon = item.icon;
           return (
             <React.Fragment key={item.path}>
@@ -44,21 +41,6 @@ export function AppBottombar() {
             </React.Fragment>
           );
         })}
-
-        {lastNavItem && (
-          <NavItem
-            icon={<Settings2 />}
-            isActive={location.pathname.includes(lastNavItem.path)}
-            label={lastNavItem.title}
-            onClick={() => {
-              // Store return path when navigating to settings
-              if (!currentPath.startsWith("/settings")) {
-                sessionStorage.setItem("settings-return-path", currentPath);
-              }
-              navigate(linkOptions({ to: lastNavItem.path }));
-            }}
-          />
-        )}
       </nav>
     </div>
   );

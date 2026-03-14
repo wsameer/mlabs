@@ -1,14 +1,6 @@
 import * as React from "react";
-import {
-  ArchiveX,
-  File,
-  Inbox,
-  Send,
-  Trash2,
-  WalletMinimalIcon,
-} from "lucide-react";
+import { WalletMinimalIcon } from "lucide-react";
 
-import { NavUser } from "@/components/NavUser";
 import { Label } from "@workspace/ui/components/label";
 import {
   Sidebar,
@@ -24,6 +16,8 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar";
 import { Switch } from "@workspace/ui/components/switch";
+import { PRIMARY_NAVIGATION_OPTIONS } from "@/features/navigation";
+import { SECONDARY_NAV_OPTIONS } from "@/features/navigation/constants";
 
 // This is sample data
 const data = {
@@ -32,38 +26,6 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
-    {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
-      isActive: true,
-    },
-    {
-      title: "Drafts",
-      url: "#",
-      icon: File,
-      isActive: false,
-    },
-    {
-      title: "Sent",
-      url: "#",
-      icon: Send,
-      isActive: false,
-    },
-    {
-      title: "Junk",
-      url: "#",
-      icon: ArchiveX,
-      isActive: false,
-    },
-    {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
-      isActive: false,
-    },
-  ],
   mails: [
     {
       name: "William Smith",
@@ -151,9 +113,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Note: I'm using state to show active item.
   // IRL you should use the url/router.
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
+  const [activeItem, setActiveItem] = React.useState(
+    PRIMARY_NAVIGATION_OPTIONS[0]
+  );
   const [mails, setMails] = React.useState(data.mails);
   const { setOpen } = useSidebar();
+  const lastNavItem =
+    PRIMARY_NAVIGATION_OPTIONS[PRIMARY_NAVIGATION_OPTIONS.length - 1];
 
   return (
     <Sidebar
@@ -189,12 +155,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
-              <SidebarMenu>
-                {data.navMain.map((item) => (
+              <SidebarMenu className="gap-2">
+                {PRIMARY_NAVIGATION_OPTIONS.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={{
-                        children: item.title,
+                        children: lastNavItem ? "Settings" : item.title,
                         hidden: false,
                       }}
                       onClick={() => {
@@ -221,7 +187,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <SidebarMenu>
+            <SidebarMenu className="gap-2">
+              {SECONDARY_NAV_OPTIONS.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    tooltip={{
+                      children: item.title,
+                      hidden: false,
+                    }}
+                    className="px-2.5 md:px-2"
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
 
@@ -231,7 +214,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader className="gap-3.5 border-b p-4">
           <div className="flex w-full items-center justify-between">
             <div className="text-base font-medium text-foreground">
-              {activeItem?.title}
+              {activeItem?.title === lastNavItem.title
+                ? "Settings"
+                : activeItem?.title}
             </div>
             <Label className="flex items-center gap-2 text-sm">
               <span>Unreads</span>

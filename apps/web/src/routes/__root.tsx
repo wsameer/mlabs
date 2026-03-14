@@ -1,7 +1,7 @@
 import { AppHeader } from "@/components/AppHeader";
 import { AppSidebar } from "@/components/AppSidebar";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
-import { DASHBOARD_ROUTE } from "@/constants";
+import { DASHBOARD_ROUTE, SETTINGS_ROUTE } from "@/constants";
 import { AppBottombar } from "@/features/navigation";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { createRootRoute, Outlet, useNavigate } from "@tanstack/react-router";
@@ -20,14 +20,13 @@ export const Route = createRootRoute({
 function RootComponent() {
   const navigate = useNavigate();
 
-  // Open settings with Cmd+, (Mac) or Ctrl+, (Windows/Linux)
   useHotkey({
     key: ",",
     modifiers: ["meta"],
     callback: () => {
       // Store current path to return to after closing settings
       const currentPath = window.location.pathname;
-      if (!currentPath.startsWith("/settings")) {
+      if (!currentPath.startsWith(SETTINGS_ROUTE)) {
         sessionStorage.setItem("settings-return-path", currentPath);
       }
       navigate({ to: DASHBOARD_ROUTE });

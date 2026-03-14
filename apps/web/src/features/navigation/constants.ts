@@ -1,6 +1,6 @@
 import {
   ChartPieIcon,
-  EllipseIcon,
+  EllipsisIcon,
   LifeBuoyIcon,
   MessageCircleQuestionIcon,
   ReceiptTextIcon,
@@ -23,7 +23,7 @@ export const PRIMARY_NAVIGATION_OPTIONS = [
     path: TRANSACTIONS_ROUTE,
   },
   { icon: WalletCardsIcon, title: "Accounts", path: ACCOUNTS_ROUTE },
-  { icon: EllipseIcon, title: "Settings", path: SETTINGS_ROUTE },
+  { icon: EllipsisIcon, title: "More", path: SETTINGS_ROUTE },
 ].filter(Boolean) as SideNavigationItem[];
 
 export const SECONDARY_NAV_OPTIONS: SideNavigationItem[] = [
