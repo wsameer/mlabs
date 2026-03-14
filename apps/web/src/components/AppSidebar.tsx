@@ -3,9 +3,9 @@ import {
   ArchiveX,
   File,
   Inbox,
-  LandmarkIcon,
   Send,
   Trash2,
+  WalletMinimalIcon,
 } from "lucide-react";
 
 import { NavUser } from "@/components/NavUser";
@@ -177,7 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 render={<a href="#" />}
               >
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <LandmarkIcon className="size-4" />
+                  <WalletMinimalIcon className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">mLabs</span>
