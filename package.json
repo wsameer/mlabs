@@ -2,12 +2,25 @@
   "name": "mlabs",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "dev:api": "pnpm --filter=api dev",
+    "dev:web": "pnpm --filter=web dev",
+    "build:api": "pnpm --filter=api build",
+    "build:web": "pnpm --filter=web build",
+    "start": "pnpm --filter=api start",
+    "lint:fix": "turbo run lint:fix",
+    "clean": "turbo clean && rm -rf node_modules .turbo",
+    "clean:full": "turbo run clean && rm -rf node_modules .turbo"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
@@ -17,6 +30,12 @@
   },
   "packageManager": "pnpm@9.0.6",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.20.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "sharp": "^0.33.5",
+      "sharp-ico": "^0.1.5"
+    }
   }
 }

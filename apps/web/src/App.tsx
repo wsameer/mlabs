@@ -1,6 +1,29 @@
-import { Button } from "@workspace/ui/components/button"
+import React from "react";
+
+import { Button } from "@workspace/ui/components/button";
+import { RouterProvider } from "@tanstack/react-router";
+import { TooltipProvider } from "@workspace/ui/components/tooltip";
+import { Toaster } from "@workspace/ui/components/sonner";
+
+import { ThemeProvider } from "@/features/theme-provider";
+import { GlobalErrorBoundary } from "@/components/ErrorBoundary";
+import { router } from "@/lib/router";
+import { AppLoader } from "@/features/AppLoader";
 
 export function App() {
+  return (
+    <GlobalErrorBoundary>
+      <ThemeProvider defaultTheme="light" storageKey="mlbas-ui-theme">
+        <TooltipProvider>
+          <React.Suspense fallback={<AppLoader />}>
+            <RouterProvider router={router} />
+            <Toaster />
+          </React.Suspense>
+        </TooltipProvider>
+      </ThemeProvider>
+    </GlobalErrorBoundary>
+  );
+
   return (
     <div className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
@@ -10,10 +33,10 @@ export function App() {
           <p>We&apos;ve already added the button component for you.</p>
           <Button className="mt-2">Button</Button>
         </div>
-        <div className="text-muted-foreground font-mono text-xs">
+        <div className="font-mono text-xs text-muted-foreground">
           (Press <kbd>d</kbd> to toggle dark mode)
         </div>
       </div>
     </div>
-  )
+  );
 }
