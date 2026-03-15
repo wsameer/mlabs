@@ -1,4 +1,5 @@
 import { DASHBOARD_ROUTE } from "@/constants";
+import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute(DASHBOARD_ROUTE)({
@@ -6,6 +7,10 @@ export const Route = createFileRoute(DASHBOARD_ROUTE)({
 });
 
 function RouteComponent() {
+  useLayoutConfig({
+    pageTitle: "Dashboard",
+  });
+
   return (
     <>
       {Array.from({ length: 24 }).map((_, index) => (

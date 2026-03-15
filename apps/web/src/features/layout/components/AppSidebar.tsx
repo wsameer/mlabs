@@ -1,0 +1,52 @@
+import * as React from "react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+} from "@workspace/ui/components/sidebar";
+import { AppLeftSideNav } from "@/features/navigation";
+import { Textarea } from "@workspace/ui/components/textarea";
+import { useAppStore } from "@/lib/store";
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const sidebarLeftContent = useAppStore((state) => state.sidebarLeftContent);
+
+  const navRef = React.useRef(null);
+
+  return (
+    <Sidebar
+      side="left"
+      collapsible="icon"
+      ref={navRef}
+      className="overflow-hidden *:data-[sidebar=sidebar]:flex-row"
+      {...props}
+    >
+      {/* This is the first sidebar */}
+      {/* We disable collapsible and adjust width to icon. */}
+      {/* This will make the sidebar appear as icons. */}
+      <AppLeftSideNav />
+
+      {/* This is the second sidebar */}
+      {/* We disable collapsible and let it fill remaining space */}
+      <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+        <SidebarHeader className="gap-3.5 border-b p-4">
+          <div className="flex w-full items-center justify-between">
+            <div className="text-base font-medium text-foreground">mLabs</div>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup className="px-0">
+            <SidebarGroupContent>
+              {sidebarLeftContent || (
+                <Textarea placeholder="Type your message here." />
+              )}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </Sidebar>
+  );
+}

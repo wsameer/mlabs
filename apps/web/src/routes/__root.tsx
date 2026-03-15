@@ -1,5 +1,3 @@
-import { AppHeader } from "@/components/AppHeader";
-import { AppSidebar } from "@/components/AppSidebar";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { DASHBOARD_ROUTE, SETTINGS_ROUTE } from "@/constants";
 import { AppBottombar } from "@/features/navigation";
@@ -10,6 +8,7 @@ import {
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
 import { NotFoundComponent } from "./404";
+import { AppHeader, AppSidebar } from "@/features/layout";
 
 export const Route = createRootRoute({
   component: RootComponent,
