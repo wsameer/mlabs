@@ -33,6 +33,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.2.2
+        version: 5.2.2(react-hook-form@7.71.2(react@19.2.4))
       '@tanstack/react-router':
         specifier: ^1.167.0
         version: 1.167.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -42,6 +45,9 @@ importers:
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       immer:
         specifier: ^11.1.4
         version: 11.1.4
@@ -54,6 +60,12 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
+      react-hook-form:
+        specifier: ^7.71.2
+        version: 7.71.2(react@19.2.4)
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
       zustand:
         specifier: ^5.0.11
         version: 5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
@@ -192,6 +204,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -642,6 +657,11 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hookform/resolvers@5.2.2':
+    resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
+    peerDependencies:
+      react-hook-form: ^7.55.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1186,6 +1206,9 @@ packages:
   '@sindresorhus/merge-streams@4.0.0':
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
+
+  '@standard-schema/utils@0.3.0':
+    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
   '@tabby_ai/hijri-converter@1.0.5':
     resolution: {integrity: sha512-r5bClKrcIusDoo049dSL8CawnHR6mRdDwhlQuIgZRNty68q0x8k3Lf1BtPAMxRf/GgnHBnIO4ujd3+GQdLWzxQ==}
@@ -1846,6 +1869,9 @@ packages:
 
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+
+  dayjs@1.11.20:
+    resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -3256,6 +3282,12 @@ packages:
     peerDependencies:
       react: ^19.2.4
 
+  react-hook-form@7.71.2:
+    resolution: {integrity: sha512-1CHvcDYzuRUNOflt4MOq3ZM46AronNJtQ1S7tnX6YN4y72qhgiUItpacZUAQ0TyWYci3yz1X+rXaSxiuEm86PA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -3839,6 +3871,12 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
+  vaul@1.1.2:
+    resolution: {integrity: sha512-ZFkClGpWyI2WUQjdLJ/BaGuV6AVQiJ3uELGk3OYtP+B6yCO7Cmn9vPFXVJkRaGkOJu3m8bQMgtyzNHixULceQA==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+
   vite@7.3.1:
     resolution: {integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -4393,6 +4431,11 @@ snapshots:
     dependencies:
       hono: 4.12.7
 
+  '@hookform/resolvers@5.2.2(react-hook-form@7.71.2(react@19.2.4))':
+    dependencies:
+      '@standard-schema/utils': 0.3.0
+      react-hook-form: 7.71.2(react@19.2.4)
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -4851,6 +4894,8 @@ snapshots:
   '@sec-ant/readable-stream@0.4.1': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
+
+  '@standard-schema/utils@0.3.0': {}
 
   '@tabby_ai/hijri-converter@1.0.5': {}
 
@@ -5600,6 +5645,8 @@ snapshots:
   date-fns-jalali@4.1.0-0: {}
 
   date-fns@4.1.0: {}
+
+  dayjs@1.11.20: {}
 
   debug@4.4.3:
     dependencies:
@@ -7062,6 +7109,10 @@ snapshots:
       react: 19.2.4
       scheduler: 0.27.0
 
+  react-hook-form@7.71.2(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+
   react-is@16.13.1: {}
 
   react-refresh@0.18.0: {}
@@ -7743,6 +7794,15 @@ snapshots:
   validate-npm-package-name@7.0.2: {}
 
   vary@1.1.2: {}
+
+  vaul@1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      '@radix-ui/react-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
 
   vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0):
     dependencies:

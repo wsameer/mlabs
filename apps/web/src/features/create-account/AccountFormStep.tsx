@@ -1,22 +1,24 @@
+import { useState } from "react";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+import { Controller, useForm } from "react-hook-form";
+import { ChevronDownIcon, DollarSignIcon } from "lucide-react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@workspace/ui/components/input-group";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import { ACCOUNT_TYPES, type AccountType } from "./types";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@workspace/ui/components/field";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@workspace/ui/components/input-group";
-import { CalendarIcon, DollarSignIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -31,18 +33,13 @@ import {
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
 import { Calendar } from "@workspace/ui/components/calendar";
-import { useState } from "react";
-import { formatDate, isValidDate } from "@/lib/format-date";
+import { ACCOUNT_TYPES, type AccountType } from "./types";
 
-interface Props {
-  type: AccountType;
-  onSuccess: () => void;
-  onBack: () => void;
-}
+dayjs.extend(customParseFormat);
 
 const accountFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  balance: z.coerce.number(),
+  balance: z.coerce.number({ invalid_type_error: "Balance is required" }),
   type: z.enum(ACCOUNT_TYPES, { message: "Please select an account type" }),
   availableCredit: z.coerce.number().optional(),
   expirationDate: z.date().optional(),
@@ -50,26 +47,29 @@ const accountFormSchema = z.object({
 
 export type AccountFormValues = z.infer<typeof accountFormSchema>;
 
+interface Props {
+  type: AccountType;
+  onSuccess: (data: AccountFormValues) => void;
+  onBack: () => void;
+}
+
 export function AccountFormStep({ type, onSuccess, onBack }: Props) {
-  const [openDatePicker, setOpenDatePicker] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [month, setMonth] = useState<Date | undefined>(date);
-  const [value, setValue] = useState(formatDate(date));
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
+      balance: 0,
       type,
-      expirationDate: new Date(),
+      availableCredit: 0,
     },
   });
 
-  async function onSubmit(data: AccountFormValues) {
-    // Do something with the form values.
-    console.log({ ...data, type });
-    onSuccess();
+  function onSubmit(data: AccountFormValues) {
+    console.log("🚀 ~ onSubmit ~ data:", data);
+    onSuccess(data);
   }
 
   return (
@@ -92,24 +92,22 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
                 {...field}
                 id="account-creation-form-name"
                 className="text-xs"
-                aria-invalid={fieldState.invalid}
-                placeholder="Example account name"
+                placeholder={type === "credit" ? "Amex Platinum" : "TD Bank"}
                 autoComplete="off"
-                required
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
 
-        {/* Account Balance */}
+        {/* Balance */}
         <Controller
           name="balance"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="account-creation-form-balance">
-                Balance on date
+                Opening balance
               </FieldLabel>
               <InputGroup>
                 <InputGroupInput
@@ -118,7 +116,6 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
                   type="number"
                   placeholder="0.00"
                   className="text-xs"
-                  required
                 />
                 <InputGroupAddon>
                   <DollarSignIcon />
@@ -138,23 +135,16 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
               <FieldLabel htmlFor="account-creation-form-type">
                 Account type
               </FieldLabel>
-              <Select
-                value={
-                  field.value
-                    ? field.value.charAt(0).toUpperCase() +
-                      field.value?.slice(1)
-                    : null
-                }
-                onValueChange={field.onChange}
-              >
+              {/* Pass raw lowercase value — match SelectItem values exactly */}
+              <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent alignItemWithTrigger={true}>
+                <SelectContent alignItemWithTrigger>
                   <SelectGroup>
-                    {ACCOUNT_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                    {ACCOUNT_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t.charAt(0).toUpperCase() + t.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -165,24 +155,25 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
           )}
         />
 
+        {/* Credit-only fields */}
         {type === "credit" && (
           <div className="grid grid-cols-2 gap-3">
+            {/* Available Credit */}
             <Controller
               name="availableCredit"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="account-creation-form-available-credit">
-                    Available Credits
+                    Credit limit
                   </FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       {...field}
                       id="account-creation-form-available-credit"
                       type="number"
-                      placeholder="1000"
+                      placeholder="5000.00"
                       className="text-xs"
-                      required
                     />
                     <InputGroupAddon>
                       <DollarSignIcon />
@@ -195,74 +186,50 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
               )}
             />
 
+            {/* Expiration Date */}
             <Controller
               name="expirationDate"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-creation-form-expiration-date">
-                    Expiration Date
+                  <FieldLabel htmlFor="date-picker-trigger">
+                    Expiration date
                   </FieldLabel>
-                  <InputGroup {...field}>
-                    <InputGroupInput
-                      id="account-creation-form-expiration-date"
-                      placeholder="June 01, 2026"
-                      className="text-xs"
-                      value={value}
-                      onChange={(e) => {
-                        const date = new Date(e.target.value);
-                        setValue(e.target.value);
-                        if (isValidDate(date)) {
-                          setDate(date);
-                          setMonth(date);
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "ArrowDown") {
-                          e.preventDefault();
-                          setOpenDatePicker(true);
-                        }
-                      }}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <Popover
-                        open={openDatePicker}
-                        onOpenChange={setOpenDatePicker}
-                      >
-                        <PopoverTrigger
-                          render={
-                            <InputGroupButton
-                              id="date-picker"
-                              variant="ghost"
-                              size="icon-xs"
-                              aria-label="Select date"
-                            >
-                              <CalendarIcon />
-                              <span className="sr-only">Select date</span>
-                            </InputGroupButton>
-                          }
-                        />
-                        <PopoverContent
-                          className="w-auto overflow-hidden p-0"
-                          align="end"
-                          alignOffset={-8}
-                          sideOffset={10}
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          id="date-picker-trigger"
+                          variant="outline"
+                          className="w-full justify-between font-normal"
                         >
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            month={month}
-                            onMonthChange={setMonth}
-                            onSelect={(date) => {
-                              setDate(date);
-                              setValue(formatDate(date));
-                              setOpenDatePicker(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </InputGroupAddon>
-                  </InputGroup>
+                          {field.value ? (
+                            dayjs(field.value).format("MMMM DD, YYYY")
+                          ) : (
+                            <span className="text-muted-foreground">
+                              Select a date
+                            </span>
+                          )}
+                          <ChevronDownIcon data-icon="inline-end" />
+                        </Button>
+                      }
+                    />
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        defaultMonth={field.value}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          field.onChange(date ?? null);
+                          setCalendarOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -274,11 +241,11 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
       </FieldGroup>
 
       <div className="flex flex-col gap-2 pt-2">
-        <Button variant="outline" onClick={onBack}>
+        <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit" form="account-creation-form" className="w-full">
-          Submit
+        <Button type="submit" className="w-full">
+          Create account
         </Button>
       </div>
     </form>
