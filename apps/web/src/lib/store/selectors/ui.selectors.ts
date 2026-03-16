@@ -4,3 +4,5 @@ export const globalLoadingSelector = (state: AppStoreState) =>
   state.globalLoading;
 export const globalSearchSelector = (state: AppStoreState) =>
   state.globalSearch;
+export const openCreateAccountSelector = (state: AppStoreState) =>
+  state.openCreateAccount;

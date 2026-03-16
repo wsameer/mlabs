@@ -16,7 +16,7 @@ export function useHotkey({
 }: HotkeyConfig) {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (!enabled) return;
+      if (!enabled || !event.key) return;
 
       // Check if the key matches
       if (event.key.toLowerCase() !== key.toLowerCase()) return;

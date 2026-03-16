@@ -1,15 +1,17 @@
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, SearchIcon } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
-import { useAppStore } from "@/lib/store";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
+import { useAppStore } from "@/lib/store";
+import { useUiActions } from "@/hooks/use-ui-store";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
   const pageTitle = useAppStore((state) => state.headerTitle);
   const mobileBackPath = useAppStore((state) => state.mobileBackPath);
+  const { setGlobalSearch } = useUiActions();
 
   const handleBack = () => {
     if (mobileBackPath) {
@@ -29,20 +31,32 @@ export const AppHeader = () => {
   );
 
   const renderMobileHeader = () => (
-    <div className="flex w-full items-center gap-3 md:hidden">
-      {mobileBackPath && (
+    <div className="flex w-full items-center justify-between gap-3 md:hidden">
+      <div className="flex">
+        {mobileBackPath && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            aria-label="Go back"
+          >
+            <ArrowLeftIcon className="size-5" />
+          </Button>
+        )}
+        <h4 className="flex-1 scroll-m-20 text-lg font-semibold tracking-wide">
+          {pageTitle}
+        </h4>
+      </div>
+      <div className="flex">
         <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleBack}
-          aria-label="Go back"
+          onClick={() => setGlobalSearch(true)}
+          variant="outline"
+          size="sm"
         >
-          <ArrowLeftIcon className="size-5" />
+          <SearchIcon data-icon="inline-start" />
+          <p className="text-muted-foreground">⌘K</p>
         </Button>
-      )}
-      <h4 className="flex-1 scroll-m-20 text-lg font-semibold tracking-wide">
-        {pageTitle}
-      </h4>
+      </div>
     </div>
   );
 
