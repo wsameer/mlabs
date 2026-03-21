@@ -1,0 +1,39 @@
+{
+  "name": "@workspace/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Database schema and utilities",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "db:generate": "dotenv -e ../../.env -- drizzle-kit generate",
+    "db:migrate": "dotenv -e ../../.env -- drizzle-kit migrate",
+    "db:push": "dotenv -e ../../.env -- drizzle-kit push",
+    "db:studio": "dotenv -e ../../.env -- drizzle-kit studio",
+    "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
+    "db:empty": "dotenv -e ../../.env -- tsx src/empty.ts",
+    "db:reset": "dotenv -e ../../.env -- tsx src/empty.ts --execute && dotenv -e ../../.env -- tsx src/seed.ts",
+    "clean": "rm -rf drizzle .turbo"
+  },
+  "keywords": [
+    "database",
+    "drizzle",
+    "postgres"
+  ],
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "@workspace/types": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0"
+  }
+}
