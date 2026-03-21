@@ -20,11 +20,20 @@
     "start": "pnpm --filter=api start",
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo clean && rm -rf node_modules .turbo",
-    "clean:full": "turbo run clean && rm -rf node_modules .turbo"
+    "clean:full": "turbo run clean && rm -rf node_modules .turbo",
+    "db:generate": "pnpm --filter=@workspace/db db:generate",
+    "db:push": "pnpm --filter=@workspace/db db:push",
+    "db:studio": "pnpm --filter=@workspace/db db:studio",
+    "db:seed": "pnpm --filter=@workspace/db db:seed",
+    "db:empty": "pnpm --filter=@workspace/db db:empty",
+    "db:reset": "pnpm --filter=@workspace/db db:reset"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "eslint-config-turbo": "^2.7.1",
+    "eslint-plugin-turbo": "^2.5.5",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.8.8",

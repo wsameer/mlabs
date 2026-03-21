@@ -11,6 +11,7 @@ export const AppHeader = () => {
   const navigate = useNavigate();
   const pageTitle = useAppStore((state) => state.headerTitle);
   const mobileBackPath = useAppStore((state) => state.mobileBackPath);
+  const headerActions = useAppStore((state) => state.headerActions);
   const { setGlobalSearch } = useUiActions();
 
   const handleBack = () => {
@@ -47,7 +48,7 @@ export const AppHeader = () => {
           {pageTitle}
         </h4>
       </div>
-      <div className="flex">
+      <div className="flex gap-1">
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
@@ -56,6 +57,7 @@ export const AppHeader = () => {
           <SearchIcon data-icon="inline-start" />
           <p className="text-muted-foreground">⌘K</p>
         </Button>
+        {headerActions}
       </div>
     </div>
   );
