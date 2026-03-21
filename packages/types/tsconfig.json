@@ -1,0 +1,9 @@
+{
+  "extends": "@workspace/typescript-config/backend-library.json",
+  "compilerOptions": {
+    "types": [],
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
