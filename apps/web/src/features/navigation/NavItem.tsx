@@ -14,7 +14,7 @@ export const NavItem = ({ icon, isActive, label, onClick }: Props) => {
   return (
     <Button
       className={cn(
-        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-foreground opacity-50 hover:bg-background/40 hover:opacity-100 active:translate-y-0",
+        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-foreground opacity-50 hover:bg-background/40 hover:opacity-100 active:translate-y-0 dark:text-background",
         {
           "opacity-100": isActive,
         }
@@ -24,7 +24,7 @@ export const NavItem = ({ icon, isActive, label, onClick }: Props) => {
       size="icon"
     >
       <div
-        className={`absolute inset-0 rounded-full bg-white transition-opacity dark:bg-zinc-900 ${
+        className={`absolute inset-0 rounded-full bg-white transition-opacity dark:bg-background ${
           isActive ? "opacity-100" : "opacity-0"
         }`}
       />

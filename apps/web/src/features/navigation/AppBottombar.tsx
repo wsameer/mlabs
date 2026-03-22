@@ -20,7 +20,7 @@ export function AppBottombar() {
       className="fixed bottom-8 left-1/2 z-50 w-3/4 -translate-x-1/2 transition-transform duration-200 ease-in-out md:hidden"
       id="app-bottom-bar"
     >
-      <nav className="flex items-center justify-between rounded-full bg-zinc-200 p-2 shadow-lg dark:bg-zinc-800">
+      <nav className="flex items-center justify-between rounded-full bg-primary p-2 shadow-lg">
         {PRIMARY_NAVIGATION_OPTIONS.map((item) => {
           const Icon = item.icon;
           return (

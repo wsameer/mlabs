@@ -12,7 +12,11 @@ import { AppLoader } from "@/features/AppLoader";
 export function App() {
   return (
     <GlobalErrorBoundary>
-      <ThemeProvider defaultTheme="light" storageKey="mlbas-ui-theme">
+      <ThemeProvider
+        defaultTheme="light"
+        storageKey="mlbas-ui-theme"
+        disableTransitionOnChange
+      >
         <TooltipProvider>
           <React.Suspense fallback={<AppLoader />}>
             <RouterProvider router={router} />

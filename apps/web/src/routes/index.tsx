@@ -1,23 +1,18 @@
 import { DASHBOARD_ROUTE } from "@/constants";
 import { CashflowPieChart } from "@/features/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
-import { TimeGrainSelect } from "@/features/TimeGrainSelect";
+import { TimeGrainSelect } from "@/components/TimeGrainSelect";
 import { createFileRoute } from "@tanstack/react-router";
-import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemMedia,
-  ItemTitle,
-} from "@workspace/ui/components/item";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { CategoryStatList } from "@/features/CategoryStatList";
+import { DateRangeFilter } from "@/features/DateRangeFilter";
+import { useFilters } from "@/hooks/use-filters";
 
 export const Route = createFileRoute(DASHBOARD_ROUTE)({
   component: RouteComponent,
@@ -37,84 +32,39 @@ const testData = [
 ];
 
 function RouteComponent() {
+  const { timeGrain } = useFilters();
+
   useLayoutConfig({
     pageTitle: "Dashboard",
-    actions: <TimeGrainSelect />,
+    actions: (
+      <TimeGrainSelect
+        value={timeGrain}
+        onValueChange={(v) => console.log(v)}
+      />
+    ),
   });
 
-  const renderIncomeSection = () => (
-    <Card className="w-full">
-      <CardContent>
-        <CashflowPieChart />
-      </CardContent>
-    </Card>
+  const renderTransactionsSummary = () => (
+    <>
+      <Card className="w-full border-none">
+        <CardContent>
+          <CashflowPieChart />
+        </CardContent>
+      </Card>
+      <CategoryStatList data={testData} />
+    </>
   );
 
   return (
-    <div>
+    <div className="flex flex-col gap-3">
+      <DateRangeFilter />
       <Tabs defaultValue="expense" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="income">Income</TabsTrigger>
           <TabsTrigger value="expense">Expense</TabsTrigger>
         </TabsList>
-        <TabsContent value="income">
-          {renderIncomeSection()}
-          <div className="my-4 flex flex-col gap-1">
-            {testData.map((item) => (
-              <Item
-                variant="outline"
-                size="xs"
-                key={item.id}
-                render={
-                  <a href="#">
-                    <ItemMedia>
-                      <Badge className="w-[48px]" variant="destructive">
-                        {item.weight}
-                      </Badge>
-                    </ItemMedia>
-                    <ItemContent>
-                      <ItemTitle>{item.category}</ItemTitle>
-                    </ItemContent>
-                    <ItemActions>
-                      <p className="leading-7 [&:not(:first-child)]:mt-6">
-                        ${item.value}
-                      </p>
-                    </ItemActions>
-                  </a>
-                }
-              />
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="expense">
-          {renderIncomeSection()}
-          <div className="my-4 flex flex-col gap-1">
-            {testData.map((item) => (
-              <Item
-                variant="outline"
-                size="xs"
-                key={item.id}
-                render={
-                  <a href="#">
-                    <ItemMedia>
-                      <Badge className="w-[48px]" variant="destructive">
-                        {item.weight}
-                      </Badge>
-                    </ItemMedia>
-                    <ItemContent>
-                      <ItemTitle>{item.category}</ItemTitle>
-                    </ItemContent>
-                    <ItemActions>
-                      <p className="leading-7 [&:not(:first-child)]:mt-6">
-                        ${item.value}
-                      </p>
-                    </ItemActions>
-                  </a>
-                }
-              />
-            ))}
-          </div>
-        </TabsContent>
+        <TabsContent value="income">{renderTransactionsSummary()}</TabsContent>
+        <TabsContent value="expense">{renderTransactionsSummary()}</TabsContent>
       </Tabs>
     </div>
   );

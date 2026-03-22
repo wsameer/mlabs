@@ -1,15 +1,23 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
 
-const app = new Hono()
+import health from "./routes/health.js";
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const app = new Hono();
 
-serve({
-  fetch: app.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+// API Routes (must come before static file serving)
+
+app.get("/", (c) => {
+  return c.text("Hello Hono!");
+});
+app.route("/api/health", health);
+
+serve(
+  {
+    fetch: app.fetch,
+    port: 3000,
+  },
+  (info) => {
+    console.log(`Server is running on http://localhost:${info.port}`);
+  }
+);
