@@ -12,6 +12,7 @@ import { AppHeader, AppSidebar } from "@/features/layout";
 import { SearchDialog } from "@/features/SearchDialog";
 import { CreateAccountDialog } from "@/features/create-account";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { AddTransactionPopover } from "@/features/add-transaction";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -55,13 +56,14 @@ function RootComponent() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-4">
           <Outlet />
+          <AppBottombar />
+          <SearchDialog />
+          <AddTransactionPopover />
+          <CreateAccountDialog />
         </div>
       </SidebarInset>
-      <AppBottombar />
-      <SearchDialog />
-      <CreateAccountDialog />
     </SidebarProvider>
   );
 }

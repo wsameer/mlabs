@@ -1,6 +1,5 @@
+import { BanknoteArrowUpIcon } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { TRANSACTIONS_ROUTE } from "@/constants";
-import { useLayoutConfig } from "@/features/layout";
 import {
   Empty,
   EmptyContent,
@@ -10,12 +9,17 @@ import {
   EmptyTitle,
 } from "@workspace/ui/components/empty";
 import { Button } from "@workspace/ui/components/button";
-import { BanknoteArrowUpIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+
+import { useLayoutConfig } from "@/features/layout";
+import { TRANSACTIONS_ROUTE } from "@/constants";
+import { cn } from "@workspace/ui/lib/utils";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
+import { TimeGrainSelect } from "@/features/TimeGrainSelect";
 
 export const Route = createFileRoute(TRANSACTIONS_ROUTE)({
   component: RouteComponent,
@@ -52,11 +56,18 @@ function EmptyTransactions() {
 function RouteComponent() {
   useLayoutConfig({
     pageTitle: "Transactions",
+    actions: <TimeGrainSelect />,
   });
 
+  const isEmpty = false;
+
   return (
-    <div className="mx-auto my-auto">
-      <EmptyTransactions />
+    <div
+      className={cn("", {
+        "mx-auto my-auto": isEmpty,
+      })}
+    >
+      {isEmpty ? <EmptyTransactions /> : <DateRangeFilter />}
     </div>
   );
 }

@@ -28,6 +28,9 @@ const testData = [
   { id: 3, category: "Food & Dining", weight: "10%", value: 710 },
   { id: 4, category: "Travel", weight: "10%", value: 710 },
   { id: 5, category: "Utilities", weight: "5%", value: 320 },
+  { id: 6, category: "Salary", weight: "25%", value: 8220 },
+  { id: 7, category: "Salary", weight: "25%", value: 8220 },
+  { id: 8, category: "Salary", weight: "25%", value: 8220 },
 ];
 
 function RouteComponent() {

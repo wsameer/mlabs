@@ -20,14 +20,6 @@ import {
   FieldLabel,
 } from "@workspace/ui/components/field";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -76,7 +68,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
     <form
       id="account-creation-form"
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 p-0"
+      className="flex flex-col gap-4 px-4 pb-4"
     >
       <FieldGroup>
         {/* Account Name */}
@@ -130,27 +122,17 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
         <Controller
           name="type"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
+          render={({ field }) => (
+            <Field>
               <FieldLabel htmlFor="account-creation-form-type">
                 Account type
               </FieldLabel>
-              {/* Pass raw lowercase value — match SelectItem values exactly */}
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent alignItemWithTrigger>
-                  <SelectGroup>
-                    {ACCOUNT_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>
-                        {t.charAt(0).toUpperCase() + t.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              <Input
+                id="account-creation-form-type"
+                type="text"
+                value={field.value}
+                disabled
+              />
             </Field>
           )}
         />

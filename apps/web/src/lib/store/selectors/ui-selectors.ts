@@ -6,3 +6,5 @@ export const globalSearchSelector = (state: AppStoreState) =>
   state.globalSearch;
 export const openCreateAccountSelector = (state: AppStoreState) =>
   state.openCreateAccount;
+export const openCreateTransactionSelector = (state: AppStoreState) =>
+  state.openCreateTransaction;

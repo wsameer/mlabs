@@ -28,7 +28,11 @@ export const NavItem = ({ icon, isActive, label, onClick }: Props) => {
           isActive ? "opacity-100" : "opacity-0"
         }`}
       />
-      <span className={`relative ${isActive ? "text-foreground" : ""}`}>
+      <span
+        className={cn("relative", {
+          "text-foreground": isActive,
+        })}
+      >
         {icon}
       </span>
       <span className="sr-only">{label}</span>

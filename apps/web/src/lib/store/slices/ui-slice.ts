@@ -6,11 +6,13 @@ export type UiSlice = {
   globalLoading: boolean;
   globalSearch: boolean;
   openCreateAccount: boolean;
+  openCreateTransaction: boolean;
 
   // Actions
   setGlobalLoading: (loading: boolean) => void;
   setGlobalSearch: (searchVisible: boolean) => void;
   setOpenCreateAccount: (open: boolean) => void;
+  setOpenCreateTransaction: (open: boolean) => void;
 };
 
 export const createUiSlice: StateCreator<
@@ -22,6 +24,7 @@ export const createUiSlice: StateCreator<
   globalLoading: false,
   globalSearch: false,
   openCreateAccount: false,
+  openCreateTransaction: false,
 
   setGlobalLoading: (loading) =>
     set((state) => {
@@ -36,5 +39,10 @@ export const createUiSlice: StateCreator<
   setOpenCreateAccount: (open) =>
     set((state) => {
       state.openCreateAccount = open;
+    }),
+
+  setOpenCreateTransaction: (open) =>
+    set((state) => {
+      state.openCreateTransaction = open;
     }),
 });

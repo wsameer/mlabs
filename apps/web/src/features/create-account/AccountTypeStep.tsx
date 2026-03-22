@@ -14,6 +14,7 @@ import {
   UploadIcon,
 } from "lucide-react";
 import type { AccountType } from "./types";
+import React from "react";
 
 const ACCOUNT_TYPES: {
   type: AccountType;
@@ -51,7 +52,7 @@ const ACCOUNT_TYPES: {
     label: "Other",
     icon: <CircleDollarSign className="size-4" />,
   },
-];
+] as const;
 
 export function AccountTypeStep({
   onSelect,
@@ -59,16 +60,17 @@ export function AccountTypeStep({
   onSelect: (type: AccountType) => void;
 }) {
   return (
-    <div className="flex flex-col gap-1 pb-2">
+    <div className="flex flex-col pb-6">
       {ACCOUNT_TYPES.map((account) => (
         <Item
           key={account.type}
           role="listitem"
           size="xs"
+          className="rounded-none"
           render={
             <button
               onClick={() => onSelect(account.type)}
-              className="hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50"
+              className="px-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50"
             >
               <ItemMedia variant="icon">{account.icon}</ItemMedia>
               <ItemContent>
@@ -80,8 +82,9 @@ export function AccountTypeStep({
       ))}
       <Item
         size="xs"
+        className="rounded-none"
         render={
-          <a href="#">
+          <a href="#" className="px-4">
             <ItemMedia variant="icon">
               <UploadIcon className="size-4" />
             </ItemMedia>
