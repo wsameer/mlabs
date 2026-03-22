@@ -4,7 +4,7 @@ import {
   globalLoadingSelector,
   globalSearchSelector,
   openCreateAccountSelector,
-} from "@/lib/store/selectors/ui.selectors";
+} from "@/lib/store/selectors/ui-selectors";
 
 export const useGlobalLoading = () => useAppStore(globalLoadingSelector);
 export const useGlobalSearch = () => useAppStore(globalSearchSelector);

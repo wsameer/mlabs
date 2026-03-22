@@ -1,7 +1,7 @@
 import { DASHBOARD_ROUTE } from "@/constants";
 import { CashflowPieChart } from "@/features/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
-import { TimeGrainSelect } from "@/components/TimeGrainSelect";
+import { TimeGrainSelect } from "@/features/TimeGrainSelect";
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@workspace/ui/components/tabs";
 import { CategoryStatList } from "@/features/CategoryStatList";
 import { DateRangeFilter } from "@/features/DateRangeFilter";
-import { useFilters } from "@/hooks/use-filters";
 
 export const Route = createFileRoute(DASHBOARD_ROUTE)({
   component: RouteComponent,
@@ -32,16 +31,9 @@ const testData = [
 ];
 
 function RouteComponent() {
-  const { timeGrain } = useFilters();
-
   useLayoutConfig({
     pageTitle: "Dashboard",
-    actions: (
-      <TimeGrainSelect
-        value={timeGrain}
-        onValueChange={(v) => console.log(v)}
-      />
-    ),
+    actions: <TimeGrainSelect />,
   });
 
   const renderTransactionsSummary = () => (
