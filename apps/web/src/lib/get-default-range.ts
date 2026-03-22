@@ -1,7 +1,6 @@
+import { ALL_DATA_START } from "@/constants";
 import type { DateRange, TimeGrain } from "@workspace/types";
 import { startOfDay, startOfWeek, startOfMonth, startOfYear } from "date-fns";
-
-const ALL_DATA_START = new Date("01-04-2022");
 
 export function getDefaultRange(grain: TimeGrain): DateRange {
   const now = new Date();

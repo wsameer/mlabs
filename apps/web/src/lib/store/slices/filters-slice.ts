@@ -2,9 +2,9 @@ import type { StateCreator } from "zustand";
 
 import { getDefaultRange } from "@/lib/get-default-range";
 import type { AppStoreState } from "@/lib/store/store";
-import type { DateRange, TimeGrain } from "@workspace/types";
-
-const DEFAULT_GRAIN: TimeGrain = "monthly";
+import type { DateNavDirections, DateRange, TimeGrain } from "@workspace/types";
+import { navigateDateRange } from "@/lib/date-navigation";
+import { DEFAULT_GRAIN } from "@/constants";
 
 export type FiltersSlice = {
   // State
@@ -14,6 +14,7 @@ export type FiltersSlice = {
   // Actions
   setTimeGrain: (grain: TimeGrain) => void;
   setDateRange: (range: DateRange) => void;
+  navigate: (direction: DateNavDirections) => void;
 };
 
 export const createFiltersSlice: StateCreator<
@@ -32,4 +33,15 @@ export const createFiltersSlice: StateCreator<
     }),
 
   setDateRange: (range) => set((state) => (state.dateRange = range)),
+
+  navigate: (direction) =>
+    set((state) => {
+      const next = navigateDateRange({
+        current: { from: state.dateRange.from, to: state.dateRange.to },
+        grain: state.timeGrain,
+        direction,
+      });
+      state.dateRange.from = next.from;
+      state.dateRange.to = next.to;
+    }),
 });

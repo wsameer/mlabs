@@ -11,7 +11,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { CategoryStatList } from "@/features/CategoryStatList";
-import { DateRangeFilter } from "@/features/DateRangeFilter";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 
 export const Route = createFileRoute(DASHBOARD_ROUTE)({
   component: RouteComponent,

@@ -14,5 +14,6 @@ export const useFiltersActions = () =>
     useShallow((state) => ({
       setTimeGrain: state.setTimeGrain,
       setDateRange: state.setDateRange,
+      navigate: state.navigate,
     }))
   );

@@ -3,6 +3,9 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
+import { DEFAULT_GRAIN } from "@/constants";
+
+import { getDefaultRange } from "../get-default-range";
 import { createFiltersSlice, type FiltersSlice } from "./slices/filters-slice";
 import { createLayoutSlice, type LayoutSlice } from "./slices/layout-slice";
 import { createUiSlice, type UiSlice } from "./slices/ui-slice";
@@ -29,10 +32,7 @@ export const useAppStore = create<AppStoreState>()(
         merge: (persisted: any, current) => ({
           ...current,
           ...persisted,
-          dateRange: {
-            from: new Date(persisted.dateRange.from),
-            to: new Date(persisted.dateRange.to),
-          },
+          dateRange: getDefaultRange(persisted.timeGrain ?? DEFAULT_GRAIN),
         }),
       }
     ),
