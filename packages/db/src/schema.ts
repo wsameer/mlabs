@@ -11,9 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
-// ============================================================================
 // Enums
-// ============================================================================
 
 export const categoryTypeEnum = pgEnum("category_type", ["INCOME", "EXPENSE"]);
 
@@ -25,9 +23,7 @@ export const dateFormatEnum = pgEnum("date_format", [
   "YYYY-MM-DD",
 ]);
 
-// ============================================================================
 // Profiles Table (UI: "Space")
-// ============================================================================
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -68,7 +64,11 @@ export const accountTypeEnum = pgEnum("account_type", [
   "NON_REGISTERED",
 ]);
 
-export const transactionTypeEnum = pgEnum("transaction_type", ["INCOME", "EXPENSE", "TRANSFER"]);
+export const transactionTypeEnum = pgEnum("transaction_type", [
+  "INCOME",
+  "EXPENSE",
+  "TRANSFER",
+]);
 
 export const budgetPeriodEnum = pgEnum("budget_period", [
   "MONTHLY",
@@ -77,9 +77,7 @@ export const budgetPeriodEnum = pgEnum("budget_period", [
   "CUSTOM",
 ]);
 
-// ============================================================================
 // Categories Table
-// ============================================================================
 
 export const categories = pgTable("categories", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -113,9 +111,7 @@ export const categoriesRelations = relations(categories, ({ one, many }) => ({
   transactions: many(transactions),
 }));
 
-// ============================================================================
 // Accounts Table
-// ============================================================================
 
 export const accounts = pgTable("accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -124,7 +120,9 @@ export const accounts = pgTable("accounts", {
     .references(() => profiles.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 100 }).notNull(),
   type: accountTypeEnum("type").notNull(),
-  balance: numeric("balance", { precision: 15, scale: 2 }).notNull().default("0"),
+  balance: numeric("balance", { precision: 15, scale: 2 })
+    .notNull()
+    .default("0"),
   currency: varchar("currency", { length: 3 }).notNull().default("CAD"),
   color: varchar("color", { length: 7 }),
   icon: varchar("icon", { length: 50 }),
@@ -158,9 +156,7 @@ export const accountsRelations = relations(accounts, ({ one, many }) => ({
   }),
 }));
 
-// ============================================================================
 // Transactions Table
-// ============================================================================
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -213,9 +209,7 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   }),
 }));
 
-// ============================================================================
 // Budgets Table
-// ============================================================================
 
 export const budgets = pgTable("budgets", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -245,9 +239,7 @@ export const budgetsRelations = relations(budgets, ({ one }) => ({
   }),
 }));
 
-// ============================================================================
 // Type exports for convenience
-// ============================================================================
 
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = typeof profiles.$inferInsert;
