@@ -58,11 +58,11 @@ function RootComponent() {
         <AppHeader />
         <div className="flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-4">
           <Outlet />
-          <AppBottombar />
-          <SearchDialog />
-          <AddTransactionPopover />
-          <CreateAccountDialog />
         </div>
+        <AppBottombar />
+        <SearchDialog />
+        <AddTransactionPopover />
+        <CreateAccountDialog />
       </SidebarInset>
     </SidebarProvider>
   );

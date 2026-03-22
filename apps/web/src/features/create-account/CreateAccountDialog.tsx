@@ -57,8 +57,8 @@ export function CreateAccountDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[425px] p-0">
-        <DialogHeader className="pt-4 px-4">
+      <DialogContent className="p-0 sm:max-w-[425px]">
+        <DialogHeader className="px-4 pt-4">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>

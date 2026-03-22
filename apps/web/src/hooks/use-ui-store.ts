@@ -5,6 +5,8 @@ import {
   globalSearchSelector,
   openCreateAccountSelector,
   openCreateTransactionSelector,
+  transactionDateSelector,
+  transactionTypeSelector,
 } from "@/lib/store/selectors/ui-selectors";
 
 export const useGlobalLoading = () => useAppStore(globalLoadingSelector);
@@ -13,6 +15,8 @@ export const useOpenCreateAccount = () =>
   useAppStore(openCreateAccountSelector);
 export const useOpenCreateTransaction = () =>
   useAppStore(openCreateTransactionSelector);
+export const useTransactionDate = () => useAppStore(transactionDateSelector);
+export const useTransactionType = () => useAppStore(transactionTypeSelector);
 
 // Include actions too — actions don't need selectors since they're stable references
 export const useUiActions = () =>
@@ -22,5 +26,7 @@ export const useUiActions = () =>
       setGlobalSearch: state.setGlobalSearch,
       setOpenCreateAccount: state.setOpenCreateAccount,
       setOpenCreateTransaction: state.setOpenCreateTransaction,
+      setTransactionDate: state.setTransactionDate,
+      setTransactionType: state.setTransactionType,
     }))
   );

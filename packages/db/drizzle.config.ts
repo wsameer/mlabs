@@ -1,7 +1,9 @@
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required. Run via pnpm db:* scripts which load .env automatically.");
+  throw new Error(
+    "DATABASE_URL environment variable is required. Run via pnpm db:* scripts which load .env automatically."
+  );
 }
 
 export default defineConfig({

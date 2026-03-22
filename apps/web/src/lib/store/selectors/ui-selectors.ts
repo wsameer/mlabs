@@ -8,3 +8,7 @@ export const openCreateAccountSelector = (state: AppStoreState) =>
   state.openCreateAccount;
 export const openCreateTransactionSelector = (state: AppStoreState) =>
   state.openCreateTransaction;
+export const transactionDateSelector = (state: AppStoreState) =>
+  state.transactionDate;
+export const transactionTypeSelector = (state: AppStoreState) =>
+  state.transactionType;

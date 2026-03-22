@@ -27,6 +27,7 @@ export const useAppStore = create<AppStoreState>()(
         partialize: (state) => ({
           timeGrain: state.timeGrain,
           dateRange: state.dateRange,
+          transactionType: state.transactionType,
         }),
         // Revive Date strings back to Date objects
         merge: (persisted: any, current) => ({

@@ -1,83 +1,9 @@
 import z from "zod";
-
-// ============================================================================
-// Enums
-// ============================================================================
-
-export const CategoryTypeEnum = z.enum(["INCOME", "EXPENSE"]);
-
-export const CurrencyEnum = z.enum(["USD", "CAD", "GBP"]);
-export type Currency = z.infer<typeof CurrencyEnum>;
-
-export const DateFormatEnum = z.enum(["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]);
-export type DateFormat = z.infer<typeof DateFormatEnum>;
-
-// ============================================================================
-// Profile Schemas (UI: "Space")
-// ============================================================================
-
-export const ProfileSchema = z.object({
-  id: z.string().uuid(),
-  // Identity
-  firstName: z.string().max(50).nullable(),
-  lastName: z.string().max(50).nullable(),
-  name: z.string().min(1).max(100), // Space name
-  icon: z.string().max(10).nullable(),
-  description: z.string().max(500).nullable(),
-  // Preferences
-  currency: CurrencyEnum.default("CAD"),
-  dateFormat: DateFormatEnum.default("MM/DD/YYYY"),
-  aiAssistantEnabled: z.boolean().default(false),
-  // Status
-  isDefault: z.boolean().default(false),
-  isSetupComplete: z.boolean().default(false),
-  isActive: z.boolean().default(true),
-  // Timestamps
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const InsertProfileSchema = ProfileSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-}).partial({
-  firstName: true,
-  lastName: true,
-  icon: true,
-  description: true,
-  currency: true,
-  dateFormat: true,
-  aiAssistantEnabled: true,
-  isDefault: true,
-  isSetupComplete: true,
-  isActive: true,
-});
-
-export const UpdateProfileSchema = InsertProfileSchema.partial();
-
-export type Profile = z.infer<typeof ProfileSchema>;
-export type InsertProfile = z.infer<typeof InsertProfileSchema>;
-export type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
-export type CategoryType = z.infer<typeof CategoryTypeEnum>;
-
-export const AccountTypeEnum = z.enum([
-  "CHEQUING",
-  "SAVINGS",
-  "CREDIT_CARD",
-  "RRSP",
-  "FHSA",
-  "RESP",
-  "TFSA",
-  "NON_REGISTERED",
-]);
-export type AccountType = z.infer<typeof AccountTypeEnum>;
-
-export const TransactionTypeEnum = z.enum(["INCOME", "EXPENSE", "TRANSFER"]);
-export type TransactionType = z.infer<typeof TransactionTypeEnum>;
-
-export const BudgetPeriodEnum = z.enum(["MONTHLY", "QUARTERLY", "YEARLY", "CUSTOM"]);
-export type BudgetPeriod = z.infer<typeof BudgetPeriodEnum>;
+import {
+  AccountTypeEnum,
+  CategoryTypeEnum,
+  TransactionTypeSchema,
+} from "./app.js";
 
 // ============================================================================
 // Category Schemas
@@ -177,7 +103,7 @@ export const TransactionSchema = z.object({
   profileId: z.string().uuid(),
   accountId: z.string().uuid(),
   categoryId: z.string().uuid().nullable(),
-  type: TransactionTypeEnum,
+  type: TransactionTypeSchema,
   amount: z.number(),
   description: z.string().min(1).max(200),
   notes: z.string().max(1000).nullable(),
@@ -231,7 +157,7 @@ export const AccountQuerySchema = z.object({
 export const TransactionQuerySchema = z.object({
   accountId: z.string().uuid().optional(),
   categoryId: z.string().uuid().optional(),
-  type: TransactionTypeEnum.optional(),
+  type: TransactionTypeSchema.optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   minAmount: z.number().optional(),
@@ -244,45 +170,3 @@ export const TransactionQuerySchema = z.object({
 export type CategoryQuery = z.infer<typeof CategoryQuerySchema>;
 export type AccountQuery = z.infer<typeof AccountQuerySchema>;
 export type TransactionQuery = z.infer<typeof TransactionQuerySchema>;
-
-// ============================================================================
-// Budget Schemas
-// ============================================================================
-
-export const BudgetSchema = z.object({
-  id: z.string().uuid(),
-  profileId: z.string().uuid(),
-  categoryId: z.string().uuid(),
-  amount: z.number(),
-  period: BudgetPeriodEnum,
-  startDate: z.date(),
-  endDate: z.date().nullable(),
-  isActive: z.boolean().default(true),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-// Note: profileId is injected by middleware from X-Profile-Id header
-export const InsertBudgetSchema = BudgetSchema.omit({
-  id: true,
-  profileId: true,
-  createdAt: true,
-  updatedAt: true,
-}).partial({
-  endDate: true,
-  isActive: true,
-});
-
-export const UpdateBudgetSchema = InsertBudgetSchema.partial();
-
-export type Budget = z.infer<typeof BudgetSchema>;
-export type InsertBudget = z.infer<typeof InsertBudgetSchema>;
-export type UpdateBudget = z.infer<typeof UpdateBudgetSchema>;
-
-export const BudgetQuerySchema = z.object({
-  categoryId: z.string().uuid().optional(),
-  period: BudgetPeriodEnum.optional(),
-  isActive: z.boolean().optional(),
-});
-
-export type BudgetQuery = z.infer<typeof BudgetQuerySchema>;

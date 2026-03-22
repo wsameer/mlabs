@@ -22,7 +22,9 @@ async function getTableCounts(db: ReturnType<typeof getDatabase>) {
   const counts: Record<string, number> = {};
 
   for (const { name, table } of TABLES) {
-    const result = await db.select({ count: sql<number>`count(*)` }).from(table);
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(table);
     counts[name] = Number(result[0]?.count ?? 0);
   }
 
@@ -73,7 +75,9 @@ async function execute() {
     process.exit(0);
   }
 
-  console.log(`Found ${totalBefore} total rows across ${TABLES.length} tables\n`);
+  console.log(
+    `Found ${totalBefore} total rows across ${TABLES.length} tables\n`
+  );
 
   // Use TRUNCATE CASCADE for efficiency and to handle foreign keys
   console.log("Truncating tables...");
@@ -81,7 +85,9 @@ async function execute() {
   try {
     // Truncate all tables in one statement with CASCADE
     const tableNames = TABLES.map((t) => t.name).join(", ");
-    await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`));
+    await db.execute(
+      sql.raw(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`)
+    );
 
     console.log("✅ All tables truncated\n");
 

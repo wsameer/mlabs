@@ -1,4 +1,10 @@
-import { getDatabase, categories, accounts, transactions, profiles } from "./index.js";
+import {
+  getDatabase,
+  categories,
+  accounts,
+  transactions,
+  profiles,
+} from "./index.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -46,11 +52,46 @@ async function seed() {
     const incomeCategories = await db
       .insert(categories)
       .values([
-        { profileId, name: "Salary", type: "INCOME", color: "#10b981", icon: "💼", sortOrder: 1 },
-        { profileId, name: "Freelance", type: "INCOME", color: "#3b82f6", icon: "💻", sortOrder: 2 },
-        { profileId, name: "Investment", type: "INCOME", color: "#8b5cf6", icon: "📈", sortOrder: 3 },
-        { profileId, name: "Gift", type: "INCOME", color: "#ec4899", icon: "🎁", sortOrder: 4 },
-        { profileId, name: "Other Income", type: "INCOME", color: "#6366f1", icon: "💰", sortOrder: 5 },
+        {
+          profileId,
+          name: "Salary",
+          type: "INCOME",
+          color: "#10b981",
+          icon: "💼",
+          sortOrder: 1,
+        },
+        {
+          profileId,
+          name: "Freelance",
+          type: "INCOME",
+          color: "#3b82f6",
+          icon: "💻",
+          sortOrder: 2,
+        },
+        {
+          profileId,
+          name: "Investment",
+          type: "INCOME",
+          color: "#8b5cf6",
+          icon: "📈",
+          sortOrder: 3,
+        },
+        {
+          profileId,
+          name: "Gift",
+          type: "INCOME",
+          color: "#ec4899",
+          icon: "🎁",
+          sortOrder: 4,
+        },
+        {
+          profileId,
+          name: "Other Income",
+          type: "INCOME",
+          color: "#6366f1",
+          icon: "💰",
+          sortOrder: 5,
+        },
       ])
       .returning();
 
@@ -64,16 +105,86 @@ async function seed() {
     const expenseCategories = await db
       .insert(categories)
       .values([
-        { profileId, name: "Housing", type: "EXPENSE", color: "#ef4444", icon: "🏠", sortOrder: 1 },
-        { profileId, name: "Transportation", type: "EXPENSE", color: "#f97316", icon: "🚗", sortOrder: 2 },
-        { profileId, name: "Food & Dining", type: "EXPENSE", color: "#84cc16", icon: "🍽️", sortOrder: 3 },
-        { profileId, name: "Utilities", type: "EXPENSE", color: "#06b6d4", icon: "⚡", sortOrder: 4 },
-        { profileId, name: "Healthcare", type: "EXPENSE", color: "#ef4444", icon: "🏥", sortOrder: 5 },
-        { profileId, name: "Entertainment", type: "EXPENSE", color: "#ec4899", icon: "🎬", sortOrder: 6 },
-        { profileId, name: "Shopping", type: "EXPENSE", color: "#a855f7", icon: "🛍️", sortOrder: 7 },
-        { profileId, name: "Subscriptions", type: "EXPENSE", color: "#3b82f6", icon: "📱", sortOrder: 8 },
-        { profileId, name: "Personal Care", type: "EXPENSE", color: "#8b5cf6", icon: "💆", sortOrder: 9 },
-        { profileId, name: "Other Expense", type: "EXPENSE", color: "#64748b", icon: "📦", sortOrder: 10 },
+        {
+          profileId,
+          name: "Housing",
+          type: "EXPENSE",
+          color: "#ef4444",
+          icon: "🏠",
+          sortOrder: 1,
+        },
+        {
+          profileId,
+          name: "Transportation",
+          type: "EXPENSE",
+          color: "#f97316",
+          icon: "🚗",
+          sortOrder: 2,
+        },
+        {
+          profileId,
+          name: "Food & Dining",
+          type: "EXPENSE",
+          color: "#84cc16",
+          icon: "🍽️",
+          sortOrder: 3,
+        },
+        {
+          profileId,
+          name: "Utilities",
+          type: "EXPENSE",
+          color: "#06b6d4",
+          icon: "⚡",
+          sortOrder: 4,
+        },
+        {
+          profileId,
+          name: "Healthcare",
+          type: "EXPENSE",
+          color: "#ef4444",
+          icon: "🏥",
+          sortOrder: 5,
+        },
+        {
+          profileId,
+          name: "Entertainment",
+          type: "EXPENSE",
+          color: "#ec4899",
+          icon: "🎬",
+          sortOrder: 6,
+        },
+        {
+          profileId,
+          name: "Shopping",
+          type: "EXPENSE",
+          color: "#a855f7",
+          icon: "🛍️",
+          sortOrder: 7,
+        },
+        {
+          profileId,
+          name: "Subscriptions",
+          type: "EXPENSE",
+          color: "#3b82f6",
+          icon: "📱",
+          sortOrder: 8,
+        },
+        {
+          profileId,
+          name: "Personal Care",
+          type: "EXPENSE",
+          color: "#8b5cf6",
+          icon: "💆",
+          sortOrder: 9,
+        },
+        {
+          profileId,
+          name: "Other Expense",
+          type: "EXPENSE",
+          color: "#64748b",
+          icon: "📦",
+          sortOrder: 10,
+        },
       ])
       .returning();
 
@@ -175,11 +286,17 @@ async function seed() {
 
     const salary = incomeCategories.find((c) => c.name === "Salary")!;
     const food = expenseCategories.find((c) => c.name === "Food & Dining")!;
-    const transport = expenseCategories.find((c) => c.name === "Transportation")!;
+    const transport = expenseCategories.find(
+      (c) => c.name === "Transportation"
+    )!;
     const utilities = expenseCategories.find((c) => c.name === "Utilities")!;
-    const entertainment = expenseCategories.find((c) => c.name === "Entertainment")!;
+    const entertainment = expenseCategories.find(
+      (c) => c.name === "Entertainment"
+    )!;
     const shopping = expenseCategories.find((c) => c.name === "Shopping")!;
-    const subscriptions = expenseCategories.find((c) => c.name === "Subscriptions")!;
+    const subscriptions = expenseCategories.find(
+      (c) => c.name === "Subscriptions"
+    )!;
 
     // Generate dates for the last 30 days
     const today = new Date();
