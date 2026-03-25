@@ -20,16 +20,59 @@ import { TRANSACTIONS_ROUTE } from "@/constants";
 import { cn } from "@workspace/ui/lib/utils";
 import { DateRangeFilter } from "@/components/DateRangeFilter";
 import { TimeGrainSelect } from "@/features/TimeGrainSelect";
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import React from "react";
 import { TransactionItem } from "@/features/add-transaction/components/TransactionItem";
 import { Separator } from "@workspace/ui/components/separator";
-import { ItemGroup } from "@workspace/ui/components/item";
+import type { TransactionItemProps } from "@/features/add-transaction/types";
 
 export const Route = createFileRoute(TRANSACTIONS_ROUTE)({
   component: RouteComponent,
 });
+
+const DEMO_TRANSACTIONS: TransactionItemProps[] = [
+  {
+    id: 1,
+    category: "Utilities",
+    categorySub: "Heat & Hydro",
+    merchant: "Metergy Solutions",
+    merchantSub: "TD Chequing Bank",
+    txDate: "Today",
+    amount: "$600.00",
+    sign: "debit",
+  },
+  {
+    id: 2,
+    category: "Groceries",
+    categorySub: "Food & Drink",
+    merchant: "Whole Foods Market",
+    merchantSub: "Visa Infinite",
+    txDate: "Yesterday",
+    amount: "$143.72",
+    sign: "debit",
+  },
+  {
+    id: 3,
+    category: "Income",
+    categorySub: "Direct Deposit",
+    merchant: "Payroll — Acme Corp Ltd.",
+    merchantSub: "TD Chequing Bank",
+    txDate: "Mar 21",
+    amount: "+$4,200.00",
+    sign: "credit",
+  },
+  {
+    category: "Subscriptions",
+    id: 4,
+    categorySub: "Software & Services",
+    merchant: "Adobe Creative Cloud Annual Plan",
+    merchantSub: "Mastercard",
+    txDate: "Mar 20",
+    amount: "$69.99",
+    sign: "debit",
+  },
+];
 
 function EmptyTransactions() {
   return (
@@ -59,17 +102,13 @@ function EmptyTransactions() {
   );
 }
 
-const tags = Array.from({ length: 10 }).map(
-  (_, i, a) => `v1.2.0-beta.${a.length - i}`
-);
-
 function RouteComponent() {
   useLayoutConfig({
     pageTitle: "Transactions",
     actions: <TimeGrainSelect />,
   });
 
-  const isEmpty = false;
+  const isEmpty = DEMO_TRANSACTIONS.length === 0;
 
   return (
     <div
@@ -83,28 +122,28 @@ function RouteComponent() {
         <div className="flex flex-col gap-3">
           <DateRangeFilter />
           <Card className="p-2">
-            <CardHeader className="p-0">
-              <div className="grid grid-cols-3 items-center justify-items-center-safe">
-                <div className="w-full text-center">
-                  <p className="mb-2 text-xs text-muted-foreground">Income</p>
-                  <p className="font-mono text-sm leading-none font-medium">
-                    $1000
-                  </p>
+            <CardContent>
+              <div className="grid w-full grid-cols-3 divide-x divide-border/60">
+                <div className="px-2 text-center">
+                  <div className="text-[0.65rem] text-muted-foreground uppercase">
+                    Income
+                  </div>
+                  <div className="text-sm font-medium tabular-nums">{1224}</div>
                 </div>
-                <div className="w-full border-x text-center">
-                  <p className="mb-2 text-xs text-muted-foreground">Expenses</p>
-                  <p className="font-mono text-sm leading-none font-medium">
-                    $1000
-                  </p>
+                <div className="px-2 text-center">
+                  <div className="text-[0.65rem] text-muted-foreground uppercase">
+                    Expense
+                  </div>
+                  <div className="text-sm font-medium tabular-nums">{869}</div>
                 </div>
-                <div className="w-full text-center">
-                  <p className="mb-2 text-xs text-muted-foreground">Total</p>
-                  <p className="font-mono text-sm leading-none font-medium">
-                    $1000
-                  </p>
+                <div className="px-2 text-center">
+                  <div className="text-[0.65rem] text-muted-foreground uppercase">
+                    Total
+                  </div>
+                  <div className="text-sm font-medium tabular-nums">$1000</div>
                 </div>
               </div>
-            </CardHeader>
+            </CardContent>
           </Card>
 
           <Card className="p-0">
@@ -115,9 +154,9 @@ function RouteComponent() {
                     <h4 className="text-sm font-semibold">Order #4189</h4>
                   </div>
                   <div>
-                    {tags.map((tag) => (
-                      <React.Fragment key={tag}>
-                        <TransactionItem tag={tag} />
+                    {DEMO_TRANSACTIONS.map((tx, i) => (
+                      <React.Fragment key={tx.id}>
+                        <TransactionItem key={i} {...tx} />
                         <Separator className="m-0" />
                       </React.Fragment>
                     ))}
@@ -128,9 +167,9 @@ function RouteComponent() {
                     <h4 className="text-sm font-semibold">Order #4189</h4>
                   </div>
                   <div>
-                    {tags.map((tag) => (
-                      <React.Fragment key={tag}>
-                        <TransactionItem tag={tag} />
+                    {DEMO_TRANSACTIONS.map((tx, i) => (
+                      <React.Fragment key={tx.id}>
+                        <TransactionItem key={i} {...tx} />
                         <Separator className="m-0" />
                       </React.Fragment>
                     ))}
@@ -141,9 +180,9 @@ function RouteComponent() {
                     <h4 className="text-sm font-semibold">Order #4189</h4>
                   </div>
                   <div>
-                    {tags.map((tag) => (
-                      <React.Fragment key={tag}>
-                        <TransactionItem tag={tag} />
+                    {DEMO_TRANSACTIONS.map((tx, i) => (
+                      <React.Fragment key={tx.id}>
+                        <TransactionItem key={i} {...tx} />
                         <Separator className="m-0" />
                       </React.Fragment>
                     ))}
