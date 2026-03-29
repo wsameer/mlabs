@@ -31,7 +31,7 @@ export const DateRangeFilter = () => {
       >
         <ChevronLeftIcon />
       </Button>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm">
         {getDisplayLabel(timeGrain, { from, to })}
       </p>
       <Button

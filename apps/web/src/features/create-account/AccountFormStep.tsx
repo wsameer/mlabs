@@ -129,6 +129,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
               </FieldLabel>
               <Input
                 id="account-creation-form-type"
+                className="capitalize"
                 type="text"
                 value={field.value}
                 disabled
@@ -223,11 +224,11 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
       </FieldGroup>
 
       <div className="flex flex-col gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
-        </Button>
         <Button type="submit" className="w-full">
           Create account
+        </Button>
+        <Button type="button" variant="secondary" onClick={onBack}>
+          Back
         </Button>
       </div>
     </form>

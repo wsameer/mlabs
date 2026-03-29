@@ -26,6 +26,8 @@ import React from "react";
 import { TransactionItem } from "@/features/add-transaction/components/TransactionItem";
 import { Separator } from "@workspace/ui/components/separator";
 import type { TransactionItemProps } from "@/features/add-transaction/types";
+import { Item, ItemActions, ItemContent } from "@workspace/ui/components/item";
+import { Badge } from "@workspace/ui/components/badge";
 
 export const Route = createFileRoute(TRANSACTIONS_ROUTE)({
   component: RouteComponent,
@@ -151,9 +153,20 @@ function RouteComponent() {
             <CardContent className="p-0">
               <ScrollArea className="h-[70svh]">
                 <div>
-                  <div className="sticky top-0 flex h-12 items-center bg-primary px-4">
-                    <h4 className="text-sm font-semibold">Order #4189</h4>
-                  </div>
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                    <ItemContent className="flex flex-row items-center gap-1">
+                      <p className="text-base">24</p>
+                      <Badge variant="secondary">Thu</Badge>
+                    </ItemContent>
+                    <ItemActions>
+                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                        $0.00
+                      </small>
+                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                        $10.00
+                      </small>
+                    </ItemActions>
+                  </Item>
                   <div>
                     {DEMO_TRANSACTIONS.map((tx, i) => (
                       <React.Fragment key={tx.id}>
@@ -164,9 +177,20 @@ function RouteComponent() {
                   </div>
                 </div>
                 <div>
-                  <div className="sticky top-0 flex h-12 items-center bg-primary px-4">
-                    <h4 className="text-sm font-semibold">Order #4189</h4>
-                  </div>
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                    <ItemContent className="flex flex-row items-center gap-1">
+                      <p className="text-base">23</p>
+                      <Badge variant="secondary">Wed</Badge>
+                    </ItemContent>
+                    <ItemActions>
+                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                        $0.00
+                      </small>
+                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                        $10.00
+                      </small>
+                    </ItemActions>
+                  </Item>
                   <div>
                     {DEMO_TRANSACTIONS.map((tx, i) => (
                       <React.Fragment key={tx.id}>
@@ -177,9 +201,20 @@ function RouteComponent() {
                   </div>
                 </div>
                 <div>
-                  <div className="sticky top-0 flex h-12 items-center bg-primary px-4">
-                    <h4 className="text-sm font-semibold">Order #4189</h4>
-                  </div>
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                    <ItemContent className="flex flex-row items-center gap-1">
+                      <p className="text-base">22</p>
+                      <Badge variant="secondary">Tue</Badge>
+                    </ItemContent>
+                    <ItemActions>
+                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                        $0.00
+                      </small>
+                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                        $10.00
+                      </small>
+                    </ItemActions>
+                  </Item>
                   <div>
                     {DEMO_TRANSACTIONS.map((tx, i) => (
                       <React.Fragment key={tx.id}>

@@ -53,7 +53,7 @@ export function AppLeftSideNav({
             <SidebarMenuButton
               size="lg"
               className="md:h-8 md:p-0"
-              render={<a href="#" />}
+              render={<Link to="/" />}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <WalletMinimalIcon className="size-4" />
