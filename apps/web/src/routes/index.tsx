@@ -51,7 +51,7 @@ function RouteComponent() {
   );
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex w-full flex-col gap-3 lg:w-1/3">
       <DateRangeFilter />
       <Tabs defaultValue="expense" className="w-full">
         <TabsList className="w-full">

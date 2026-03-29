@@ -112,8 +112,9 @@ function RouteComponent() {
 
   return (
     <div
-      className={cn("", {
+      className={cn("flex w-full flex-col gap-3", {
         "mx-auto my-auto": isEmpty,
+        "lg:w-1/2": !isEmpty,
       })}
     >
       {isEmpty ? (

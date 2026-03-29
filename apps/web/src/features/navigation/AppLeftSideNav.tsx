@@ -1,8 +1,13 @@
+import { PlusIcon, WalletMinimalIcon } from "lucide-react";
+import React from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+
 import {
   PRIMARY_NAVIGATION_OPTIONS,
   SECONDARY_NAV_OPTIONS,
 } from "@/features/navigation/constants";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useUiActions } from "@/hooks/use-ui-store";
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,16 +20,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
-import { WalletMinimalIcon } from "lucide-react";
-import React from "react";
-
-const lastNavItem =
-  PRIMARY_NAVIGATION_OPTIONS[PRIMARY_NAVIGATION_OPTIONS.length - 1];
 
 export function AppLeftSideNav({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { setOpenMobile, isMobile } = useSidebar();
+  const { setOpenCreateTransaction } = useUiActions();
   const router = useRouterState();
 
   const currentPath = router.location.pathname;
@@ -73,7 +74,7 @@ export function AppLeftSideNav({
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     tooltip={{
-                      children: lastNavItem ? "Settings" : item.title,
+                      children: item.title,
                       hidden: false,
                     }}
                     render={
@@ -98,6 +99,21 @@ export function AppLeftSideNav({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenu className="gap-2">
+            <SidebarMenuItem className="mb-2">
+              <SidebarMenuButton
+                className="rounded-full bg-primary/80 px-2.5 hover:bg-primary active:bg-primary md:px-2"
+                variant="outline"
+                aria-label="Add transaction"
+                onClick={() => setOpenCreateTransaction(true)}
+                tooltip={{
+                  children: "Add new transaction",
+                  hidden: false,
+                }}
+              >
+                <PlusIcon />
+                <span>Add transaction</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             {SECONDARY_NAV_OPTIONS.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
