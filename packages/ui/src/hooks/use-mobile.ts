@@ -20,12 +20,6 @@ export function useIsMobile() {
   return !!isMobile;
 }
 
-// Get initial value synchronously to avoid hydration mismatch
-function getInitialIsMobile(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth < MOBILE_BREAKPOINT;
-}
-
 /**
  * Returns undefined during initial render (before hydration),
  * then the actual mobile state. Use this when you need to avoid

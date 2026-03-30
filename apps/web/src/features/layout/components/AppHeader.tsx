@@ -4,7 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import { useAppStore } from "@/lib/store";
+import { useAppStore } from "@/stores";
 import { useUiActions } from "@/hooks/use-ui-store";
 
 export const AppHeader = () => {

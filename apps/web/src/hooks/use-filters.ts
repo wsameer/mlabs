@@ -1,10 +1,10 @@
 import { useShallow } from "zustand/shallow";
 
-import { useAppStore } from "@/lib/store/store";
+import { useAppStore } from "@/stores/app-store";
 import {
   globalDateRangeSelector,
   globalTimeGrainSelector,
-} from "@/lib/store/selectors/filters-selectors";
+} from "@/stores/selectors/filters-selectors";
 
 export const useTimeGrain = () => useAppStore(globalTimeGrainSelector);
 export const useDateRange = () => useAppStore(globalDateRangeSelector);

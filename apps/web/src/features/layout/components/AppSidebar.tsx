@@ -9,7 +9,7 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { AppLeftSideNav } from "@/features/navigation";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { useAppStore } from "@/lib/store";
+import { useAppStore } from "@/stores";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const sidebarLeftContent = useAppStore((state) => state.sidebarLeftContent);
