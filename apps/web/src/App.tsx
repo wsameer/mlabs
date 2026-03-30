@@ -1,13 +1,16 @@
 import React from "react";
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "@tanstack/react-router";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { Toaster } from "@workspace/ui/components/sonner";
 
-import { ThemeProvider } from "@/features/theme-provider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalErrorBoundary } from "@/components/ErrorBoundary";
 import { router } from "@/lib/router";
-import { AppLoader } from "@/features/AppLoader";
+import { queryClient } from "@/lib/query-client";
+import { AppLoader } from "@/components/AppLoader";
 
 export function App() {
   return (
@@ -17,12 +20,15 @@ export function App() {
         storageKey="mlbas-ui-theme"
         disableTransitionOnChange
       >
-        <TooltipProvider>
-          <React.Suspense fallback={<AppLoader />}>
-            <RouterProvider router={router} />
-            <Toaster />
-          </React.Suspense>
-        </TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <React.Suspense fallback={<AppLoader />}>
+              <RouterProvider router={router} />
+              <Toaster />
+            </React.Suspense>
+          </TooltipProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </ThemeProvider>
     </GlobalErrorBoundary>
   );

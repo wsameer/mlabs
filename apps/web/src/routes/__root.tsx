@@ -9,10 +9,10 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { NotFoundComponent } from "./404";
 import { AppHeader, AppSidebar } from "@/features/layout";
-import { SearchDialog } from "@/features/SearchDialog";
-import { CreateAccountDialog } from "@/features/create-account";
+import { SearchDialog } from "@/components/SearchDialog";
+import { CreateAccountDialog } from "@/features/accounts";
 import { useUiActions } from "@/hooks/use-ui-store";
-import { AddTransactionPopover } from "@/features/add-transaction";
+import { AddTransactionPopover } from "@/features/transactions";
 
 export const Route = createRootRoute({
   component: RootComponent,

@@ -1,4 +1,4 @@
-import { useAppStore } from "@/lib/store";
+import { useAppStore } from "@/stores";
 import { useEffect, useRef } from "react";
 
 type LayoutConfig = {
@@ -15,35 +15,30 @@ export function useLayoutConfig(config: LayoutConfig) {
   const setLeftSidebarContent = useAppStore(
     (state) => state.setSidebarLeftContent
   );
-
   const resetLayout = useAppStore((state) => state.resetLayout);
 
-  const isInitialMount = useRef(true);
+  // Use ref to capture latest config without triggering re-execution.
+  // config.actions and config.leftSidebarContent are React nodes (new refs every render).
+  const configRef = useRef(config);
+  configRef.current = config;
 
   useEffect(() => {
-    // Set initial config
-    if (config.pageTitle !== undefined) setHeaderTitle(config.pageTitle);
-    if (config.actions !== undefined) setHeaderActions(config.actions);
-    if (config.mobileBackPath !== undefined)
-      setMobileBackPath(config.mobileBackPath);
-    if (config.leftSidebarContent !== undefined)
-      setLeftSidebarContent(config.leftSidebarContent);
+    const cfg = configRef.current;
+    if (cfg.pageTitle !== undefined) setHeaderTitle(cfg.pageTitle);
+    if (cfg.actions !== undefined) setHeaderActions(cfg.actions);
+    if (cfg.mobileBackPath !== undefined) setMobileBackPath(cfg.mobileBackPath);
+    if (cfg.leftSidebarContent !== undefined)
+      setLeftSidebarContent(cfg.leftSidebarContent);
 
-    isInitialMount.current = false;
-
-    // Cleanup on unmount - reset to defaults
     return () => {
       resetLayout();
     };
+    // Zustand selectors are stable refs — safe to include. Config read via ref.
   }, [
     setHeaderTitle,
     setHeaderActions,
     setMobileBackPath,
     setLeftSidebarContent,
     resetLayout,
-    config.pageTitle,
-    config.actions,
-    config.mobileBackPath,
-    config.leftSidebarContent,
   ]);
 }

@@ -1,5 +1,5 @@
 import { useShallow } from "zustand/react/shallow";
-import { useAppStore } from "@/lib/store";
+import { useAppStore } from "@/stores";
 import {
   globalLoadingSelector,
   globalSearchSelector,
@@ -7,7 +7,7 @@ import {
   openCreateTransactionSelector,
   transactionDateSelector,
   transactionTypeSelector,
-} from "@/lib/store/selectors/ui-selectors";
+} from "@/stores/selectors/ui-selectors";
 
 export const useGlobalLoading = () => useAppStore(globalLoadingSelector);
 export const useGlobalSearch = () => useAppStore(globalSearchSelector);

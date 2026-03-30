@@ -42,7 +42,10 @@ export function NotFoundComponent() {
           </InputGroupAddon>
         </InputGroup>
         <EmptyDescription>
-          Need help? <a href="#">Contact support</a>
+          Need help?{" "}
+          <button type="button" className="underline">
+            Contact support
+          </button>
         </EmptyDescription>
       </EmptyContent>
     </Empty>
