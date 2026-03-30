@@ -6,14 +6,19 @@ type ProfileEnv = {
   };
 };
 
-export const profileMiddleware = createMiddleware<ProfileEnv>(async (c, next) => {
-  const profileId = c.req.header("X-Profile-Id");
-  if (!profileId) {
-    return c.json(
-      { success: false, error: { message: "X-Profile-Id header is required" } },
-      400
-    );
+export const profileMiddleware = createMiddleware<ProfileEnv>(
+  async (c, next) => {
+    const profileId = c.req.header("X-Profile-Id");
+    if (!profileId) {
+      return c.json(
+        {
+          success: false,
+          error: { message: "X-Profile-Id header is required" },
+        },
+        400
+      );
+    }
+    c.set("profileId", profileId);
+    await next();
   }
-  c.set("profileId", profileId);
-  await next();
-});
+);

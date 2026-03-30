@@ -1,14 +1,6 @@
 import { Hono } from "hono";
-import {
-  getDatabase,
-  accounts,
-  eq,
-  and,
-} from "@workspace/db";
-import {
-  InsertAccountSchema,
-  UpdateAccountSchema,
-} from "@workspace/types";
+import { getDatabase, accounts, eq, and } from "@workspace/db";
+import { InsertAccountSchema, UpdateAccountSchema } from "@workspace/types";
 import type { ApiResponse } from "@workspace/types";
 
 type Env = { Variables: { profileId: string } };
@@ -29,7 +21,9 @@ accountRoutes.get("/", async (c) => {
 
   const conditions = [eq(accounts.profileId, profileId)];
   if (type) {
-    conditions.push(eq(accounts.type, type as typeof accounts.type.enumValues[number]));
+    conditions.push(
+      eq(accounts.type, type as (typeof accounts.type.enumValues)[number])
+    );
   }
   if (isActive !== undefined) {
     conditions.push(eq(accounts.isActive, isActive === "true"));
@@ -57,7 +51,10 @@ accountRoutes.get("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Account not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Account not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -73,7 +70,12 @@ accountRoutes.post("/", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
@@ -81,10 +83,17 @@ accountRoutes.post("/", async (c) => {
   const db = getDb();
   const [result] = await db
     .insert(accounts)
-    .values({ ...parsed.data, profileId, balance: String(parsed.data.balance ?? 0) })
+    .values({
+      ...parsed.data,
+      profileId,
+      balance: String(parsed.data.balance ?? 0),
+    })
     .returning();
 
-  return c.json<ApiResponse<typeof result>>({ success: true, data: result }, 201);
+  return c.json<ApiResponse<typeof result>>(
+    { success: true, data: result },
+    201
+  );
 });
 
 // PATCH /:id — update account
@@ -96,13 +105,21 @@ accountRoutes.patch("/:id", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
 
   const db = getDb();
-  const values: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
+  const values: Record<string, unknown> = {
+    ...parsed.data,
+    updatedAt: new Date(),
+  };
   if (parsed.data.balance !== undefined) {
     values.balance = String(parsed.data.balance);
   }
@@ -115,7 +132,10 @@ accountRoutes.patch("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Account not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Account not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -137,7 +157,10 @@ accountRoutes.delete("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Account not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Account not found", code: "NOT_FOUND" },
+      },
       404
     );
   }

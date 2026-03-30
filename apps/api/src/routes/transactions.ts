@@ -1,12 +1,5 @@
 import { Hono } from "hono";
-import {
-  getDatabase,
-  transactions,
-  eq,
-  and,
-  desc,
-  sql,
-} from "@workspace/db";
+import { getDatabase, transactions, eq, and, desc, sql } from "@workspace/db";
 import {
   InsertTransactionSchema,
   UpdateTransactionSchema,
@@ -44,7 +37,12 @@ transactionRoutes.get("/", async (c) => {
     conditions.push(eq(transactions.categoryId, categoryId));
   }
   if (type) {
-    conditions.push(eq(transactions.type, type.toUpperCase() as typeof transactions.type.enumValues[number]));
+    conditions.push(
+      eq(
+        transactions.type,
+        type.toUpperCase() as (typeof transactions.type.enumValues)[number]
+      )
+    );
   }
   if (startDate) {
     conditions.push(sql`${transactions.date} >= ${new Date(startDate)}`);
@@ -80,7 +78,10 @@ transactionRoutes.get("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Transaction not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Transaction not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -96,7 +97,12 @@ transactionRoutes.post("/", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
@@ -108,11 +114,14 @@ transactionRoutes.post("/", async (c) => {
       ...parsed.data,
       profileId,
       amount: String(parsed.data.amount),
-      type: parsed.data.type.toUpperCase() as typeof transactions.type.enumValues[number],
+      type: parsed.data.type.toUpperCase() as (typeof transactions.type.enumValues)[number],
     })
     .returning();
 
-  return c.json<ApiResponse<typeof result>>({ success: true, data: result }, 201);
+  return c.json<ApiResponse<typeof result>>(
+    { success: true, data: result },
+    201
+  );
 });
 
 // PATCH /:id — update transaction
@@ -124,13 +133,21 @@ transactionRoutes.patch("/:id", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
 
   const db = getDb();
-  const values: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
+  const values: Record<string, unknown> = {
+    ...parsed.data,
+    updatedAt: new Date(),
+  };
   if (parsed.data.amount !== undefined) {
     values.amount = String(parsed.data.amount);
   }
@@ -146,7 +163,10 @@ transactionRoutes.patch("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Transaction not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Transaction not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -167,7 +187,10 @@ transactionRoutes.delete("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Transaction not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Transaction not found", code: "NOT_FOUND" },
+      },
       404
     );
   }

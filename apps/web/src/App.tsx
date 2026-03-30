@@ -17,7 +17,7 @@ export function App() {
     <GlobalErrorBoundary>
       <ThemeProvider
         defaultTheme="light"
-        storageKey="mlbas-ui-theme"
+        storageKey="mlabs-ui-theme"
         disableTransitionOnChange
       >
         <QueryClientProvider client={queryClient}>

@@ -1,15 +1,6 @@
 import { Hono } from "hono";
-import {
-  getDatabase,
-  categories,
-  eq,
-  and,
-  isNull,
-} from "@workspace/db";
-import {
-  InsertCategorySchema,
-  UpdateCategorySchema,
-} from "@workspace/types";
+import { getDatabase, categories, eq, and, isNull } from "@workspace/db";
+import { InsertCategorySchema, UpdateCategorySchema } from "@workspace/types";
 import type { ApiResponse } from "@workspace/types";
 
 type Env = { Variables: { profileId: string } };
@@ -31,7 +22,9 @@ categoryRoutes.get("/", async (c) => {
 
   const conditions = [eq(categories.profileId, profileId)];
   if (type) {
-    conditions.push(eq(categories.type, type as typeof categories.type.enumValues[number]));
+    conditions.push(
+      eq(categories.type, type as (typeof categories.type.enumValues)[number])
+    );
   }
   if (isActive !== undefined) {
     conditions.push(eq(categories.isActive, isActive === "true"));
@@ -64,7 +57,10 @@ categoryRoutes.get("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Category not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Category not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -80,7 +76,12 @@ categoryRoutes.post("/", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
@@ -91,7 +92,10 @@ categoryRoutes.post("/", async (c) => {
     .values({ ...parsed.data, profileId })
     .returning();
 
-  return c.json<ApiResponse<typeof result>>({ success: true, data: result }, 201);
+  return c.json<ApiResponse<typeof result>>(
+    { success: true, data: result },
+    201
+  );
 });
 
 // PATCH /:id — update category
@@ -103,7 +107,12 @@ categoryRoutes.patch("/:id", async (c) => {
 
   if (!parsed.success) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: parsed.error.issues[0]?.message ?? "Validation failed" } },
+      {
+        success: false,
+        error: {
+          message: parsed.error.issues[0]?.message ?? "Validation failed",
+        },
+      },
       400
     );
   }
@@ -117,7 +126,10 @@ categoryRoutes.patch("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Category not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Category not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
@@ -139,7 +151,10 @@ categoryRoutes.delete("/:id", async (c) => {
 
   if (!result) {
     return c.json<ApiResponse<never>>(
-      { success: false, error: { message: "Category not found", code: "NOT_FOUND" } },
+      {
+        success: false,
+        error: { message: "Category not found", code: "NOT_FOUND" },
+      },
       404
     );
   }
