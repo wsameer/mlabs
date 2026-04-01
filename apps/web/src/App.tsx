@@ -27,7 +27,7 @@ export function App() {
               <Toaster />
             </React.Suspense>
           </TooltipProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+          {/*<ReactQueryDevtools initialIsOpen={false} />*/}
         </QueryClientProvider>
       </ThemeProvider>
     </GlobalErrorBoundary>
