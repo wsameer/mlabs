@@ -52,7 +52,7 @@ export const TransactionTypeSchema = z.enum(["INCOME", "EXPENSE", "TRANSFER"]);
 // ============================================================================
 
 export const ProfileSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(1).max(100),
   icon: z.string().max(10).optional(),
   type: ProfileTypeSchema.default("PERSONAL"),
@@ -66,8 +66,8 @@ export const ProfileSchema = z.object({
   isActive: z.boolean().default(true),
   isSetupComplete: z.boolean().default(false),
   notes: z.string().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.date(),
+  updatedAt: z.iso.date(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -80,7 +80,7 @@ export const InsertProfileSchema = ProfileSchema.omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
 });
 
 export type InsertProfile = z.infer<typeof InsertProfileSchema>;
@@ -90,8 +90,8 @@ export type InsertProfile = z.infer<typeof InsertProfileSchema>;
 // ============================================================================
 
 export const AccountSchema = z.object({
-  id: z.string().uuid(),
-  profileId: z.string().uuid(),
+  id: z.uuid(),
+  profileId: z.uuid(),
   name: z.string().min(1).max(100),
   group: AccountGroupSchema,
   // Negative for liabilities (loans, mortgages, credit cards)
@@ -102,7 +102,7 @@ export const AccountSchema = z.object({
   interestRate: z.string().optional(),
   nextPaymentDate: z.string().optional(),
   // Generic linking: credit card → payment account, mortgage → property
-  linkedAccountId: z.string().uuid().nullable().optional(),
+  linkedAccountId: z.uuid().nullable().optional(),
   // Display
   color: z
     .string()
@@ -114,8 +114,8 @@ export const AccountSchema = z.object({
   includeInNetWorth: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
   notes: z.string().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.date(),
+  updatedAt: z.iso.date(),
 });
 
 export type Account = z.infer<typeof AccountSchema>;
@@ -126,7 +126,7 @@ export const InsertAccountSchema = AccountSchema.omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   balance: z.string().optional(),
   originalAmount: z.string().optional(),
   interestRate: z.string().optional(),
@@ -139,8 +139,8 @@ export type InsertAccount = z.infer<typeof InsertAccountSchema>;
 // ============================================================================
 
 export const CategorySchema = z.object({
-  id: z.string().uuid(),
-  profileId: z.string().uuid(),
+  id: z.uuid(),
+  profileId: z.uuid(),
   name: z.string().min(1).max(100),
   type: CategoryTypeSchema,
   icon: z.string().max(50).optional(),
@@ -148,11 +148,11 @@ export const CategorySchema = z.object({
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
     .optional(),
-  parentId: z.string().uuid().nullable().optional(),
+  parentId: z.uuid().nullable().optional(),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.date(),
+  updatedAt: z.iso.date(),
 });
 
 export type Category = z.infer<typeof CategorySchema>;
@@ -163,7 +163,7 @@ export const InsertCategorySchema = CategorySchema.omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
 });
 
 export type InsertCategory = z.infer<typeof InsertCategorySchema>;
@@ -173,11 +173,11 @@ export type InsertCategory = z.infer<typeof InsertCategorySchema>;
 // ============================================================================
 
 export const TransactionSchema = z.object({
-  id: z.string().uuid(),
-  profileId: z.string().uuid(),
-  accountId: z.string().uuid(),
+  id: z.uuid(),
+  profileId: z.uuid(),
+  accountId: z.uuid(),
   // null for TRANSFER transactions
-  categoryId: z.string().uuid().nullable().optional(),
+  categoryId: z.uuid().nullable().optional(),
   type: TransactionTypeSchema,
   // Always positive — type + account side determines direction
   amount: z.string(), // numeric
@@ -188,10 +188,10 @@ export const TransactionSchema = z.object({
   date: z.string(), // date type
   // Double-entry transfers: both records share this UUID
   // null for INCOME / EXPENSE
-  transferId: z.string().uuid().nullable().optional(),
+  transferId: z.uuid().nullable().optional(),
   isCleared: z.boolean().default(false),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.date(),
+  updatedAt: z.iso.date(),
 });
 
 export type Transaction = z.infer<typeof TransactionSchema>;
@@ -202,7 +202,7 @@ export const InsertTransactionSchema = TransactionSchema.omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   amount: z.string(),
 });
 

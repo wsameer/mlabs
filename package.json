@@ -21,6 +21,7 @@
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo clean && rm -rf node_modules .turbo",
     "clean:full": "turbo run clean && rm -rf node_modules .turbo",
+    "db:setup": "pnpm --filter=@workspace/db db:setup",
     "db:generate": "pnpm --filter=@workspace/db db:generate",
     "db:push": "pnpm --filter=@workspace/db db:push",
     "db:studio": "pnpm --filter=@workspace/db db:studio",

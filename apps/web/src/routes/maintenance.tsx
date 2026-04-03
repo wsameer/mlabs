@@ -8,8 +8,9 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from "@workspace/ui/components/empty";
+import { MAINTENANCE_ROUTE } from "@/constants";
 
-export const Route = createFileRoute("/maintenance")({
+export const Route = createFileRoute(MAINTENANCE_ROUTE)({
   component: MaintenancePage,
 });
 

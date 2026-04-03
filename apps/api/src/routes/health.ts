@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { getDatabase, sql } from "@workspace/db";
-
-import type { HealthCheck, ApiResponse } from "@workspace/types";
+import type { ApiResponse, HealthCheck } from "@workspace/types";
 
 const health = new Hono();
 

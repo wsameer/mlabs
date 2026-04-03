@@ -1,7 +1,6 @@
 import React from "react";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "@tanstack/react-router";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { Toaster } from "@workspace/ui/components/sonner";
@@ -11,10 +10,8 @@ import { GlobalErrorBoundary } from "@/components/ErrorBoundary";
 import { router } from "@/lib/router";
 import { queryClient } from "@/lib/query-client";
 import { AppLoader } from "@/components/AppLoader";
-import { BackendStatus } from "@/components/BackendStatus";
 
 export function App() {
-
   return (
     <GlobalErrorBoundary>
       <ThemeProvider
@@ -26,11 +23,9 @@ export function App() {
           <TooltipProvider>
             <React.Suspense fallback={<AppLoader />}>
               <RouterProvider router={router} />
-              <BackendStatus />
               <Toaster />
             </React.Suspense>
           </TooltipProvider>
-          {/*<ReactQueryDevtools initialIsOpen={false} />*/}
         </QueryClientProvider>
       </ThemeProvider>
     </GlobalErrorBoundary>

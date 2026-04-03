@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppStore } from "@/stores/app-store";
@@ -10,14 +10,21 @@ export function BackendStatus() {
   const navigate = useNavigate();
   const setBackendStatus = useAppStore((s) => s.setBackendStatus);
   const setBackendHealth = useAppStore((s) => s.setBackendHealth);
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
     if (isSuccess && data?.status === "ok") {
       setBackendStatus("connected");
       setBackendHealth(data);
-    } else if (isError) {
+      hasNavigated.current = false;
+    } else if (isError && !hasNavigated.current) {
       setBackendStatus("disconnected");
-      navigate({ to: MAINTENANCE_ROUTE, replace: true });
+      hasNavigated.current = true;
+      if (navigate) {
+        navigate({ to: MAINTENANCE_ROUTE, replace: true }).catch(() => {
+          hasNavigated.current = false;
+        });
+      }
     }
   }, [isSuccess, isError, data, setBackendStatus, setBackendHealth, navigate]);
 

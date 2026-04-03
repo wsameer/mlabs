@@ -9,7 +9,7 @@ export const BaseEnvSchema = z.object({
 
 export const ApiEnvSchema = BaseEnvSchema.extend({
   PORT: z.coerce.number().int().positive().default(3001),
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: z.url().optional(),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
@@ -17,7 +17,7 @@ export const ApiEnvSchema = BaseEnvSchema.extend({
 });
 
 export const WebEnvSchema = BaseEnvSchema.extend({
-  VITE_API_URL: z.string().url().default("http://localhost:3001"),
+  VITE_API_URL: z.url().default("http://localhost:3001"),
 });
 
 export type ApiEnv = z.infer<typeof ApiEnvSchema>;

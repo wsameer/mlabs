@@ -12,12 +12,9 @@ import { requestLogger } from "./middleware/request-logger.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { profileMiddleware } from "./middleware/profile.js";
 import { env } from "./libs/env.js";
-import { logger } from "./libs/logger.js";
 
 import health from "./routes/health.js";
-import categories from "./routes/categories.js";
-import accounts from "./routes/accounts.js";
-import transactionRoutes from "./routes/transactions.js";
+import { logger } from "./libs/logger.js";
 
 const app = new Hono();
 
@@ -90,9 +87,9 @@ app.route("/api/health", health);
 app.use("/api/*", profileMiddleware);
 
 // Protected API Routes
-app.route("/api/categories", categories);
-app.route("/api/accounts", accounts);
-app.route("/api/transactions", transactionRoutes);
+// app.route("/api/categories", categories);
+// app.route("/api/accounts", accounts);
+// app.route("/api/transactions", transactionRoutes);
 
 // Static File Serving (Production Only)
 if (env.NODE_ENV === "production") {
@@ -163,14 +160,3 @@ function gracefulShutdown(signal: string) {
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-
-// Handle uncaught errors
-process.on("uncaughtException", (error) => {
-  logger.error("Uncaught Exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
