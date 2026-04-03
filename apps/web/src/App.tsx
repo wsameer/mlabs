@@ -11,8 +11,10 @@ import { GlobalErrorBoundary } from "@/components/ErrorBoundary";
 import { router } from "@/lib/router";
 import { queryClient } from "@/lib/query-client";
 import { AppLoader } from "@/components/AppLoader";
+import { BackendStatus } from "@/components/BackendStatus";
 
 export function App() {
+
   return (
     <GlobalErrorBoundary>
       <ThemeProvider
@@ -24,6 +26,7 @@ export function App() {
           <TooltipProvider>
             <React.Suspense fallback={<AppLoader />}>
               <RouterProvider router={router} />
+              <BackendStatus />
               <Toaster />
             </React.Suspense>
           </TooltipProvider>
