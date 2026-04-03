@@ -9,6 +9,7 @@ import {
 import { NavItem } from "./NavItem";
 import { PRIMARY_NAVIGATION_OPTIONS } from "../constants";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores/app-store";
 
 export function AppBottombar() {
   const router = useRouterState();
@@ -16,6 +17,18 @@ export function AppBottombar() {
   const currentPath = router.location.pathname;
   const navRef = useRef(null);
   const { setOpenCreateTransaction } = useUiActions();
+  const backendStatus = useAppStore((s) => s.backendStatus);
+  const isBackendConnected = backendStatus === "connected"
+
+  const handleNavigation = (itemPath: string) => {
+    if (!isBackendConnected) return;
+    navigate(linkOptions({ to: itemPath }));
+  };
+
+  const handleAddTransaction = () => {
+    if (!isBackendConnected) return;
+    setOpenCreateTransaction(true);
+  };
 
   return (
     <div
@@ -32,13 +45,8 @@ export function AppBottombar() {
                 icon={<Icon />}
                 isActive={currentPath === item.path}
                 label={item.title}
-                onClick={() =>
-                  navigate(
-                    linkOptions({
-                      to: item.path,
-                    })
-                  )
-                }
+                onClick={() => handleNavigation(item.path)}
+                disabled={!isBackendConnected}
               />
             </React.Fragment>
           );
@@ -49,7 +57,8 @@ export function AppBottombar() {
           icon={<PlusIcon />}
           isActive={false}
           label="Add transaction"
-          onClick={() => setOpenCreateTransaction(true)}
+          onClick={handleAddTransaction}
+          disabled={!isBackendConnected}
         />
       </div>
     </div>

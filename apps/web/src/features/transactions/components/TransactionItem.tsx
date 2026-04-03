@@ -68,7 +68,7 @@ export const TransactionItem = React.forwardRef<
 
           <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
             <span
-              className={`block truncate font-mono text-xs text-foreground tabular-nums ${amountColor}`}
+              className={`block truncate text-xs text-foreground tabular-nums ${amountColor}`}
             >
               {amount}
             </span>

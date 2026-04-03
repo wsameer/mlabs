@@ -6,29 +6,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a pnpm monorepo using Turbo. Node.js >=20.20.0 required.
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm dev` | Start all dev servers (web + api) |
-| `pnpm dev:web` | Start Vite dev server only |
-| `pnpm dev:api` | Start Hono API server only (tsx watch) |
-| `pnpm build` | Build all apps via Turbo |
-| `pnpm lint` | Lint all packages |
-| `pnpm lint:fix` | Auto-fix lint issues |
-| `pnpm typecheck` | Type-check all packages |
-| `pnpm format` | Format all code (Prettier) |
-| `pnpm clean` | Remove node_modules, dist, .turbo |
+| Command          | Purpose                                |
+| ---------------- | -------------------------------------- |
+| `pnpm dev`       | Start all dev servers (web + api)      |
+| `pnpm dev:web`   | Start Vite dev server only             |
+| `pnpm dev:api`   | Start Hono API server only (tsx watch) |
+| `pnpm build`     | Build all apps via Turbo               |
+| `pnpm lint`      | Lint all packages                      |
+| `pnpm lint:fix`  | Auto-fix lint issues                   |
+| `pnpm typecheck` | Type-check all packages                |
+| `pnpm format`    | Format all code (Prettier)             |
+| `pnpm clean`     | Remove node_modules, dist, .turbo      |
 
 Filter to a specific workspace: `pnpm --filter=web <script>` or `pnpm --filter=api <script>`
 
 ### Database (packages/db)
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm db:generate` | Generate Drizzle migrations |
-| `pnpm db:push` | Push schema to database |
-| `pnpm db:studio` | Open Drizzle Studio |
-| `pnpm db:seed` | Seed database |
-| `pnpm db:reset` | Empty + reseed database |
+| Command              | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| `pnpm db:create`     | Create database (if not exists)          |
+| `pnpm db:drop`       | Drop the database                        |
+| `pnpm db:generate`   | Generate Drizzle migrations              |
+| `pnpm db:migrate`    | Run Drizzle migrations                   |
+| `pnpm db:push`       | Push schema to database                  |
+| `pnpm db:push:force` | Push schema with force (non-interactive) |
+| `pnpm db:studio`     | Open Drizzle Studio                      |
+| `pnpm db:seed`       | Seed database with sample data           |
+| `pnpm db:reset`      | Drop, recreate, and seed database        |
+| `pnpm db:setup`      | Full setup: create + push + seed         |
 
 ### Adding shadcn/ui Components
 
@@ -37,6 +42,7 @@ pnpm dlx shadcn@latest add <component> -c apps/web
 ```
 
 Components are placed in `packages/ui/src/components/` and imported as:
+
 ```tsx
 import { Button } from "@workspace/ui/components/button";
 ```
@@ -70,6 +76,7 @@ features/<name>/
 ```
 
 **Key rules:**
+
 - Features cannot import from other features (use public API via index.ts)
 - `src/components/` is for pure, reusable UI only — no API calls, no global state
 - `src/hooks/` is for shared hooks used by 2+ features
@@ -98,10 +105,10 @@ TanStack Router v1 with file-based routing. Route tree is auto-generated in `rou
 
 ### Naming Conventions
 
-| Type | File | Export |
-|------|------|--------|
-| Components | `PascalCase.tsx` | `PascalCase` |
-| Hooks | `use-kebab-case.ts` | `useCamelCase` |
-| Stores | `*-store.ts` | `use*Store` |
-| API hooks | `use-verb-noun.ts` | `useVerbNoun` |
-| Constants | any | `SCREAMING_SNAKE_CASE` |
+| Type       | File                | Export                 |
+| ---------- | ------------------- | ---------------------- |
+| Components | `PascalCase.tsx`    | `PascalCase`           |
+| Hooks      | `use-kebab-case.ts` | `useCamelCase`         |
+| Stores     | `*-store.ts`        | `use*Store`            |
+| API hooks  | `use-verb-noun.ts`  | `useVerbNoun`          |
+| Constants  | any                 | `SCREAMING_SNAKE_CASE` |

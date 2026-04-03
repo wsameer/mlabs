@@ -8,7 +8,6 @@ import {
   SidebarHeader,
 } from "@workspace/ui/components/sidebar";
 import { AppLeftSideNav } from "@/features/navigation";
-import { Textarea } from "@workspace/ui/components/textarea";
 import { useAppStore } from "@/stores";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -39,11 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="px-0">
-            <SidebarGroupContent>
-              {sidebarLeftContent || (
-                <Textarea placeholder="Type your message here." />
-              )}
-            </SidebarGroupContent>
+            <SidebarGroupContent>{sidebarLeftContent}</SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>

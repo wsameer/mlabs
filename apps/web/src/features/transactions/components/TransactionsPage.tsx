@@ -125,19 +125,19 @@ export function TransactionsPage() {
                   <div className="text-[0.65rem] text-muted-foreground uppercase">
                     Income
                   </div>
-                  <div className="text-sm font-medium tabular-nums">{1224}</div>
+                  <div className="text-sm font-medium">{1224}</div>
                 </div>
                 <div className="px-2 text-center">
                   <div className="text-[0.65rem] text-muted-foreground uppercase">
                     Expense
                   </div>
-                  <div className="text-sm font-medium tabular-nums">{869}</div>
+                  <div className="text-sm font-medium">{869}</div>
                 </div>
                 <div className="px-2 text-center">
                   <div className="text-[0.65rem] text-muted-foreground uppercase">
                     Total
                   </div>
-                  <div className="text-sm font-medium tabular-nums">$1000</div>
+                  <div className="text-sm font-medium">$1000</div>
                 </div>
               </div>
             </CardContent>
@@ -153,10 +153,10 @@ export function TransactionsPage() {
                       <Badge variant="secondary">Thu</Badge>
                     </ItemContent>
                     <ItemActions>
-                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-xs text-foreground">
                         $0.00
                       </small>
-                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-right text-xs text-foreground">
                         $10.00
                       </small>
                     </ItemActions>
@@ -177,10 +177,10 @@ export function TransactionsPage() {
                       <Badge variant="secondary">Wed</Badge>
                     </ItemContent>
                     <ItemActions>
-                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-xs text-foreground">
                         $0.00
                       </small>
-                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-right text-xs text-foreground">
                         $10.00
                       </small>
                     </ItemActions>
@@ -201,10 +201,10 @@ export function TransactionsPage() {
                       <Badge variant="secondary">Tue</Badge>
                     </ItemContent>
                     <ItemActions>
-                      <small className="w-16 truncate font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-xs text-foreground">
                         $0.00
                       </small>
-                      <small className="w-16 truncate text-right font-mono text-xs text-foreground tabular-nums">
+                      <small className="w-16 truncate text-right text-xs text-foreground">
                         $10.00
                       </small>
                     </ItemActions>

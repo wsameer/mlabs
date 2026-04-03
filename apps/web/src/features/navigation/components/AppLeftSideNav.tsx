@@ -7,6 +7,7 @@ import {
   SECONDARY_NAV_OPTIONS,
 } from "@/features/navigation/constants";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores/app-store";
 
 import {
   Sidebar,
@@ -20,6 +21,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 
 export function AppLeftSideNav({
   ...props
@@ -27,10 +29,14 @@ export function AppLeftSideNav({
   const { setOpenMobile, isMobile } = useSidebar();
   const { setOpenCreateTransaction } = useUiActions();
   const router = useRouterState();
+  const backendStatus = useAppStore((s) => s.backendStatus);
+  const isBackendConnected = backendStatus === "connected";
 
   const currentPath = router.location.pathname;
 
   const handleNavClick = (path: string) => {
+    if (!isBackendConnected) return;
+
     // Store return path when navigating to settings
     if (path.startsWith("/settings") && !currentPath.startsWith("/settings")) {
       sessionStorage.setItem("settings-return-path", currentPath);
@@ -85,6 +91,7 @@ export function AppLeftSideNav({
                     }
                     isActive={currentPath === item.path}
                     className="px-2.5 md:px-2"
+                    disabled={!isBackendConnected}
                   >
                     <item.icon />
                     <span>{item.title}</span>
@@ -101,14 +108,20 @@ export function AppLeftSideNav({
           <SidebarMenu className="gap-2">
             <SidebarMenuItem className="mb-2">
               <SidebarMenuButton
-                className="rounded-full bg-primary/80 px-2.5 hover:bg-primary active:bg-primary md:px-2"
+                className={cn("rounded-full bg-primary/80 px-2.5 md:px-2", {
+                  "bg-muted": !isBackendConnected,
+                  "hover:bg-primary active:bg-primary": isBackendConnected,
+                })}
                 variant="outline"
                 aria-label="Add transaction"
-                onClick={() => setOpenCreateTransaction(true)}
+                onClick={() =>
+                  isBackendConnected && setOpenCreateTransaction(true)
+                }
                 tooltip={{
                   children: "Add new transaction",
                   hidden: false,
                 }}
+                disabled={!isBackendConnected}
               >
                 <PlusIcon />
                 <span>Add transaction</span>
@@ -122,6 +135,7 @@ export function AppLeftSideNav({
                     hidden: false,
                   }}
                   className="px-2.5 md:px-2"
+                  disabled={!isBackendConnected}
                 >
                   <item.icon />
                   <span>{item.title}</span>
