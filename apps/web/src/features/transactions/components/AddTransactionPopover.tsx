@@ -3,7 +3,6 @@ import {
   useTransactionType,
   useUiActions,
 } from "@/hooks/use-ui-store";
-import { TransactionTypeSchema } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Drawer,
@@ -30,6 +29,7 @@ export function AddTransactionPopover() {
   const isMobile = useIsMobile();
 
   const { setOpenCreateTransaction } = useUiActions();
+  const isTransfer = selectedTransactionType === "TRANSFER";
 
   if (isMobile) {
     return (
@@ -38,9 +38,7 @@ export function AddTransactionPopover() {
           <DrawerHeader>
             <DrawerTitle className="text-left text-xl font-light">
               Record
-              {selectedTransactionType === TransactionTypeSchema.enum.transfer
-                ? " a "
-                : " an "}
+              {isTransfer ? " a " : " an "}
               {selectedTransactionType}
             </DrawerTitle>
           </DrawerHeader>
@@ -65,9 +63,7 @@ export function AddTransactionPopover() {
         <DialogHeader>
           <DialogTitle className="text-left text-xl font-light">
             Record
-            {selectedTransactionType === TransactionTypeSchema.enum.transfer
-              ? " a "
-              : " an "}
+            {isTransfer ? " a " : " an "}
             {selectedTransactionType}
           </DialogTitle>
         </DialogHeader>

@@ -12,7 +12,6 @@ if (!DATABASE_URL) {
 // Tables in order (respects foreign key dependencies)
 const TABLES = [
   { name: "transactions", table: schema.transactions },
-  { name: "budgets", table: schema.budgets },
   { name: "accounts", table: schema.accounts },
   { name: "categories", table: schema.categories },
   { name: "profiles", table: schema.profiles },

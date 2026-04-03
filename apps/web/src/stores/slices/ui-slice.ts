@@ -1,5 +1,5 @@
 import type { AppStoreState } from "@/stores/app-store";
-import { TransactionTypeSchema, type TransactionType } from "@workspace/types";
+import type { TransactionType } from "@workspace/types";
 
 import type { StateCreator } from "zustand";
 
@@ -32,7 +32,7 @@ export const createUiSlice: StateCreator<
   openCreateAccount: false,
   openCreateTransaction: false,
   transactionDate: new Date(),
-  transactionType: TransactionTypeSchema.enum.expense,
+  transactionType: "EXPENSE" as TransactionType,
 
   setGlobalLoading: (loading) =>
     set((state) => {

@@ -27,22 +27,28 @@ async function seed() {
     const [defaultProfile] = await db
       .insert(profiles)
       .values({
-        firstName: "Demo",
-        lastName: "User",
         name: "Personal Space",
         icon: "💰",
-        description: "Default space for demo data",
+        type: "PERSONAL",
         currency: "CAD",
-        dateFormat: "MM/DD/YYYY",
-        aiAssistantEnabled: false,
+        dateFormat: "D MMM, YYYY",
+        weekStart: "MONDAY",
+        timezone: "America/Toronto",
         isDefault: true,
+        isActive: true,
         isSetupComplete: true,
       })
-      .returning();
+      .returning()
+      .onConflictDoNothing();
+
+    if (!defaultProfile) {
+      console.log("✅ Default profile already exists, skipping seed");
+      process.exit(0);
+    }
 
     console.log(`✅ Created default profile: ${defaultProfile.id}`);
 
-    const profileId = defaultProfile.id;
+    const profileId: string = defaultProfile.id;
 
     // ============================================================================
     // Seed Income Categories
@@ -56,40 +62,40 @@ async function seed() {
           profileId,
           name: "Salary",
           type: "INCOME",
-          color: "#10b981",
           icon: "💼",
+          color: "#10b981",
           sortOrder: 1,
         },
         {
           profileId,
           name: "Freelance",
           type: "INCOME",
-          color: "#3b82f6",
           icon: "💻",
+          color: "#3b82f6",
           sortOrder: 2,
         },
         {
           profileId,
           name: "Investment",
           type: "INCOME",
-          color: "#8b5cf6",
           icon: "📈",
+          color: "#8b5cf6",
           sortOrder: 3,
         },
         {
           profileId,
           name: "Gift",
           type: "INCOME",
-          color: "#ec4899",
           icon: "🎁",
+          color: "#ec4899",
           sortOrder: 4,
         },
         {
           profileId,
           name: "Other Income",
           type: "INCOME",
-          color: "#6366f1",
           icon: "💰",
+          color: "#6366f1",
           sortOrder: 5,
         },
       ])
@@ -109,80 +115,80 @@ async function seed() {
           profileId,
           name: "Housing",
           type: "EXPENSE",
-          color: "#ef4444",
           icon: "🏠",
+          color: "#ef4444",
           sortOrder: 1,
         },
         {
           profileId,
           name: "Transportation",
           type: "EXPENSE",
-          color: "#f97316",
           icon: "🚗",
+          color: "#f97316",
           sortOrder: 2,
         },
         {
           profileId,
           name: "Food & Dining",
           type: "EXPENSE",
-          color: "#84cc16",
           icon: "🍽️",
+          color: "#84cc16",
           sortOrder: 3,
         },
         {
           profileId,
           name: "Utilities",
           type: "EXPENSE",
-          color: "#06b6d4",
           icon: "⚡",
+          color: "#06b6d4",
           sortOrder: 4,
         },
         {
           profileId,
           name: "Healthcare",
           type: "EXPENSE",
-          color: "#ef4444",
           icon: "🏥",
+          color: "#ef4444",
           sortOrder: 5,
         },
         {
           profileId,
           name: "Entertainment",
           type: "EXPENSE",
-          color: "#ec4899",
           icon: "🎬",
+          color: "#ec4899",
           sortOrder: 6,
         },
         {
           profileId,
           name: "Shopping",
           type: "EXPENSE",
-          color: "#a855f7",
           icon: "🛍️",
+          color: "#a855f7",
           sortOrder: 7,
         },
         {
           profileId,
           name: "Subscriptions",
           type: "EXPENSE",
-          color: "#3b82f6",
           icon: "📱",
+          color: "#3b82f6",
           sortOrder: 8,
         },
         {
           profileId,
           name: "Personal Care",
           type: "EXPENSE",
-          color: "#8b5cf6",
           icon: "💆",
+          color: "#8b5cf6",
           sortOrder: 9,
         },
         {
           profileId,
           name: "Other Expense",
           type: "EXPENSE",
-          color: "#64748b",
           icon: "📦",
+          color: "#64748b",
           sortOrder: 10,
         },
       ])
@@ -195,247 +201,280 @@ async function seed() {
     // ============================================================================
     console.log("🏦 Seeding accounts...");
 
-    const chequingAccount = await db
+    const [checkingAccount] = await db
       .insert(accounts)
       .values({
         profileId,
         name: "TD Chequing",
-        type: "CHEQUING",
+        group: "checking",
         balance: "4250.75",
         currency: "CAD",
         icon: "wallet",
+        notes: "Primary checking account",
+        includeInNetWorth: true,
         sortOrder: 1,
-        notes: "Primary chequing account",
       })
       .returning();
 
-    const savingsAccount = await db
+    const [savingsAccount] = await db
       .insert(accounts)
       .values({
         profileId,
         name: "EQ Bank Savings",
-        type: "SAVINGS",
+        group: "savings",
         balance: "15000.00",
         currency: "CAD",
         icon: "piggy-bank",
-        sortOrder: 2,
         notes: "Emergency fund",
+        includeInNetWorth: true,
+        sortOrder: 2,
       })
       .returning();
 
-    const creditCard = await db
+    if (!checkingAccount) {
+      throw new Error("Failed to create checking account");
+    }
+
+    const [creditCard] = await db
       .insert(accounts)
       .values({
         profileId,
         name: "TD Visa Infinite",
-        type: "CREDIT_CARD",
-        balance: "1250.00",
+        group: "credit_card",
+        balance: "-1250.00", // Negative for liability
         currency: "CAD",
         icon: "credit-card",
-        sortOrder: 3,
         notes: "Primary rewards card",
-        defaultPaymentAccountId: chequingAccount[0].id,
+        linkedAccountId: checkingAccount.id,
+        includeInNetWorth: false,
+        sortOrder: 3,
       })
       .returning();
 
-    const tfsa = await db
-      .insert(accounts)
-      .values({
+    if (!savingsAccount || !creditCard) {
+      throw new Error("Failed to create savings or credit card account");
+    }
+
+    await db.insert(accounts).values([
+      {
         profileId,
-        name: "Wealthsimple TFSA",
-        type: "TFSA",
+        name: "Wealthsimple",
+        group: "investment",
         balance: "45000.00",
         currency: "CAD",
-        icon: "landmark",
-        sortOrder: 4,
-      })
-      .returning();
-
-    const rrsp = await db
-      .insert(accounts)
-      .values({
-        profileId,
-        name: "Questrade RRSP",
-        type: "RRSP",
-        balance: "32500.00",
-        currency: "CAD",
         icon: "trending-up",
-        sortOrder: 5,
-      })
-      .returning();
-
-    const fhsa = await db
-      .insert(accounts)
-      .values({
+        includeInNetWorth: true,
+        sortOrder: 4,
+      },
+      {
         profileId,
-        name: "CIBC FHSA",
-        type: "FHSA",
-        balance: "8000.00",
+        name: "Cash Wallet",
+        group: "cash",
+        balance: "200.00",
         currency: "CAD",
-        icon: "home",
-        sortOrder: 6,
-      })
-      .returning();
+        icon: "banknote",
+        includeInNetWorth: true,
+        sortOrder: 5,
+      },
+    ]);
 
-    console.log("✅ Created 6 accounts");
+    console.log("✅ Created 5 accounts");
 
     // ============================================================================
     // Seed Transactions
     // ============================================================================
     console.log("💳 Seeding transactions...");
 
-    const salary = incomeCategories.find((c) => c.name === "Salary")!;
-    const food = expenseCategories.find((c) => c.name === "Food & Dining")!;
-    const transport = expenseCategories.find(
-      (c) => c.name === "Transportation"
-    )!;
-    const utilities = expenseCategories.find((c) => c.name === "Utilities")!;
-    const entertainment = expenseCategories.find(
-      (c) => c.name === "Entertainment"
-    )!;
-    const shopping = expenseCategories.find((c) => c.name === "Shopping")!;
-    const subscriptions = expenseCategories.find(
-      (c) => c.name === "Subscriptions"
-    )!;
-
-    // Generate dates for the last 30 days
     const today = new Date();
     const daysAgo = (days: number) => {
       const d = new Date(today);
       d.setDate(d.getDate() - days);
-      return d;
+      return d.toISOString().split("T")[0]; // YYYY-MM-DD format
     };
 
+    const salary = incomeCategories.find((c) => c.name === "Salary");
+    const food = expenseCategories.find((c) => c.name === "Food & Dining");
+    const transport = expenseCategories.find(
+      (c) => c.name === "Transportation"
+    );
+    const utilities = expenseCategories.find((c) => c.name === "Utilities");
+    const entertainment = expenseCategories.find(
+      (c) => c.name === "Entertainment"
+    );
+    const shopping = expenseCategories.find((c) => c.name === "Shopping");
+    const subscriptions = expenseCategories.find(
+      (c) => c.name === "Subscriptions"
+    );
+
+    if (
+      !salary ||
+      !food ||
+      !transport ||
+      !utilities ||
+      !entertainment ||
+      !shopping ||
+      !subscriptions
+    ) {
+      throw new Error("Failed to find required categories");
+    }
+
+    // Generate a transfer ID for the transfer transaction
+    const transferUuid = crypto.randomUUID();
+
     await db.insert(transactions).values([
-      // Income
+      // Income (positive amount, checking account)
       {
         profileId,
-        accountId: chequingAccount[0].id,
+        accountId: checkingAccount.id,
         categoryId: salary.id,
         type: "INCOME",
         amount: "5500.00",
         description: "Salary deposit",
         date: daysAgo(15),
+        isCleared: true,
       },
-      // Food & Dining
+      // Food & Dining (expense, credit card)
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: food.id,
         type: "EXPENSE",
         amount: "85.50",
         description: "Loblaws groceries",
         date: daysAgo(1),
+        isCleared: true,
       },
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: food.id,
         type: "EXPENSE",
         amount: "42.00",
         description: "Thai Express",
         date: daysAgo(3),
+        isCleared: true,
       },
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: food.id,
         type: "EXPENSE",
         amount: "6.50",
         description: "Tim Hortons",
         date: daysAgo(5),
+        isCleared: true,
       },
       // Transportation
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: transport.id,
         type: "EXPENSE",
         amount: "65.00",
         description: "Gas - Petro Canada",
         date: daysAgo(7),
+        isCleared: true,
       },
       {
         profileId,
-        accountId: chequingAccount[0].id,
+        accountId: checkingAccount.id,
         categoryId: transport.id,
         type: "EXPENSE",
         amount: "156.00",
         description: "TTC Monthly Pass",
         date: daysAgo(28),
+        isCleared: true,
       },
       // Utilities
       {
         profileId,
-        accountId: chequingAccount[0].id,
+        accountId: checkingAccount.id,
         categoryId: utilities.id,
         type: "EXPENSE",
         amount: "125.00",
         description: "Hydro One",
         date: daysAgo(10),
+        isCleared: true,
       },
       {
         profileId,
-        accountId: chequingAccount[0].id,
+        accountId: checkingAccount.id,
         categoryId: utilities.id,
         type: "EXPENSE",
         amount: "85.00",
         description: "Rogers Internet",
         date: daysAgo(12),
+        isCleared: true,
       },
       // Entertainment
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: entertainment.id,
         type: "EXPENSE",
         amount: "25.00",
         description: "Cineplex",
         date: daysAgo(8),
+        isCleared: true,
       },
       // Shopping
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: shopping.id,
         type: "EXPENSE",
         amount: "150.00",
         description: "Amazon.ca",
         date: daysAgo(4),
+        isCleared: true,
       },
       // Subscriptions
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: subscriptions.id,
         type: "EXPENSE",
         amount: "16.99",
         description: "Netflix",
         date: daysAgo(20),
+        isCleared: true,
       },
       {
         profileId,
-        accountId: creditCard[0].id,
+        accountId: creditCard.id,
         categoryId: subscriptions.id,
         type: "EXPENSE",
         amount: "11.99",
         description: "Spotify",
         date: daysAgo(18),
+        isCleared: true,
       },
-      // Transfer
+      // Transfer: checking → savings (both sides of the transfer)
       {
         profileId,
-        accountId: chequingAccount[0].id,
+        accountId: checkingAccount.id,
         categoryId: null,
         type: "TRANSFER",
         amount: "500.00",
         description: "Transfer to savings",
         date: daysAgo(2),
-        toAccountId: savingsAccount[0].id,
+        transferId: transferUuid,
+        isCleared: true,
+      },
+      {
+        profileId,
+        accountId: savingsAccount.id,
+        categoryId: null,
+        type: "TRANSFER",
+        amount: "500.00",
+        description: "Transfer from checking",
+        date: daysAgo(2),
+        transferId: transferUuid,
+        isCleared: true,
       },
     ]);
 
-    console.log("✅ Created 13 transactions");
+    console.log("✅ Created 14 transactions (including 2 for transfer)");
 
     // ============================================================================
     // Summary
@@ -445,8 +484,8 @@ async function seed() {
   - Profiles: 1 (Default)
   - Income categories: ${incomeCategories.length}
   - Expense categories: ${expenseCategories.length}
-  - Accounts: 6
-  - Transactions: 13
+  - Accounts: 5
+  - Transactions: 14
     `);
 
     process.exit(0);

@@ -1,5 +1,5 @@
 import { useTransactionType, useUiActions } from "@/hooks/use-ui-store";
-import { TransactionTypeSchema, type TransactionType } from "@workspace/types";
+import type { TransactionType } from "@workspace/types";
 import {
   Tabs,
   TabsContent,
@@ -11,7 +11,7 @@ export const TransactionsWrapper = () => {
   const selectedTransactionType = useTransactionType();
   const { setTransactionType } = useUiActions();
 
-  const transactionTypes = TransactionTypeSchema.options;
+  const transactionTypes = ["INCOME", "EXPENSE", "TRANSFER"] as const;
 
   return (
     <Tabs
