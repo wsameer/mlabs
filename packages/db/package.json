@@ -10,13 +10,17 @@
     "./schema": "./src/schema.ts"
   },
   "scripts": {
+    "db:create": "dotenv -e ../../.env -- tsx src/create-db.ts",
+    "db:drop": "dotenv -e ../../.env -- tsx src/drop-db.ts",
     "db:generate": "dotenv -e ../../.env -- drizzle-kit generate",
     "db:migrate": "dotenv -e ../../.env -- drizzle-kit migrate",
     "db:push": "dotenv -e ../../.env -- drizzle-kit push",
+    "db:push:force": "dotenv -e ../../.env -- drizzle-kit push --force",
     "db:studio": "dotenv -e ../../.env -- drizzle-kit studio",
     "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
     "db:empty": "dotenv -e ../../.env -- tsx src/empty.ts",
     "db:reset": "dotenv -e ../../.env -- tsx src/empty.ts --execute && dotenv -e ../../.env -- tsx src/seed.ts",
+    "db:setup": "pnpm db:create && pnpm db:push:force && pnpm db:seed",
     "clean": "rm -rf drizzle .turbo"
   },
   "keywords": [
@@ -33,6 +37,7 @@
     "@types/pg": "^8.20.0",
     "@workspace/types": "workspace:*",
     "dotenv-cli": "^11.0.0",
+    "dotenv-expand": "^12.0.3",
     "drizzle-kit": "^0.31.8",
     "tsx": "^4.21.0"
   }
