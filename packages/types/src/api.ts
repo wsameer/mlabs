@@ -4,6 +4,10 @@ export const HealthCheckSchema = z.object({
   status: z.enum(["ok", "error"]),
   timestamp: z.string(),
   version: z.string().optional(),
+  database: z.enum(["connected", "disconnected"]).optional(),
+  responseTime: z.string().optional(),
+  uptime: z.number().optional(),
+  error: z.string().optional(),
 });
 
 export type HealthCheck = z.infer<typeof HealthCheckSchema>;

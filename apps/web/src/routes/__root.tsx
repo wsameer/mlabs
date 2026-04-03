@@ -2,7 +2,12 @@ import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { SETTINGS_ROUTE } from "@/constants";
 import { AppBottombar } from "@/features/navigation";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { createRootRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import type { QueryClient } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useNavigate,
+} from "@tanstack/react-router";
 import {
   SidebarInset,
   SidebarProvider,
@@ -14,7 +19,11 @@ import { CreateAccountDialog } from "@/features/accounts";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { AddTransactionPopover } from "@/features/transactions";
 
-export const Route = createRootRoute({
+interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
   errorComponent: RouteErrorBoundary,
   notFoundComponent: NotFoundComponent,

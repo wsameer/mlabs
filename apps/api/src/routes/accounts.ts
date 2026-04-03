@@ -5,11 +5,11 @@ import type { ApiResponse } from "@workspace/types";
 
 type Env = { Variables: { profileId: string } };
 
-const accountRoutes = new Hono<Env>();
-
 function getDb() {
   return getDatabase(process.env.DATABASE_URL!);
 }
+
+const accountRoutes = new Hono<Env>();
 
 // GET / — list accounts for profile
 accountRoutes.get("/", async (c) => {

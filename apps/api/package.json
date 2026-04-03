@@ -9,6 +9,7 @@
   "dependencies": {
     "@hono/node-server": "^1.19.11",
     "hono": "^4.12.8",
+    "hono-rate-limiter": "^0.4.0",
     "@workspace/db": "workspace:^",
     "@workspace/types": "workspace:*",
     "dotenv": "^17.2.3",

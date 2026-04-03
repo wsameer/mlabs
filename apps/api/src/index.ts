@@ -1,56 +1,139 @@
+import { join } from "path";
+import { existsSync } from "fs";
+import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { requestId } from "hono/request-id";
+import { secureHeaders } from "hono/secure-headers";
+import { rateLimiter } from "hono-rate-limiter";
 
-import { profileMiddleware } from "./middleware/profile.js";
-import health from "./routes/health.js";
-import accountRoutes from "./routes/accounts.js";
-import categoryRoutes from "./routes/categories.js";
-import transactionRoutes from "./routes/transactions.js";
 import { requestLogger } from "./middleware/request-logger.js";
-import { logger } from "./libs/logger.js";
 import { errorHandler } from "./middleware/error-handler.js";
+import { profileMiddleware } from "./middleware/profile.js";
 import { env } from "./libs/env.js";
+import { logger } from "./libs/logger.js";
+
+import health from "./routes/health.js";
+import categories from "./routes/categories.js";
+import accounts from "./routes/accounts.js";
+import transactionRoutes from "./routes/transactions.js";
 
 const app = new Hono();
 
+// Global Middleware
+// Request ID for tracing
+app.use("*", requestId());
+
+// Security headers
+app.use("*", secureHeaders());
+
+// Request logging
 app.use("*", requestLogger);
-// CORS
+
+// CORS - apply to all routes for proper preflight handling
 app.use(
-  "/api/*",
+  "*",
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: env.CORS_ORIGIN.split(","),
     allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "X-Profile-Id"],
+    allowHeaders: ["Content-Type", "X-Profile-Id", "X-Request-Id"],
     credentials: true,
+    maxAge: 86400, // 24 hours
   })
 );
 
-// Public routes
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
+// Rate limiting for API routes
+app.use(
+  "/api/*",
+  rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // limit each IP to 100 requests per windowMs
+    standardHeaders: "draft-6",
+    keyGenerator: (c) => {
+      return (
+        c.req.header("X-Forwarded-For") ??
+        c.req.header("X-Real-Ip") ??
+        "unknown"
+      );
+    },
+    handler: (c) => {
+      return c.json(
+        {
+          success: false,
+          error: {
+            message: "Too many requests, please try again later.",
+            code: "RATE_LIMIT_EXCEEDED",
+          },
+        },
+        429
+      );
+    },
+  })
+);
+
+// Public Routes
+// API root endpoint - useful for discovery and documentation
+app.get("/api", (c) => {
+  return c.json({
+    name: "mLabs API",
+    version: "1.0.0",
+    status: "running",
+    timestamp: new Date().toISOString(),
+  });
 });
+
+// Health check with database connectivity
 app.route("/api/health", health);
 
-// Protected routes (require X-Profile-Id)
-app.use("/api/accounts/*", profileMiddleware);
-app.use("/api/accounts", profileMiddleware);
-app.use("/api/categories/*", profileMiddleware);
-app.use("/api/categories", profileMiddleware);
-app.use("/api/transactions/*", profileMiddleware);
-app.use("/api/transactions", profileMiddleware);
+// Profile middleware - validates X-Profile-Id header for all API routes
+app.use("/api/*", profileMiddleware);
 
-app.route("/api/accounts", accountRoutes);
-app.route("/api/categories", categoryRoutes);
+// Protected API Routes
+app.route("/api/categories", categories);
+app.route("/api/accounts", accounts);
 app.route("/api/transactions", transactionRoutes);
 
-// Error handler
+// Static File Serving (Production Only)
+if (env.NODE_ENV === "production") {
+  const webDistPath = join(process.cwd(), "..", "web", "dist");
+
+  if (existsSync(webDistPath)) {
+    logger.info(`Serving static files from: ${webDistPath}`);
+
+    // Serve static assets
+    app.use("/*", serveStatic({ root: webDistPath }));
+
+    // SPA fallback - serve index.html for all non-API routes
+    app.get("*", serveStatic({ path: join(webDistPath, "index.html") }));
+  } else {
+    logger.warn(`Web dist directory not found at: ${webDistPath}`);
+  }
+}
+
+// Error Handling
+
+// 404 handler - must come after all routes
+app.notFound((c) => {
+  return c.json(
+    {
+      success: false,
+      error: {
+        message: "Not found",
+        code: "NOT_FOUND",
+      },
+    },
+    404
+  );
+});
+
+// Global error handler
 app.onError(errorHandler);
 
-// Start server
+// Server Startup
 const port = env.PORT;
 
-serve(
+const server = serve(
   {
     fetch: app.fetch,
     port,
@@ -58,5 +141,36 @@ serve(
   (info) => {
     logger.info(`Server is running on http://localhost:${info.port}/api`);
     logger.info(`Environment: ${env.NODE_ENV}`);
+    logger.info(`Rate limiting: 100 requests per 15 minutes`);
   }
 );
+
+// Graceful Shutdown
+function gracefulShutdown(signal: string) {
+  logger.info(`${signal} received, shutting down gracefully...`);
+
+  server.close(() => {
+    logger.info("HTTP server closed");
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    logger.error("Forced shutdown after timeout");
+    process.exit(1);
+  }, 10000);
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+// Handle uncaught errors
+process.on("uncaughtException", (error) => {
+  logger.error("Uncaught Exception:", error);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error("Unhandled Rejection at:", promise, "reason:", reason);
+  process.exit(1);
+});
