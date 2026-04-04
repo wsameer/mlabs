@@ -14,6 +14,8 @@ import { profileMiddleware } from "./middleware/profile.js";
 import { env } from "./libs/env.js";
 
 import health from "./routes/health.js";
+import bootstrap from "./routes/bootstrap.js";
+import profiles from "./routes/profiles.js";
 import { logger } from "./libs/logger.js";
 
 const app = new Hono();
@@ -82,6 +84,8 @@ app.get("/api", (c) => {
 
 // Health check with database connectivity
 app.route("/api/health", health);
+app.route("/api/bootstrap", bootstrap);
+app.route("/api/profiles", profiles);
 
 // Profile middleware - validates X-Profile-Id header for all API routes
 app.use("/api/*", profileMiddleware);
