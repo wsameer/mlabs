@@ -27,16 +27,16 @@ import {
 } from "@workspace/ui/components/popover";
 import { Calendar } from "@workspace/ui/components/calendar";
 import { ACCOUNT_TYPES, type AccountType } from "../types";
-import type { AccountType as DbAccountType } from "@workspace/types";
+import type { AccountGroup } from "@workspace/types";
 
-const ACCOUNT_TYPE_MAP: Record<AccountType, DbAccountType> = {
-  cash: "CHEQUING",
-  chequing: "CHEQUING",
-  savings: "SAVINGS",
-  credit: "CREDIT_CARD",
-  investment: "NON_REGISTERED",
-  gic: "TFSA",
-  other: "NON_REGISTERED",
+const ACCOUNT_TYPE_MAP: Record<AccountType, AccountGroup> = {
+  cash: "cash",
+  chequing: "checking",
+  savings: "savings",
+  credit: "credit_card",
+  investment: "investment",
+  gic: "savings",
+  other: "other",
 };
 
 const accountFormSchema = z.object({
@@ -74,8 +74,12 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
     createAccount.mutate(
       {
         name: data.name,
-        type: ACCOUNT_TYPE_MAP[data.type],
-        balance: data.balance,
+        group: ACCOUNT_TYPE_MAP[data.type],
+        balance: String(data.balance),
+        currency: "CAD",
+        isActive: true,
+        includeInNetWorth: true,
+        sortOrder: 0,
       },
       {
         onSuccess: () => {

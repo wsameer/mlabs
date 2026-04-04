@@ -2,6 +2,7 @@ import { PlusIcon, WalletMinimalIcon } from "lucide-react";
 import React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 
+import { DASHBOARD_ROUTE } from "@/constants";
 import {
   PRIMARY_NAVIGATION_OPTIONS,
   SECONDARY_NAV_OPTIONS,
@@ -59,7 +60,7 @@ export function AppLeftSideNav({
             <SidebarMenuButton
               size="lg"
               className="md:h-8 md:p-0"
-              render={<Link to="/" />}
+              render={<Link to={DASHBOARD_ROUTE} />}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <WalletMinimalIcon className="size-4" />

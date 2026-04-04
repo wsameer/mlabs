@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
 import type {
   Account,
-  InsertAccount,
+  CreateAccount,
   UpdateAccount,
   AccountQuery,
 } from "@workspace/types";
@@ -37,7 +37,7 @@ export function useAccount(id: string) {
 export function useCreateAccount() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: InsertAccount) =>
+    mutationFn: (data: CreateAccount) =>
       apiClient<Account>("/accounts", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.lists() });

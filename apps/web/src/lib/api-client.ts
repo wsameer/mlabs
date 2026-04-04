@@ -7,13 +7,15 @@ type RequestOptions = {
   body?: unknown;
   params?: Record<string, string | number | boolean | undefined | null>;
   signal?: AbortSignal;
+  includeProfileId?: boolean;
 };
 
 export async function apiClient<T>(
   path: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { method = "GET", body, params, signal } = options;
+  const { method = "GET", body, params, signal, includeProfileId = true } =
+    options;
 
   const url = new URL(`/api${path}`, API_BASE);
   if (params) {
@@ -25,8 +27,14 @@ export async function apiClient<T>(
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "X-Profile-Id": getProfileId(),
   };
+
+  if (includeProfileId) {
+    const currentProfileId = getProfileId();
+    if (currentProfileId) {
+      headers["X-Profile-Id"] = currentProfileId;
+    }
+  }
 
   const response = await fetch(url.toString(), {
     method,
@@ -76,12 +84,20 @@ export function toQueryParams(
   return result;
 }
 
+/**
+ * @todo - move this to its own file
+ */
 // Profile ID management (simple localStorage for now)
 let profileId: string | null = null;
 
 export function setProfileId(id: string) {
   profileId = id;
   localStorage.setItem("mlabs-profile-id", id);
+}
+
+export function clearProfileId() {
+  profileId = null;
+  localStorage.removeItem("mlabs-profile-id");
 }
 
 export function getProfileId(): string {

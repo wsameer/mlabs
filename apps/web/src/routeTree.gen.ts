@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfilesRouteImport } from './routes/profiles'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,9 +29,24 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfilesRoute = ProfilesRouteImport.update({
+  id: '/profiles',
+  path: '/profiles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
@@ -51,7 +69,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/dashboard': typeof DashboardRoute
   '/maintenance': typeof MaintenanceRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
 }
@@ -59,7 +80,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/dashboard': typeof DashboardRoute
   '/maintenance': typeof MaintenanceRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
 }
@@ -68,7 +92,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/dashboard': typeof DashboardRoute
   '/maintenance': typeof MaintenanceRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
 }
@@ -78,7 +105,10 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/accounts'
+    | '/dashboard'
     | '/maintenance'
+    | '/onboarding'
+    | '/profiles'
     | '/settings'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
@@ -86,7 +116,10 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/accounts'
+    | '/dashboard'
     | '/maintenance'
+    | '/onboarding'
+    | '/profiles'
     | '/settings'
     | '/transactions'
   id:
@@ -94,7 +127,10 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/accounts'
+    | '/dashboard'
     | '/maintenance'
+    | '/onboarding'
+    | '/profiles'
     | '/settings'
     | '/transactions'
   fileRoutesById: FileRoutesById
@@ -103,7 +139,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   AccountsRoute: typeof AccountsRoute
+  DashboardRoute: typeof DashboardRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ProfilesRoute: typeof ProfilesRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
 }
@@ -124,11 +163,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profiles': {
+      id: '/profiles'
+      path: '/profiles'
+      fullPath: '/profiles'
+      preLoaderRoute: typeof ProfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/maintenance': {
       id: '/maintenance'
       path: '/maintenance'
       fullPath: '/maintenance'
       preLoaderRoute: typeof MaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts': {
@@ -159,7 +219,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   AccountsRoute: AccountsRoute,
+  DashboardRoute: DashboardRoute,
   MaintenanceRoute: MaintenanceRoute,
+  OnboardingRoute: OnboardingRoute,
+  ProfilesRoute: ProfilesRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,
 }

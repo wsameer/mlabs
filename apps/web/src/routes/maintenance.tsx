@@ -25,7 +25,11 @@ export function MaintenancePage() {
             Service Unavailable
           </EmptyTitle>
           <EmptyDescription>
-            We&apos;re experiencing temporary issues with our services. The application is currently unavailable. Please try again in a few minutes.
+            We&apos;re experiencing temporary issues with our services.
+          </EmptyDescription>
+          <EmptyDescription>
+            The application is currently unavailable. Please try again in a few
+            minutes.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>

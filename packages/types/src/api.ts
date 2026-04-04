@@ -75,6 +75,40 @@ export type ProfileType = z.infer<typeof ProfileTypeSchema>;
 export type DateFormat = z.infer<typeof DateFormatSchema>;
 export type WeekStart = z.infer<typeof WeekStartSchema>;
 
+export const BootstrapStatusSchema = z.enum(["onboarding", "pick", "ready"]);
+
+export const BootstrapSchema = z.object({
+  status: BootstrapStatusSchema,
+  profile: ProfileSchema.nullable().optional(),
+  profiles: z.array(ProfileSchema).default([]),
+});
+
+export type Bootstrap = z.infer<typeof BootstrapSchema>;
+export type BootstrapStatus = z.infer<typeof BootstrapStatusSchema>;
+
+export const OnboardingAccountSchema = z.object({
+  name: z.string().min(1).max(100),
+  group: AccountGroupSchema,
+  balance: z.string().default("0"),
+});
+
+export type OnboardingAccount = z.infer<typeof OnboardingAccountSchema>;
+
+export const CreateOnboardingProfileSchema = z.object({
+  name: z.string().min(1).max(100),
+  icon: z.string().max(10).optional(),
+  type: ProfileTypeSchema.default("PERSONAL"),
+  currency: z.string().length(3).default("CAD"),
+  dateFormat: DateFormatSchema.default("D MMM, YYYY"),
+  weekStart: WeekStartSchema.default("MONDAY"),
+  timezone: z.string().min(1),
+  firstAccount: OnboardingAccountSchema.optional(),
+});
+
+export type CreateOnboardingProfile = z.infer<
+  typeof CreateOnboardingProfileSchema
+>;
+
 export const InsertProfileSchema = ProfileSchema.omit({
   id: true,
   createdAt: true,

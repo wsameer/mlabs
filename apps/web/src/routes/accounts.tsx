@@ -1,7 +1,16 @@
 import { ACCOUNTS_ROUTE } from "@/constants";
+import { RequiresProfile } from "@/components/RouteGuards";
 import { AccountsPage } from "@/features/accounts";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute(ACCOUNTS_ROUTE)({
-  component: AccountsPage,
+  component: AccountsRoute,
 });
+
+function AccountsRoute() {
+  return (
+    <RequiresProfile>
+      <AccountsPage />
+    </RequiresProfile>
+  );
+}

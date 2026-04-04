@@ -11,6 +11,7 @@ import { router } from "@/lib/router";
 import { queryClient } from "@/lib/query-client";
 import { AppGate } from "@/components/AppGate";
 import { AppLoader } from "@/components/AppLoader";
+import { BootstrapGate } from "@/components/BootstrapGate";
 
 export function App() {
   return (
@@ -23,10 +24,12 @@ export function App() {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <AppGate>
-              <React.Suspense fallback={<AppLoader />}>
-                <RouterProvider router={router} />
-                <Toaster />
-              </React.Suspense>
+              <BootstrapGate>
+                <React.Suspense fallback={<AppLoader />}>
+                  <RouterProvider router={router} />
+                  <Toaster />
+                </React.Suspense>
+              </BootstrapGate>
             </AppGate>
           </TooltipProvider>
         </QueryClientProvider>

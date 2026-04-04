@@ -1,8 +1,12 @@
 import { createRouter, type RouteIds } from "@tanstack/react-router";
+import { queryClient } from "@/lib/query-client";
 import { routeTree } from "../routeTree.gen";
 
 export const router = createRouter({
   routeTree,
+  context: {
+    queryClient,
+  },
   defaultPendingComponent: () => (
     <div>Loading form global pending component...</div>
   ),

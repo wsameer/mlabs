@@ -1,5 +1,11 @@
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
-import { SETTINGS_ROUTE } from "@/constants";
+import {
+  MAINTENANCE_ROUTE,
+  ONBOARDING_ROUTE,
+  PROFILES_ROUTE,
+  ROOT_ROUTE_PATH,
+  SETTINGS_ROUTE,
+} from "@/constants";
 import { AppBottombar } from "@/features/navigation";
 import { useHotkey } from "@/hooks/use-hotkey";
 import type { QueryClient } from "@tanstack/react-query";
@@ -7,6 +13,7 @@ import {
   createRootRouteWithContext,
   Outlet,
   useNavigate,
+  useRouterState,
 } from "@tanstack/react-router";
 import {
   SidebarInset,
@@ -31,7 +38,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
   const navigate = useNavigate();
+  const router = useRouterState();
   const { setGlobalSearch } = useUiActions();
+  const pathname = router.location.pathname;
+  const isPublicRoute =
+    pathname === ROOT_ROUTE_PATH ||
+    pathname.startsWith(ONBOARDING_ROUTE) ||
+    pathname.startsWith(PROFILES_ROUTE) ||
+    pathname.startsWith(MAINTENANCE_ROUTE);
 
   useHotkey({
     key: ",",
@@ -53,6 +67,10 @@ function RootComponent() {
       setGlobalSearch(true);
     },
   });
+
+  if (isPublicRoute) {
+    return <Outlet />;
+  }
 
   return (
     <SidebarProvider
