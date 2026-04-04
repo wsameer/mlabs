@@ -6,20 +6,20 @@ import { immer } from "zustand/middleware/immer";
 import { DEFAULT_GRAIN } from "@/constants";
 
 import { getDefaultRange } from "@/lib/get-default-range";
-import { createBackendSlice, type BackendSlice } from "./slices/backend-slice";
+import { createAppSlice, type AppSlice } from "./slices/app-slice";
 import { createFiltersSlice, type FiltersSlice } from "./slices/filters-slice";
 import { createLayoutSlice, type LayoutSlice } from "./slices/layout-slice";
 import { createUiSlice, type UiSlice } from "./slices/ui-slice";
 
 // COMBINED STORE TYPE
-export type AppStoreState = BackendSlice & LayoutSlice & UiSlice & FiltersSlice;
+export type AppStoreState = AppSlice & LayoutSlice & UiSlice & FiltersSlice;
 
 // STORE CREATION
 export const useAppStore = create<AppStoreState>()(
   devtools(
     persist(
       immer((...args) => ({
-        ...createBackendSlice(...args),
+        ...createAppSlice(...args),
         ...createLayoutSlice(...args),
         ...createUiSlice(...args),
         ...createFiltersSlice(...args),
