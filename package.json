@@ -27,7 +27,15 @@
     "db:studio": "pnpm --filter=@workspace/db db:studio",
     "db:seed": "pnpm --filter=@workspace/db db:seed",
     "db:empty": "pnpm --filter=@workspace/db db:empty",
-    "db:reset": "pnpm --filter=@workspace/db db:reset"
+    "db:reset": "pnpm --filter=@workspace/db db:reset",
+    "db:docker:up": "docker compose up -d db",
+    "db:docker:down": "docker compose stop db",
+    "db:docker:restart": "docker compose restart db",
+    "db:docker:logs": "docker compose logs -f db",
+    "db:docker:status": "docker compose ps db",
+    "db:docker:reset": "docker compose down -v && docker compose up -d db",
+    "db:bootstrap": "pnpm db:setup",
+    "db:bootstrap:seed": "pnpm db:setup:seed"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

@@ -20,8 +20,9 @@
     "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
     "db:empty": "dotenv -e ../../.env -- tsx src/empty.ts",
     "db:reset": "dotenv -e ../../.env -- tsx src/empty.ts --execute && dotenv -e ../../.env -- tsx src/seed.ts",
-    "db:setup": "pnpm db:create",
-    "clean": "rm -rf drizzle .turbo"
+    "db:setup": "pnpm db:create && pnpm db:push:force",
+    "clean": "rm -rf drizzle .turbo",
+    "db:setup:seed": "pnpm db:setup && pnpm db:seed"
   },
   "keywords": [
     "database",

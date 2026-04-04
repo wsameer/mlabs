@@ -124,7 +124,8 @@ All scripts load environment variables from root `.env` automatically via `doten
 | `pnpm db:empty`           | Show table row counts (dry-run)                            |
 | `pnpm db:empty --execute` | Truncate all tables                                        |
 | `pnpm db:reset`           | Empty + reseed database                                    |
-| `pnpm db:setup`           | Full setup: create + push + seed                           |
+| `pnpm db:setup`           | Full setup: create + push                                  |
+| `pnpm db:setup:seed`      | Full setup: create + push + seed                           |
 
 ## Quick Start on New Machine
 
@@ -132,11 +133,11 @@ All scripts load environment variables from root `.env` automatically via `doten
 # 1. Copy environment file
 cp .env.example .env
 
-# 2. Ensure PostgreSQL is running (e.g., Docker)
-docker run -d -e POSTGRES_PASSWORD=postgres -p 5433:5432 postgres
+# 2. Ensure PostgreSQL is running (from repo root)
+pnpm db:docker:up
 
 # 3. Create database, tables, and seed data
-pnpm db:setup
+pnpm db:setup:seed
 ```
 
 ## Seeded Data

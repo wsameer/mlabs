@@ -2,6 +2,17 @@
 
 This is a Vite monorepo template with shadcn/ui.
 
+## Local development (app local + DB in Docker)
+
+```bash
+cp .env.example .env
+pnpm db:docker:up
+pnpm db:bootstrap
+pnpm dev
+```
+
+Use `pnpm db:bootstrap:seed` instead of `pnpm db:bootstrap` if you want sample data.
+
 ## Adding components
 
 To add components to your app, run the following command at the root of your `web` app:
