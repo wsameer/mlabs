@@ -25,8 +25,8 @@ function validateEnv(): ApiEnv {
     console.error("");
     console.error("💡 Tips:");
     console.error(" 1. Copy .env.example to .env");
-    console.error(" 2. Fill in required values (especially DATABASE_URL");
-    console.error(" 3. Check that your database is running");
+    console.error(" 2. Fill in required values (especially DATABASE_URL)");
+    console.error(" 3. DATABASE_URL should point to your sqlite file (e.g. ./data/mlabs.db)");
     console.error("");
 
     process.exit(1);

@@ -1,35 +1,34 @@
-import postgres from "postgres";
+import { existsSync, unlinkSync } from "fs";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
+import { resolveDatabasePath } from "./path.js";
 
 expand(config({ path: "../../.env" }));
 
+function safeDelete(path: string) {
+  if (existsSync(path)) {
+    unlinkSync(path);
+  }
+}
+
 async function dropDatabase() {
-  const dbName = process.env.POSTGRES_DB;
-  const dbUser = process.env.POSTGRES_USER ?? "postgres";
-  const dbPassword = process.env.POSTGRES_PASSWORD ?? "postgres";
-  const dbHost = process.env.DB_HOST ?? "localhost";
-  const dbPort = parseInt(process.env.DB_PORT ?? "5432");
+  const databaseUrl = process.env.DATABASE_URL;
 
-  if (!dbName) {
-    throw new Error("POSTGRES_DB is not defined in .env");
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not defined in .env");
   }
 
-  const connectionString = `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/postgres`;
+  const databasePath = resolveDatabasePath(databaseUrl);
+  const walPath = `${databasePath}-wal`;
+  const shmPath = `${databasePath}-shm`;
 
-  console.log(`⚠️  Dropping database "${dbName}"...`);
+  console.log(`⚠️  Dropping sqlite database at "${databasePath}"...`);
 
-  const client = postgres(connectionString);
+  safeDelete(walPath);
+  safeDelete(shmPath);
+  safeDelete(databasePath);
 
-  try {
-    await client`DROP DATABASE IF EXISTS ${client(dbName)}`;
-    console.log(`✅ Database "${dbName}" dropped successfully!`);
-  } catch (error) {
-    console.error(`❌ Error dropping database:`, error);
-    throw error;
-  } finally {
-    await client.end();
-  }
+  console.log("✅ SQLite database dropped successfully!");
 }
 
 dropDatabase();

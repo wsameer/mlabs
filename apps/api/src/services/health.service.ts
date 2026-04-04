@@ -1,7 +1,8 @@
 import type { HealthCheck } from "@workspace/types";
+import { profiles } from "@workspace/db";
 
 import { env } from "../libs/env.js";
-import { getDb, sql } from "../libs/db.js";
+import { getDb } from "../libs/db.js";
 
 export class HealthService {
   async getHealthCheck(): Promise<HealthCheck> {
@@ -9,7 +10,7 @@ export class HealthService {
 
     try {
       const db = getDb();
-      await db.execute(sql`SELECT 1`);
+      await db.select({ id: profiles.id }).from(profiles).limit(1);
 
       return {
         status: "ok",

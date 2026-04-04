@@ -1,23 +1,20 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: mlabs_db
+  app:
+    profiles: ["full-stack"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mlabs_app
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: 3001
+      DATABASE_URL: /data/mlabs.db
     ports:
-      - "${DB_PORT:-5433}:5432"
+      - "3001:3001"
     volumes:
-      - mlabs_db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - mlabs_data:/data
 
 volumes:
-  mlabs_db_data:
+  mlabs_data:

@@ -9,7 +9,7 @@ export const BaseEnvSchema = z.object({
 
 export const ApiEnvSchema = BaseEnvSchema.extend({
   PORT: z.coerce.number().int().positive().default(3001),
-  DATABASE_URL: z.url().optional(),
+  DATABASE_URL: z.string().min(1).default("./data/mlabs.db"),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),

@@ -4,6 +4,7 @@ import {
   accounts,
   transactions,
   profiles,
+  eq,
 } from "./index.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -24,6 +25,17 @@ async function seed() {
     // ============================================================================
     console.log("👤 Creating default profile...");
 
+    const existingDefaultProfile = await db
+      .select({ id: profiles.id })
+      .from(profiles)
+      .where(eq(profiles.isDefault, true))
+      .limit(1);
+
+    if (existingDefaultProfile.length > 0) {
+      console.log("✅ Default profile already exists, skipping seed");
+      process.exit(0);
+    }
+
     const [defaultProfile] = await db
       .insert(profiles)
       .values({
@@ -38,13 +50,7 @@ async function seed() {
         isActive: true,
         isSetupComplete: true,
       })
-      .returning()
-      .onConflictDoNothing();
-
-    if (!defaultProfile) {
-      console.log("✅ Default profile already exists, skipping seed");
-      process.exit(0);
-    }
+      .returning();
 
     console.log(`✅ Created default profile: ${defaultProfile.id}`);
 

@@ -1,14 +1,23 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { createClient, type Client } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema.js";
+import { ensureDatabaseDirectory, resolveDatabasePath } from "./path.js";
 
 // Database connection singleton
 let db: ReturnType<typeof drizzle> | null = null;
+let sqliteClient: Client | null = null;
 
-export function getDatabase(connectionString: string) {
+export function getDatabase(databaseUrl: string) {
   if (!db) {
-    const queryClient = postgres(connectionString);
-    db = drizzle(queryClient, { schema });
+    const databasePath = resolveDatabasePath(databaseUrl);
+    ensureDatabaseDirectory(databasePath);
+    const sqliteUrl = `file:${databasePath}`;
+
+    sqliteClient = createClient({ url: sqliteUrl });
+    void sqliteClient.execute("PRAGMA journal_mode = WAL");
+    void sqliteClient.execute("PRAGMA foreign_keys = ON");
+
+    db = drizzle(sqliteClient, { schema });
   }
   return db;
 }

@@ -2,11 +2,10 @@
 
 This is a Vite monorepo template with shadcn/ui.
 
-## Local development (app local + DB in Docker)
+## Local development (app + embedded SQLite)
 
 ```bash
 cp .env.example .env
-pnpm db:docker:up
 pnpm db:bootstrap
 pnpm dev
 ```

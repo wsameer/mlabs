@@ -1,44 +1,29 @@
-import postgres from "postgres";
+import { closeSync, existsSync, openSync } from "fs";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
+import { ensureDatabaseDirectory, resolveDatabasePath } from "./path.js";
 
 expand(config({ path: "../../.env" }));
 
 async function createDatabase() {
-  const dbName = process.env.POSTGRES_DB;
-  const dbUser = process.env.POSTGRES_USER ?? "postgres";
-  const dbPassword = process.env.POSTGRES_PASSWORD ?? "postgres";
-  const dbHost = process.env.DB_HOST ?? "localhost";
-  const dbPort = parseInt(process.env.DB_PORT ?? "5432");
+  const databaseUrl = process.env.DATABASE_URL;
 
-  if (!dbName) {
-    throw new Error("POSTGRES_DB is not defined in .env");
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not defined in .env");
   }
 
-  const connectionString = `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/postgres`;
+  const databasePath = resolveDatabasePath(databaseUrl);
+  ensureDatabaseDirectory(databasePath);
 
-  console.log(`🔧 Creating database "${dbName}"...`);
-
-  const client = postgres(connectionString);
-
-  try {
-    const result = await client`
-      SELECT 1 FROM pg_database WHERE datname = ${dbName}
-    `;
-
-    if (result.length > 0) {
-      console.log(`✅ Database "${dbName}" already exists.`);
-      return;
-    }
-
-    await client`CREATE DATABASE ${client(dbName)}`;
-    console.log(`✅ Database "${dbName}" created successfully!`);
-  } catch (error) {
-    console.error(`❌ Error creating database:`, error);
-    throw error;
-  } finally {
-    await client.end();
+  if (existsSync(databasePath)) {
+    console.log(`✅ SQLite database already exists at "${databasePath}".`);
+    return;
   }
+
+  console.log(`🔧 Creating sqlite database at "${databasePath}"...`);
+  const handle = openSync(databasePath, "a");
+  closeSync(handle);
+  console.log("✅ SQLite database created successfully!");
 }
 
 createDatabase();

@@ -1,68 +1,30 @@
-# Docker (Database Only for Local Development)
+# Docker Notes
 
-This project currently runs:
-- app locally (`pnpm dev`)
-- PostgreSQL in Docker (`docker compose`)
+SQLite is embedded, so local development does not need a database container.
 
-## 1. Prepare environment
+## Local development (recommended)
 
 ```bash
 cp .env.example .env
-```
-
-Default database config:
-- host: `localhost`
-- port: `5433`
-- db: `mlabs_dev`
-- user: `postgres`
-
-## 2. Start PostgreSQL in Docker
-
-```bash
-pnpm db:docker:up
-pnpm db:docker:status
-```
-
-If you need logs:
-
-```bash
-pnpm db:docker:logs
-```
-
-## 3. Bootstrap schema
-
-Run once on a fresh DB:
-
-```bash
 pnpm db:bootstrap
+pnpm dev
 ```
 
-Optional seed data:
+Optional sample data:
 
 ```bash
 pnpm db:bootstrap:seed
 ```
 
-## 4. Run the app locally
+## Optional full-stack container (later/deployment testing)
+
+`compose.yaml` includes an `app` service under the `full-stack` profile.
+It mounts a persistent Docker volume at `/data` and uses:
+
+- `DATABASE_URL=/data/mlabs.db`
+
+Run it with:
 
 ```bash
-pnpm dev
+docker compose --profile full-stack up --build
 ```
-
-## Useful commands
-
-```bash
-# stop DB container (keeps data volume)
-pnpm db:docker:down
-
-# restart DB container
-pnpm db:docker:restart
-
-# reset DB container and delete all DB data
-pnpm db:docker:reset
-```
-
-## Data persistence
-
-Postgres data is stored in a named Docker volume: `mlabs_db_data`.
-That means restarting containers does not wipe data unless you run a reset with `-v`.

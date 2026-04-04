@@ -78,17 +78,16 @@ async function execute() {
     `Found ${totalBefore} total rows across ${TABLES.length} tables\n`
   );
 
-  // Use TRUNCATE CASCADE for efficiency and to handle foreign keys
-  console.log("Truncating tables...");
+  console.log("Deleting rows from all tables...");
 
   try {
-    // Truncate all tables in one statement with CASCADE
-    const tableNames = TABLES.map((t) => t.name).join(", ");
-    await db.execute(
-      sql.raw(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`)
-    );
+    await db.transaction(async (tx) => {
+      for (const { table } of TABLES) {
+        await tx.delete(table);
+      }
+    });
 
-    console.log("✅ All tables truncated\n");
+    console.log("✅ All table rows deleted\n");
 
     // Verify
     const afterCounts = await getTableCounts(db);
