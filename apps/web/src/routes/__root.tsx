@@ -1,5 +1,4 @@
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
-import { BackendStatus } from "@/components/BackendStatus";
 import { SETTINGS_ROUTE } from "@/constants";
 import { AppBottombar } from "@/features/navigation";
 import { useHotkey } from "@/hooks/use-hotkey";
@@ -57,13 +56,8 @@ function RootComponent() {
 
   return (
     <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "350px",
-        } as React.CSSProperties
-      }
+      style={{ "--sidebar-width": "350px" } as React.CSSProperties}
     >
-      <BackendStatus />
       <AppSidebar />
       <SidebarInset>
         <AppHeader />

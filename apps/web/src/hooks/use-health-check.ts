@@ -14,6 +14,6 @@ export function useHealthCheck() {
     queryFn: () => apiClient<HealthCheck>("/health"),
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
-    staleTime: 30000,
+    staleTime: Infinity, // treat as resolved for the session lifetime
   });
 }

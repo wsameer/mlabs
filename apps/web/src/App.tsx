@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalErrorBoundary } from "@/components/ErrorBoundary";
 import { router } from "@/lib/router";
 import { queryClient } from "@/lib/query-client";
+import { AppGate } from "@/components/AppGate";
 import { AppLoader } from "@/components/AppLoader";
 
 export function App() {
@@ -21,10 +22,12 @@ export function App() {
       >
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
-            <React.Suspense fallback={<AppLoader />}>
-              <RouterProvider router={router} />
-              <Toaster />
-            </React.Suspense>
+            <AppGate>
+              <React.Suspense fallback={<AppLoader />}>
+                <RouterProvider router={router} />
+                <Toaster />
+              </React.Suspense>
+            </AppGate>
           </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>
