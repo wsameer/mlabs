@@ -15,8 +15,6 @@ export const ONBOARDING_ACCOUNT_GROUPS = [
   "savings",
   "cash",
   "credit_card",
-  "investment",
-  "other",
 ] as const;
 
 export const WorkspaceTypeSchema = z.enum(WORKSPACE_TYPES);

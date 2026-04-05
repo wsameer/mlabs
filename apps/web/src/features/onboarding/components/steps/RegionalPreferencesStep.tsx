@@ -196,8 +196,8 @@ export function RegionalPreferencesStep({
                 className="bg-muted"
               />
               <FieldDescription>
-                Detected from this device for now. We can make this editable
-                later if needed.
+                Detected from this device for now. This is not editable as of
+                today
               </FieldDescription>
               {fieldState.invalid ? (
                 <FieldError errors={[fieldState.error]} />

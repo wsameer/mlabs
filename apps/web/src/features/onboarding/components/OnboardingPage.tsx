@@ -76,7 +76,7 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   <div className="flex size-8 items-center justify-center rounded-2xl md:justify-start">
                     <Building2Icon className="size-6" />
                   </div>
-                  <CardTitle className="text-xl md:text-sm">
+                  <CardTitle className="text-xl md:text-lg">
                     Welcome to mLabs
                   </CardTitle>
                   <CardDescription className="hidden md:block">
@@ -139,7 +139,7 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                 </div>
 
                 <div className="space-y-2 text-left">
-                  <h3 className="text-base font-medium md:text-lg">
+                  <h3 className="text-base font-medium md:text-base">
                     {currentStep.title}
                   </h3>
                   <p className="text-sm text-muted-foreground">
@@ -159,7 +159,6 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   updateRegionalPreferences={updateRegionalPreferences}
                   updateFirstAccount={updateFirstAccount}
                   setStepCompletion={setStepCompletion}
-                  skipOptionalAccountStep={skipOptionalAccountStep}
                 />
 
                 <div className="flex items-center justify-between gap-3">
@@ -171,20 +170,33 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                     Previous
                   </Button>
 
-                  <Button
-                    onClick={() =>
-                      nextStep
-                        ? void goToNextStep()
-                        : void submitOptionalAccountStep()
-                    }
-                    disabled={
-                      nextStep
-                        ? !canGoNext || isSubmitting
-                        : !canSubmitOptionalAccount || isSubmitting
-                    }
-                  >
-                    {isSubmitting ? "Creating..." : currentStep.actionLabel}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {step === 3 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => void skipOptionalAccountStep()}
+                        disabled={isSubmitting}
+                      >
+                        Skip for now
+                      </Button>
+                    ) : null}
+
+                    <Button
+                      onClick={() =>
+                        nextStep
+                          ? void goToNextStep()
+                          : void submitOptionalAccountStep()
+                      }
+                      disabled={
+                        nextStep
+                          ? !canGoNext || isSubmitting
+                          : !canSubmitOptionalAccount || isSubmitting
+                      }
+                    >
+                      {isSubmitting ? "Creating..." : currentStep.actionLabel}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

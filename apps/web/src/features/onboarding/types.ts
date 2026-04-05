@@ -28,7 +28,6 @@ export type OnboardingStepComponentProps = {
   updateRegionalPreferences: (value: RegionalPreferences) => void;
   updateFirstAccount: (value: FirstAccount) => void;
   setStepCompletion: (step: OnboardingStep, isComplete: boolean) => void;
-  skipOptionalAccountStep: () => Promise<void>;
 };
 
 export type OnboardingStepDefinition = {
