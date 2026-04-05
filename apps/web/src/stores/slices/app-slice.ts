@@ -5,10 +5,14 @@ import {
   getProfileId,
   setProfileId,
 } from "@/lib/api-client";
-import type { BackendStatus, Bootstrap, HealthCheck, Profile } from "@workspace/types";
+import type {
+  BackendStatus,
+  Bootstrap,
+  HealthCheck,
+  Profile,
+} from "@workspace/types";
 
 import type { StateCreator } from "zustand";
-
 
 export type AppStatus = "onboarding" | "pick" | "ready" | null;
 
@@ -22,6 +26,7 @@ export type AppSlice = {
   appError: string | null;
   setBackendStatus: (status: BackendStatus) => void;
   setBackendHealth: (health: HealthCheck | null) => void;
+  completeOnboarding: (profile: Profile) => void;
   fetchAppData: () => Promise<Bootstrap>;
 };
 
@@ -48,6 +53,17 @@ export const createAppSlice: StateCreator<
     set((state) => {
       state.backendHealth = health;
     }),
+
+  completeOnboarding: (profile) => {
+    setProfileId(profile.id);
+    set((state) => {
+      state.appStatus = "ready";
+      state.appProfile = profile;
+      state.appProfiles = [profile];
+      state.isAppLoading = false;
+      state.appError = null;
+    });
+  },
 
   fetchAppData: async () => {
     set((state) => {

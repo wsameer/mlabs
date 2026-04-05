@@ -1,4 +1,11 @@
 import z from "zod";
+import {
+  DateFormatSchema,
+  FirstAccountSchema,
+  WeekStartSchema,
+  WorkspaceNameSchema,
+  WorkspaceTypeSchema,
+} from "./onboarding.js";
 
 // ============================================================================
 // Health Check
@@ -19,15 +26,6 @@ export type HealthCheck = z.infer<typeof HealthCheckSchema>;
 // ============================================================================
 // Enums
 // ============================================================================
-
-export const DateFormatSchema = z.enum([
-  "D MMM, YYYY", // 12 Aug, 2025
-  "DD/MM/YYYY", // 12/08/2025
-  "MM/DD/YYYY", // 08/12/2025
-  "YYYY-MM-DD", // 2025-08-12
-]);
-
-export const WeekStartSchema = z.enum(["SUNDAY", "MONDAY"]);
 
 export const ProfileTypeSchema = z.enum(["PERSONAL", "BUSINESS", "SHARED"]);
 
@@ -86,18 +84,20 @@ export const BootstrapSchema = z.object({
 export type Bootstrap = z.infer<typeof BootstrapSchema>;
 export type BootstrapStatus = z.infer<typeof BootstrapStatusSchema>;
 
-export const OnboardingAccountSchema = z.object({
-  name: z.string().min(1).max(100),
-  group: AccountGroupSchema,
-  balance: z.string().default("0"),
-});
+export const OnboardingAccountSchema = FirstAccountSchema.refine(
+  (value) => AccountGroupSchema.safeParse(value.group).success,
+  {
+    message: "Unsupported account group",
+    path: ["group"],
+  }
+);
 
 export type OnboardingAccount = z.infer<typeof OnboardingAccountSchema>;
 
 export const CreateOnboardingProfileSchema = z.object({
-  name: z.string().min(1).max(100),
+  name: WorkspaceNameSchema,
   icon: z.string().max(10).optional(),
-  type: ProfileTypeSchema.default("PERSONAL"),
+  type: WorkspaceTypeSchema.default("PERSONAL"),
   currency: z.string().length(3).default("CAD"),
   dateFormat: DateFormatSchema.default("D MMM, YYYY"),
   weekStart: WeekStartSchema.default("MONDAY"),

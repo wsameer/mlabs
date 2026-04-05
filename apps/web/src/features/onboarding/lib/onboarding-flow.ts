@@ -1,45 +1,63 @@
 import type { OnboardingCompletionState, OnboardingStep } from "../types";
+import type { OnboardingStepDefinition } from "../types";
+import { FirstAccountStep } from "../components/steps/FirstAccountStep";
+import { RegionalPreferencesStep } from "../components/steps/RegionalPreferencesStep";
+import { WorkspaceBasicsStep } from "../components/steps/WorkspaceBasicsStep";
 
-export const onboardingSteps = [
+export const onboardingSteps: readonly OnboardingStepDefinition[] = [
   {
-    id: 1 as const,
+    id: 1,
     title: "Workspace basics",
     description: "Name the workspace and choose the primary setup direction.",
     actionLabel: "Use workspace defaults",
+    Component: WorkspaceBasicsStep,
   },
   {
-    id: 2 as const,
+    id: 2,
     title: "Regional preferences",
-    description: "Apply date, timezone, and currency defaults for the workspace.",
+    description:
+      "Apply date, timezone, and currency defaults for the workspace.",
     actionLabel: "Apply regional defaults",
+    Component: RegionalPreferencesStep,
   },
   {
-    id: 3 as const,
+    id: 3,
     title: "First account",
-    description: "Add the first account placeholder so the setup can finish.",
-    actionLabel: "Create starter account",
+    description: "Create a starter account so the workspace is ready to use.",
+    actionLabel: "Create workspace",
+    Component: FirstAccountStep,
   },
 ] as const;
 
-export const firstOnboardingStep: OnboardingStep = 1;
-export const lastOnboardingStep: OnboardingStep = 3;
+export const firstOnboardingStep: OnboardingStep = onboardingSteps[0].id;
+export const lastOnboardingStep: OnboardingStep =
+  onboardingSteps[onboardingSteps.length - 1].id;
 
 export function parseOnboardingStep(value: unknown): OnboardingStep {
   const parsed = Number(value);
+  const isKnownStep = onboardingSteps.some((step) => step.id === parsed);
 
-  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 3) {
+  if (!Number.isInteger(parsed) || !isKnownStep) {
     return firstOnboardingStep;
   }
 
   return parsed as OnboardingStep;
 }
 
+export function getOnboardingStep(step: OnboardingStep) {
+  return onboardingSteps.find((item) => item.id === step);
+}
+
 export function getLastUnlockedStep(
   completionState: OnboardingCompletionState
 ): OnboardingStep {
-  if (!completionState[1]) return 1;
-  if (!completionState[2]) return 2;
-  return 3;
+  for (const step of onboardingSteps) {
+    if (!completionState[step.id]) {
+      return step.id;
+    }
+  }
+
+  return lastOnboardingStep;
 }
 
 export function canAccessStep(
@@ -50,11 +68,15 @@ export function canAccessStep(
 }
 
 export function getNextStep(step: OnboardingStep): OnboardingStep | null {
-  if (step === lastOnboardingStep) return null;
-  return (step + 1) as OnboardingStep;
+  const currentIndex = onboardingSteps.findIndex((item) => item.id === step);
+  const nextStep = onboardingSteps[currentIndex + 1];
+
+  return nextStep?.id ?? null;
 }
 
 export function getPreviousStep(step: OnboardingStep): OnboardingStep | null {
-  if (step === firstOnboardingStep) return null;
-  return (step - 1) as OnboardingStep;
+  const currentIndex = onboardingSteps.findIndex((item) => item.id === step);
+  const previousStep = onboardingSteps[currentIndex - 1];
+
+  return previousStep?.id ?? null;
 }

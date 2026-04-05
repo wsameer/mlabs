@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Building2Icon, CheckIcon, InboxIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -15,64 +14,54 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@workspace/ui/components/item";
+import {
+  Progress,
+  ProgressLabel,
+  ProgressValue,
+} from "@workspace/ui/components/progress";
+import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
-import {
-  canAccessStep,
-  getLastUnlockedStep,
-  getNextStep,
-  getPreviousStep,
-  onboardingSteps,
-} from "../lib/onboarding-flow";
-import type { OnboardingCompletionState, OnboardingStep } from "../types";
+import { canAccessStep } from "../lib/onboarding-flow";
+import { useOnboardingFlow } from "../hooks/use-onboarding-flow";
+import type { OnboardingStep } from "../types";
 
 type OnboardingPageProps = {
   step: OnboardingStep;
   onStepChange: (step: OnboardingStep) => void;
 };
 
-const initialCompletionState: OnboardingCompletionState = {
-  1: false,
-  2: false,
-  3: false,
-};
-
 export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
-  const [completionState, setCompletionState] = useState(
-    initialCompletionState
-  );
+  const {
+    steps,
+    currentStep,
+    previousStep,
+    nextStep,
+    completionState,
+    formState,
+    canGoNext,
+    isSubmitting,
+    setStepCompletion,
+    updateWorkspaceBasics,
+    updateRegionalPreferences,
+    updateFirstAccount,
+    submitOnboarding,
+    goToNextStep,
+    goToPreviousStep,
+    goToStep,
+  } = useOnboardingFlow({
+    step,
+    onStepChange,
+  });
 
-  const previousStep = getPreviousStep(step);
-  const nextStep = getNextStep(step);
-  const lastUnlockedStep = getLastUnlockedStep(completionState);
+  if (!currentStep) {
+    return null;
+  }
+
+  const CurrentStepComponent = currentStep.Component;
   const isCurrentStepComplete = completionState[step];
-  const canGoNext = nextStep !== null && isCurrentStepComplete;
-  const currentStepConfig = onboardingSteps.find((item) => item.id === step);
-
-  useEffect(() => {
-    if (!canAccessStep(step, completionState)) {
-      onStepChange(lastUnlockedStep);
-    }
-  }, [completionState, lastUnlockedStep, onStepChange, step]);
-
-  function markStepComplete(stepToComplete: OnboardingStep) {
-    setCompletionState((current) => ({
-      ...current,
-      [stepToComplete]: true,
-    }));
-  }
-
-  function handleNext() {
-    if (nextStep && canGoNext) {
-      onStepChange(nextStep);
-    }
-  }
-
-  function handlePrevious() {
-    if (previousStep) {
-      onStepChange(previousStep);
-    }
-  }
+  const canSubmit = nextStep === null && isCurrentStepComplete;
+  const progressValue = (step / steps.length) * 100;
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
@@ -85,15 +74,19 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   <div className="flex size-8 items-center justify-center rounded-2xl md:justify-start">
                     <Building2Icon className="size-6" />
                   </div>
-                  <CardTitle>Welcome to mLabs</CardTitle>
+                  <CardTitle className="text-xl md:text-sm">
+                    Welcome to mLabs
+                  </CardTitle>
                   <CardDescription className="hidden md:block">
-                    The current step lives in the URL. Completion stays local
-                    until we wire in the real form.
+                    Each step is driven from a shared config, so we can add or
+                    reorder onboarding screens without reworking the page shell.
                   </CardDescription>
                 </div>
 
+                <Separator className="m-0 block md:hidden" />
+
                 <ItemGroup className="hidden md:flex">
-                  {onboardingSteps.map((item) => {
+                  {steps.map((item) => {
                     const isActive = item.id === step;
                     const isComplete = completionState[item.id];
                     const isUnlocked = canAccessStep(item.id, completionState);
@@ -103,13 +96,13 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                         key={item.id}
                         variant="muted"
                         className={cn({
-                          "border-primary": isActive,
+                          "border-2 border-primary": isActive,
                           "opacity-50": !isUnlocked,
                         })}
                         render={
                           <button
                             type="button"
-                            onClick={() => isUnlocked && onStepChange(item.id)}
+                            onClick={() => isUnlocked && goToStep(item.id)}
                             disabled={!isUnlocked}
                           />
                         }
@@ -132,42 +125,61 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
               </div>
 
               <div className="space-y-4 md:col-span-2">
-                <div className="space-y-2 text-center md:text-left">
-                  <h3 className="text-lg font-medium">
-                    {currentStepConfig?.title}
+                <div className="space-y-2 md:hidden">
+                  <Progress value={progressValue} className="w-full max-w-sm">
+                    <ProgressLabel>
+                      Step {step} of {steps.length}
+                    </ProgressLabel>
+                    <ProgressValue />
+                  </Progress>
+                </div>
+
+                <div className="space-y-2 text-left">
+                  <h3 className="text-base font-medium md:text-lg">
+                    {currentStep.title}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {currentStepConfig?.description}
+                    {currentStep.description}
                   </p>
                 </div>
 
-                <div className="rounded-md border p-4 text-center md:text-left">
-                  <p className="mb-4 text-sm text-muted-foreground">
-                    This is a temporary placeholder for step {step}. Use the
-                    button below to mark it complete and unlock the next step.
-                  </p>
-
-                  <Button
-                    variant={isCurrentStepComplete ? "secondary" : "default"}
-                    onClick={() => markStepComplete(step)}
-                  >
-                    {isCurrentStepComplete
-                      ? "Step completed"
-                      : currentStepConfig?.actionLabel}
-                  </Button>
-                </div>
+                <CurrentStepComponent
+                  step={step}
+                  stepDefinition={currentStep}
+                  formState={formState}
+                  isComplete={isCurrentStepComplete}
+                  isSubmitting={isSubmitting}
+                  updateWorkspaceBasics={updateWorkspaceBasics}
+                  updateRegionalPreferences={updateRegionalPreferences}
+                  updateFirstAccount={updateFirstAccount}
+                  setStepCompletion={setStepCompletion}
+                  submitOnboarding={submitOnboarding}
+                />
 
                 <div className="flex items-center justify-between gap-3">
                   <Button
                     variant="outline"
-                    onClick={handlePrevious}
-                    disabled={!previousStep}
+                    onClick={goToPreviousStep}
+                    disabled={!previousStep || isSubmitting}
                   >
                     Previous
                   </Button>
 
-                  <Button onClick={handleNext} disabled={!canGoNext}>
-                    Next
+                  <Button
+                    onClick={() =>
+                      nextStep ? void goToNextStep() : void submitOnboarding()
+                    }
+                    disabled={
+                      nextStep
+                        ? !canGoNext || isSubmitting
+                        : !canSubmit || isSubmitting
+                    }
+                  >
+                    {isSubmitting
+                      ? "Creating..."
+                      : nextStep
+                        ? "Next"
+                        : currentStep.actionLabel}
                   </Button>
                 </div>
               </div>
