@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 type LayoutConfig = {
   pageTitle?: string;
@@ -17,28 +17,27 @@ export function useLayoutConfig(config: LayoutConfig) {
   );
   const resetLayout = useAppStore((state) => state.resetLayout);
 
-  // Use ref to capture latest config without triggering re-execution.
-  // config.actions and config.leftSidebarContent are React nodes (new refs every render).
-  const configRef = useRef(config);
-  configRef.current = config;
+  useEffect(() => {
+    if (config.pageTitle !== undefined) setHeaderTitle(config.pageTitle);
+  }, [config.pageTitle, setHeaderTitle]);
 
   useEffect(() => {
-    const cfg = configRef.current;
-    if (cfg.pageTitle !== undefined) setHeaderTitle(cfg.pageTitle);
-    if (cfg.actions !== undefined) setHeaderActions(cfg.actions);
-    if (cfg.mobileBackPath !== undefined) setMobileBackPath(cfg.mobileBackPath);
-    if (cfg.leftSidebarContent !== undefined)
-      setLeftSidebarContent(cfg.leftSidebarContent);
+    if (config.actions !== undefined) setHeaderActions(config.actions);
+  }, [config.actions, setHeaderActions]);
 
+  useEffect(() => {
+    if (config.mobileBackPath !== undefined)
+      setMobileBackPath(config.mobileBackPath);
+  }, [config.mobileBackPath, setMobileBackPath]);
+
+  useEffect(() => {
+    if (config.leftSidebarContent !== undefined)
+      setLeftSidebarContent(config.leftSidebarContent);
+  }, [config.leftSidebarContent, setLeftSidebarContent]);
+
+  useEffect(() => {
     return () => {
       resetLayout();
     };
-    // Zustand selectors are stable refs — safe to include. Config read via ref.
-  }, [
-    setHeaderTitle,
-    setHeaderActions,
-    setMobileBackPath,
-    setLeftSidebarContent,
-    resetLayout,
-  ]);
+  }, [resetLayout]);
 }

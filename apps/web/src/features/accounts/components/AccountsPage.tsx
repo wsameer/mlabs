@@ -1,61 +1,98 @@
-import { LandmarkIcon } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { AlertCircleIcon } from "lucide-react";
 import { useLayoutConfig } from "@/features/layout";
-import { useUiActions } from "@/hooks/use-ui-store";
-import { Button } from "@workspace/ui/components/button";
+import { useAccounts } from "../api/use-accounts";
+import { EmptyAccounts } from "./EmptyAccounts";
+import { AccountCategoriesSidebar } from "./AccountCategoriesSidebar";
+import { useAppStore } from "@/stores";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Spinner } from "@workspace/ui/components/spinner";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@workspace/ui/components/empty";
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@workspace/ui/components/alert";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@workspace/ui/components/tooltip";
-
-function EmptyAccounts() {
-  const { setOpenCreateAccount } = useUiActions();
-
-  return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <LandmarkIcon />
-        </EmptyMedia>
-        <EmptyTitle>No Account Yet</EmptyTitle>
-        <EmptyDescription>
-          You haven&apos;t created any accounts yet. Get started by adding your
-          first bank account.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent className="flex-row justify-center gap-2">
-        <Button onClick={() => setOpenCreateAccount(true)}>
-          Create Account
-        </Button>
-        <Tooltip>
-          <TooltipTrigger
-            render={<Button variant="outline">Import Accounts</Button>}
-          />
-          <TooltipContent>
-            <p>Coming soon</p>
-          </TooltipContent>
-        </Tooltip>
-      </EmptyContent>
-    </Empty>
-  );
-}
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 
 export function AccountsPage() {
+  const { data: accounts, isPending, isError } = useAccounts();
+  const setHasAccount = useAppStore((state) => state.setHasAccount);
+  const isMobile = useIsMobile();
+  const hasAccounts = (accounts?.length ?? 0) > 0;
+
+  const leftSidebarContent = useMemo(() => {
+    if (isMobile || isPending || isError || hasAccounts) {
+      return null;
+    }
+
+    return <AccountCategoriesSidebar />;
+  }, [hasAccounts, isError, isMobile, isPending]);
+
   useLayoutConfig({
     pageTitle: "Accounts",
+    leftSidebarContent,
   });
 
+  useEffect(() => {
+    if (accounts) {
+      setHasAccount(accounts.length > 0);
+    }
+  }, [accounts, setHasAccount]);
+
+  if (isPending) {
+    return (
+      <div className="flex h-full min-h-[50vh] items-center justify-center">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto my-auto w-full max-w-2xl">
+        <Alert variant="destructive">
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>Could not load accounts</AlertTitle>
+          <AlertDescription>
+            There was a problem fetching accounts. Please try again in a
+            moment.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!hasAccounts) {
+    return (
+      <div className="mx-auto my-auto w-full max-w-2xl">
+        <EmptyAccounts />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto my-auto">
-      <EmptyAccounts />
+    <div className="mx-auto my-auto w-full max-w-2xl">
+      <Card>
+        <CardHeader>
+          <CardTitle>Accounts</CardTitle>
+          <CardDescription>
+            Account list states are coming next. For now, the empty flow is in
+            place when there are no accounts.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Once seeded data is available, we can replace this placeholder with
+            the populated accounts experience.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
