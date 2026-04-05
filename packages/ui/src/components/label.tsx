@@ -1,6 +1,8 @@
-import * as React from "react";
+"use client"
 
-import { cn } from "@workspace/ui/lib/utils";
+import * as React from "react"
+
+import { cn } from "@workspace/ui/lib/utils"
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
@@ -12,7 +14,7 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Label };
+export { Label }

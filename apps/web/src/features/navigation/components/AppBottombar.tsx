@@ -18,7 +18,7 @@ export function AppBottombar() {
   const navRef = useRef(null);
   const { setOpenCreateTransaction } = useUiActions();
   const backendStatus = useAppStore((s) => s.backendStatus);
-  const isBackendConnected = backendStatus === "connected"
+  const isBackendConnected = backendStatus === "connected";
 
   const handleNavigation = (itemPath: string) => {
     if (!isBackendConnected) return;
@@ -36,7 +36,7 @@ export function AppBottombar() {
       className="justify-even fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 content-center items-center gap-4 transition-transform duration-200 ease-in-out md:hidden"
       id="app-bottom-bar"
     >
-      <nav className="flex items-center justify-between gap-6 rounded-full bg-primary p-2 shadow-lg">
+      <nav className="flex items-center justify-between gap-6 rounded-full bg-secondary p-2 shadow-lg">
         {PRIMARY_NAVIGATION_OPTIONS.map((item) => {
           const Icon = item.icon;
           return (
@@ -52,7 +52,7 @@ export function AppBottombar() {
           );
         })}
       </nav>
-      <div className="rounded-full bg-primary p-2 shadow-lg">
+      <div className="rounded-full bg-secondary p-2 shadow-lg">
         <NavItem
           icon={<PlusIcon />}
           isActive={false}

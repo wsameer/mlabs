@@ -5,6 +5,7 @@ import type {
   RegionalPreferences,
   WorkspaceBasics,
 } from "@workspace/types";
+import { hasFirstAccountData } from "@workspace/types";
 import { toast } from "sonner";
 import { DASHBOARD_ROUTE } from "@/constants";
 import { useAppStore } from "@/stores";
@@ -50,7 +51,7 @@ function createInitialFormState(): OnboardingFormState {
     firstAccount: {
       name: "",
       group: "checking",
-      balance: "0",
+      balance: "",
     },
   };
 }
@@ -177,7 +178,9 @@ export function useOnboardingFlow({
       const payload: CreateOnboardingProfile = {
         ...formState.workspaceBasics,
         ...formState.regionalPreferences,
-        firstAccount: formState.firstAccount,
+        firstAccount: hasFirstAccountData(formState.firstAccount)
+          ? formState.firstAccount
+          : undefined,
       };
 
       try {

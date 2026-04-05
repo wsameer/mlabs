@@ -24,10 +24,10 @@ import {
 import type { OnboardingStepComponentProps } from "../../types";
 
 const DATE_FORMAT_LABELS: Record<RegionalPreferences["dateFormat"], string> = {
-  "D MMM, YYYY": "12 Aug, 2025",
-  "DD/MM/YYYY": "12/08/2025",
-  "MM/DD/YYYY": "08/12/2025",
-  "YYYY-MM-DD": "2025-08-12",
+  "D MMM, YYYY": "20 May, 2026",
+  "DD/MM/YYYY": "20/05/2026",
+  "MM/DD/YYYY": "05/20/2026",
+  "YYYY-MM-DD": "2026-05-20",
 };
 
 const WEEK_START_LABELS: Record<RegionalPreferences["weekStart"], string> = {

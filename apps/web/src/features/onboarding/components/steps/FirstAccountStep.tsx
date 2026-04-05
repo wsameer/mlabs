@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FirstAccountSchema,
   ONBOARDING_ACCOUNT_GROUPS,
+  hasFirstAccountData,
   type FirstAccount,
 } from "@workspace/types";
 import {
@@ -38,7 +38,6 @@ export function FirstAccountStep({
   setStepCompletion,
 }: OnboardingStepComponentProps) {
   const form = useForm<FirstAccount>({
-    resolver: zodResolver(FirstAccountSchema),
     mode: "onChange",
     defaultValues: formState.firstAccount,
   });
@@ -61,9 +60,41 @@ export function FirstAccountStep({
     updateFirstAccount,
   ]);
 
+  const nextFirstAccount = useMemo(
+    () => ({
+      name: currentValues.name?.trim() ?? "",
+      group: currentValues.group ?? formState.firstAccount.group,
+      balance: currentValues.balance?.trim() ?? "",
+    }),
+    [
+      currentValues.balance,
+      currentValues.group,
+      currentValues.name,
+      formState.firstAccount.group,
+    ]
+  );
+
+  const isOptionalStepEmpty = !hasFirstAccountData(nextFirstAccount);
+  const validationResult = useMemo(
+    () =>
+      isOptionalStepEmpty
+        ? { success: true as const, error: undefined }
+        : FirstAccountSchema.safeParse(nextFirstAccount),
+    [isOptionalStepEmpty, nextFirstAccount]
+  );
+
+  const fieldErrors = validationResult.success
+    ? {}
+    : Object.fromEntries(
+        validationResult.error.issues.map((issue) => [
+          String(issue.path[0]),
+          issue.message,
+        ])
+      );
+
   useEffect(() => {
-    setStepCompletion(step, form.formState.isValid);
-  }, [form.formState.isValid, setStepCompletion, step]);
+    setStepCompletion(step, validationResult.success);
+  }, [setStepCompletion, step, validationResult.success]);
 
   return (
     <div className="rounded-md border p-4 text-left">
@@ -71,8 +102,8 @@ export function FirstAccountStep({
         <Controller
           name="name"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
+          render={({ field }) => (
+            <Field data-invalid={Boolean(fieldErrors.name)}>
               <FieldLabel htmlFor="first-account-name">Account name</FieldLabel>
               <Input
                 {...field}
@@ -82,10 +113,11 @@ export function FirstAccountStep({
                 disabled={isSubmitting}
               />
               <FieldDescription>
-                This starter account helps us finish the workspace setup.
+                Optional. Leave this blank if you want to finish onboarding
+                faster and add an account from the dashboard instead.
               </FieldDescription>
-              {fieldState.invalid ? (
-                <FieldError errors={[fieldState.error]} />
+              {fieldErrors.name ? (
+                <FieldError>{fieldErrors.name}</FieldError>
               ) : null}
             </Field>
           )}
@@ -95,8 +127,8 @@ export function FirstAccountStep({
           <Controller
             name="group"
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+            render={({ field }) => (
+              <Field data-invalid={Boolean(fieldErrors.group)}>
                 <FieldLabel htmlFor="first-account-group">
                   Account type
                 </FieldLabel>
@@ -106,7 +138,7 @@ export function FirstAccountStep({
                   value={field.value}
                   onBlur={field.onBlur}
                   onChange={field.onChange}
-                  aria-invalid={fieldState.invalid}
+                  aria-invalid={Boolean(fieldErrors.group)}
                   className="w-full"
                   disabled={isSubmitting}
                 >
@@ -116,8 +148,8 @@ export function FirstAccountStep({
                     </NativeSelectOption>
                   ))}
                 </NativeSelect>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
+                {fieldErrors.group ? (
+                  <FieldError>{fieldErrors.group}</FieldError>
                 ) : null}
               </Field>
             )}
@@ -126,8 +158,8 @@ export function FirstAccountStep({
           <Controller
             name="balance"
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+            render={({ field }) => (
+              <Field data-invalid={Boolean(fieldErrors.balance)}>
                 <FieldLabel htmlFor="first-account-balance">
                   Opening balance
                 </FieldLabel>
@@ -139,10 +171,11 @@ export function FirstAccountStep({
                   disabled={isSubmitting}
                 />
                 <FieldDescription>
-                  Use a negative amount for liabilities like credit cards.
+                  Optional unless you start filling this account. Use a negative
+                  amount for liabilities like credit cards.
                 </FieldDescription>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
+                {fieldErrors.balance ? (
+                  <FieldError>{fieldErrors.balance}</FieldError>
                 ) : null}
               </Field>
             )}

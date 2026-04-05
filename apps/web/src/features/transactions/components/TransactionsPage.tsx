@@ -119,7 +119,7 @@ export function TransactionsPage() {
         <div className="flex flex-col gap-3">
           <DateRangeFilter />
           <Card className="p-2">
-            <CardContent>
+            <CardContent className="p-0">
               <div className="grid w-full grid-cols-3 divide-x divide-border/60">
                 <div className="px-2 text-center">
                   <div className="text-[0.65rem] text-muted-foreground uppercase">
@@ -147,7 +147,7 @@ export function TransactionsPage() {
             <CardContent className="p-0">
               <ScrollArea className="h-[70svh]">
                 <div>
-                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-secondary px-3">
                     <ItemContent className="flex flex-row items-center gap-1">
                       <p className="text-base">24</p>
                       <Badge variant="secondary">Thu</Badge>
@@ -171,7 +171,7 @@ export function TransactionsPage() {
                   </div>
                 </div>
                 <div>
-                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-secondary px-3">
                     <ItemContent className="flex flex-row items-center gap-1">
                       <p className="text-base">23</p>
                       <Badge variant="secondary">Wed</Badge>
@@ -195,7 +195,7 @@ export function TransactionsPage() {
                   </div>
                 </div>
                 <div>
-                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-primary px-3">
+                  <Item className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-secondary px-3">
                     <ItemContent className="flex flex-row items-center gap-1">
                       <p className="text-base">22</p>
                       <Badge variant="secondary">Tue</Badge>

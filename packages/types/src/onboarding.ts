@@ -85,3 +85,7 @@ export type CheckWorkspaceNameAvailabilityQuery = z.infer<
 export type CheckWorkspaceNameAvailabilityResult = z.infer<
   typeof CheckWorkspaceNameAvailabilityResultSchema
 >;
+
+export function hasFirstAccountData(account: FirstAccount) {
+  return account.name.trim().length > 0 || account.balance.trim().length > 0;
+}
