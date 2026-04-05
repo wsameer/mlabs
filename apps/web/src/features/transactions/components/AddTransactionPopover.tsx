@@ -59,7 +59,7 @@ export function AddTransactionPopover() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpenCreateTransaction}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-131.25">
         <DialogHeader>
           <DialogTitle className="text-left text-xl font-light">
             Record

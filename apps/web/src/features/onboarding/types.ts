@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import type {
   FirstAccount,
+  Profile,
   RegionalPreferences,
   WorkspaceBasics,
 } from "@workspace/types";
@@ -19,13 +20,15 @@ export type OnboardingStepComponentProps = {
   step: OnboardingStep;
   stepDefinition: OnboardingStepDefinition;
   formState: OnboardingFormState;
+  createdProfile: Profile | null;
   isComplete: boolean;
   isSubmitting: boolean;
+  canSubmitOptionalAccount: boolean;
   updateWorkspaceBasics: (value: WorkspaceBasics) => void;
   updateRegionalPreferences: (value: RegionalPreferences) => void;
   updateFirstAccount: (value: FirstAccount) => void;
   setStepCompletion: (step: OnboardingStep, isComplete: boolean) => void;
-  submitOnboarding: () => Promise<void>;
+  skipOptionalAccountStep: () => Promise<void>;
 };
 
 export type OnboardingStepDefinition = {

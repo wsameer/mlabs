@@ -16,6 +16,7 @@ import { env } from "./libs/env.js";
 import health from "./routes/health.js";
 import bootstrap from "./routes/bootstrap.js";
 import profiles from "./routes/profiles.js";
+import accounts from "./routes/accounts.js";
 import { logger } from "./libs/logger.js";
 
 const app = new Hono();
@@ -92,7 +93,7 @@ app.use("/api/*", profileMiddleware);
 
 // Protected API Routes
 // app.route("/api/categories", categories);
-// app.route("/api/accounts", accounts);
+app.route("/api/accounts", accounts);
 // app.route("/api/transactions", transactionRoutes);
 
 // Static File Serving (Production Only)

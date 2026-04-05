@@ -1,7 +1,7 @@
-import { profiles } from "@workspace/db";
+import { accounts, profiles } from "@workspace/db";
 import type { Bootstrap } from "@workspace/types";
 
-import { asc, db, eq } from "../libs/db.js";
+import { and, asc, count, db, eq } from "../libs/db.js";
 import { serializeProfile } from "./profile-serializer.js";
 
 export class BootstrapService {
@@ -20,14 +20,28 @@ export class BootstrapService {
         status: activeProfiles.length === 0 ? "onboarding" : "pick",
         profiles: activeProfiles.map(serializeProfile),
         profile: null,
+        hasAccount: false,
       };
     }
+
+    const activeAccounts = await db
+      .select({ count: count() })
+      .from(accounts)
+      .where(
+        and(
+          eq(accounts.profileId, defaultProfile.id),
+          eq(accounts.isActive, true)
+        )
+      );
+
+    const hasAccount = Number(activeAccounts[0]?.count ?? 0) > 0;
 
     if (!defaultProfile.isSetupComplete) {
       return {
         status: "onboarding",
         profiles: activeProfiles.map(serializeProfile),
         profile: null,
+        hasAccount,
       };
     }
 
@@ -35,6 +49,7 @@ export class BootstrapService {
       status: "ready",
       profile: serializeProfile(defaultProfile),
       profiles: activeProfiles.map(serializeProfile),
+      hasAccount,
     };
   }
 }

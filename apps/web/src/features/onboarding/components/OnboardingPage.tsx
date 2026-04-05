@@ -39,13 +39,16 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
     nextStep,
     completionState,
     formState,
+    createdProfile,
     canGoNext,
+    canSubmitOptionalAccount,
     isSubmitting,
     setStepCompletion,
     updateWorkspaceBasics,
     updateRegionalPreferences,
     updateFirstAccount,
-    submitOnboarding,
+    submitOptionalAccountStep,
+    skipOptionalAccountStep,
     goToNextStep,
     goToPreviousStep,
     goToStep,
@@ -60,7 +63,6 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
 
   const CurrentStepComponent = currentStep.Component;
   const isCurrentStepComplete = completionState[step];
-  const canSubmit = nextStep === null && isCurrentStepComplete;
   const progressValue = (step / steps.length) * 100;
 
   return (
@@ -89,7 +91,9 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   {steps.map((item) => {
                     const isActive = item.id === step;
                     const isComplete = completionState[item.id];
-                    const isUnlocked = canAccessStep(item.id, completionState);
+                    const isUnlocked =
+                      canAccessStep(item.id, completionState) &&
+                      !(createdProfile && item.id < 3);
 
                     return (
                       <Item
@@ -147,13 +151,15 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   step={step}
                   stepDefinition={currentStep}
                   formState={formState}
+                  createdProfile={createdProfile}
                   isComplete={isCurrentStepComplete}
                   isSubmitting={isSubmitting}
+                  canSubmitOptionalAccount={canSubmitOptionalAccount}
                   updateWorkspaceBasics={updateWorkspaceBasics}
                   updateRegionalPreferences={updateRegionalPreferences}
                   updateFirstAccount={updateFirstAccount}
                   setStepCompletion={setStepCompletion}
-                  submitOnboarding={submitOnboarding}
+                  skipOptionalAccountStep={skipOptionalAccountStep}
                 />
 
                 <div className="flex items-center justify-between gap-3">
@@ -167,19 +173,17 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
 
                   <Button
                     onClick={() =>
-                      nextStep ? void goToNextStep() : void submitOnboarding()
+                      nextStep
+                        ? void goToNextStep()
+                        : void submitOptionalAccountStep()
                     }
                     disabled={
                       nextStep
                         ? !canGoNext || isSubmitting
-                        : !canSubmit || isSubmitting
+                        : !canSubmitOptionalAccount || isSubmitting
                     }
                   >
-                    {isSubmitting
-                      ? "Creating..."
-                      : nextStep
-                        ? "Next"
-                        : currentStep.actionLabel}
+                    {isSubmitting ? "Creating..." : currentStep.actionLabel}
                   </Button>
                 </div>
               </div>

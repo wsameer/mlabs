@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 
-type ProfileEnv = {
+export type ProfileEnv = {
   Variables: {
     profileId: string;
   };

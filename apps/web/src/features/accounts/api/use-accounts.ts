@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
+import { useAppStore } from "@/stores";
 import type {
   Account,
   CreateAccount,
@@ -36,10 +37,12 @@ export function useAccount(id: string) {
 
 export function useCreateAccount() {
   const queryClient = useQueryClient();
+  const setHasAccount = useAppStore((state) => state.setHasAccount);
   return useMutation({
     mutationFn: (data: CreateAccount) =>
       apiClient<Account>("/accounts", { method: "POST", body: data }),
     onSuccess: () => {
+      setHasAccount(true);
       queryClient.invalidateQueries({ queryKey: accountKeys.lists() });
     },
   });

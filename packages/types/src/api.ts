@@ -79,6 +79,7 @@ export const BootstrapSchema = z.object({
   status: BootstrapStatusSchema,
   profile: ProfileSchema.nullable().optional(),
   profiles: z.array(ProfileSchema).default([]),
+  hasAccount: z.boolean().default(false),
 });
 
 export type Bootstrap = z.infer<typeof BootstrapSchema>;

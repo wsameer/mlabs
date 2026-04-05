@@ -22,11 +22,13 @@ export type AppSlice = {
   appStatus: AppStatus;
   appProfile: Profile | null;
   appProfiles: Profile[];
+  hasAccount: boolean;
   isAppLoading: boolean;
   appError: string | null;
   setBackendStatus: (status: BackendStatus) => void;
   setBackendHealth: (health: HealthCheck | null) => void;
-  completeOnboarding: (profile: Profile) => void;
+  setHasAccount: (value: boolean) => void;
+  completeOnboarding: (profile: Profile, hasAccount: boolean) => void;
   fetchAppData: () => Promise<Bootstrap>;
 };
 
@@ -41,6 +43,7 @@ export const createAppSlice: StateCreator<
   appStatus: null,
   appProfile: null,
   appProfiles: [],
+  hasAccount: false,
   isAppLoading: false,
   appError: null,
 
@@ -54,12 +57,18 @@ export const createAppSlice: StateCreator<
       state.backendHealth = health;
     }),
 
-  completeOnboarding: (profile) => {
+  setHasAccount: (value) =>
+    set((state) => {
+      state.hasAccount = value;
+    }),
+
+  completeOnboarding: (profile, hasAccount) => {
     setProfileId(profile.id);
     set((state) => {
       state.appStatus = "ready";
       state.appProfile = profile;
       state.appProfiles = [profile];
+      state.hasAccount = hasAccount;
       state.isAppLoading = false;
       state.appError = null;
     });
@@ -92,6 +101,7 @@ export const createAppSlice: StateCreator<
         state.appStatus = data.status;
         state.appProfile = data.profile ?? null;
         state.appProfiles = data.profiles;
+        state.hasAccount = data.hasAccount;
         state.isAppLoading = false;
         state.appError = null;
       });
@@ -100,6 +110,7 @@ export const createAppSlice: StateCreator<
     } catch (error) {
       set((state) => {
         state.isAppLoading = false;
+        state.hasAccount = false;
         state.appError =
           error instanceof Error ? error.message : "Failed to load app data";
       });

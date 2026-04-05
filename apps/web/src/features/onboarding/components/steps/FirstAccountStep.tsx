@@ -18,6 +18,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
+import { Button } from "@workspace/ui/components/button";
 
 import type { OnboardingStepComponentProps } from "../../types";
 
@@ -34,8 +35,10 @@ export function FirstAccountStep({
   step,
   formState,
   isSubmitting,
+  canSubmitOptionalAccount,
   updateFirstAccount,
   setStepCompletion,
+  skipOptionalAccountStep,
 }: OnboardingStepComponentProps) {
   const form = useForm<FirstAccount>({
     mode: "onChange",
@@ -181,6 +184,25 @@ export function FirstAccountStep({
             )}
           />
         </div>
+
+        <div className="flex justify-start">
+          <Button
+            type="button"
+            variant="ghost"
+            className="px-0 text-sm"
+            onClick={() => void skipOptionalAccountStep()}
+            disabled={isSubmitting}
+          >
+            Skip for now
+          </Button>
+        </div>
+
+        {!canSubmitOptionalAccount && !isOptionalStepEmpty ? (
+          <p className="text-sm text-muted-foreground">
+            Finish the account details above, or skip and add one from the
+            dashboard.
+          </p>
+        ) : null}
       </FieldGroup>
     </div>
   );

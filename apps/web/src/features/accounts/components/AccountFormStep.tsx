@@ -26,16 +26,21 @@ import {
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
 import { Calendar } from "@workspace/ui/components/calendar";
-import { ACCOUNT_TYPES, type AccountType } from "../types";
-import type { AccountGroup } from "@workspace/types";
+import {
+  ACCOUNT_TYPES,
+  type AccountGroup,
+  type AccountType,
+} from "@workspace/types";
 
 const ACCOUNT_TYPE_MAP: Record<AccountType, AccountGroup> = {
   cash: "cash",
-  chequing: "checking",
+  checking: "checking",
   savings: "savings",
-  credit: "credit_card",
+  credit_card: "credit_card",
   investment: "investment",
-  gic: "savings",
+  loan: "loan",
+  mortgage: "mortgage",
+  asset: "asset",
   other: "other",
 };
 
@@ -113,7 +118,9 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
                 {...field}
                 id="account-creation-form-name"
                 className="text-xs"
-                placeholder={type === "credit" ? "Amex Platinum" : "TD Bank"}
+                placeholder={
+                  type === "credit_card" ? "Amex Platinum" : "TD Bank"
+                }
                 autoComplete="off"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -168,7 +175,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
         />
 
         {/* Credit-only fields */}
-        {type === "credit" && (
+        {type === "credit_card" && (
           <div className="grid grid-cols-2 gap-3">
             {/* Available Credit */}
             <Controller

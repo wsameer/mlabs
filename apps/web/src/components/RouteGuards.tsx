@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
-import {
-  DASHBOARD_ROUTE,
-  ONBOARDING_ROUTE,
-  PROFILES_ROUTE,
-} from "@/constants";
+import { DASHBOARD_ROUTE, ONBOARDING_ROUTE, PROFILES_ROUTE } from "@/constants";
 import { getProfileId } from "@/lib/api-client";
 import { useAppStore } from "@/stores";
 

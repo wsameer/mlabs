@@ -1,3 +1,4 @@
+import { LandmarkIcon } from "lucide-react";
 import { useLayoutConfig } from "@/features/layout";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { Button } from "@workspace/ui/components/button";
@@ -14,7 +15,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { LandmarkIcon } from "lucide-react";
 
 function EmptyAccounts() {
   const { setOpenCreateAccount } = useUiActions();

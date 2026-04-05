@@ -49,9 +49,12 @@ export function AppLeftSideNav({
   };
 
   return (
+    /* This is the first sidebar */
+    /* We disable collapsible and adjust width to icon. */
+    /* This will make the sidebar appear as icons. */
     <Sidebar
       collapsible="none"
-      className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r"
+      className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r py-1"
       {...props}
     >
       <SidebarHeader>
@@ -109,10 +112,14 @@ export function AppLeftSideNav({
           <SidebarMenu className="gap-2">
             <SidebarMenuItem className="mb-2">
               <SidebarMenuButton
-                className={cn("rounded-full bg-primary/80 px-2.5 md:px-2", {
-                  "bg-muted": !isBackendConnected,
-                  "hover:bg-primary active:bg-primary": isBackendConnected,
-                })}
+                className={cn(
+                  "rounded-full bg-primary/80 px-2.5 text-secondary md:px-2",
+                  {
+                    "bg-muted": !isBackendConnected,
+                    "hover:bg-primary hover:text-white active:bg-primary":
+                      isBackendConnected,
+                  }
+                )}
                 variant="outline"
                 aria-label="Add transaction"
                 onClick={() =>

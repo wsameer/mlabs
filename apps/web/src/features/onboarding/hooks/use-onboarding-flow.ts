@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type {
-  CreateOnboardingProfile,
-  FirstAccount,
-  RegionalPreferences,
-  WorkspaceBasics,
-} from "@workspace/types";
-import { hasFirstAccountData } from "@workspace/types";
-import { toast } from "sonner";
-import { DASHBOARD_ROUTE } from "@/constants";
-import { useAppStore } from "@/stores";
 import { useNavigate } from "@tanstack/react-router";
+import {
+  hasFirstAccountData,
+  type CreateOnboardingProfile,
+  type FirstAccount,
+  type Profile,
+  type RegionalPreferences,
+  type WorkspaceBasics,
+} from "@workspace/types";
+import { toast } from "sonner";
+
+import { DASHBOARD_ROUTE } from "@/constants";
+import { setProfileId } from "@/lib/api-client";
+import { useAppStore } from "@/stores";
+import { useCreateAccount } from "@/features/accounts/api/use-accounts";
 
 import {
   canAccessStep,
@@ -68,10 +72,13 @@ export function useOnboardingFlow({
   const navigate = useNavigate();
   const completeOnboarding = useAppStore((state) => state.completeOnboarding);
   const createOnboardingProfile = useCreateOnboardingProfile();
+  const createAccount = useCreateAccount();
+
   const [completionState, setCompletionState] = useState(
     initialCompletionState
   );
   const [formState, setFormState] = useState(createInitialFormState);
+  const [createdProfile, setCreatedProfile] = useState<Profile | null>(null);
 
   const currentStep = useMemo(() => getOnboardingStep(step), [step]);
   const previousStep = useMemo(() => getPreviousStep(step), [step]);
@@ -80,7 +87,11 @@ export function useOnboardingFlow({
     () => getLastUnlockedStep(completionState),
     [completionState]
   );
+  const hasOptionalFirstAccount = hasFirstAccountData(formState.firstAccount);
   const canGoNext = nextStep !== null && completionState[step];
+  const canSubmitOptionalAccount = step === 3 && hasOptionalFirstAccount;
+  const isSubmitting =
+    createOnboardingProfile.isPending || createAccount.isPending;
 
   useEffect(() => {
     if (!canAccessStep(step, completionState)) {
@@ -104,31 +115,40 @@ export function useOnboardingFlow({
     });
   }, []);
 
-  const updateWorkspaceBasics = useCallback(function updateWorkspaceBasics(
-    workspaceBasics: WorkspaceBasics
-  ) {
-    setFormState((current) => {
-      const currentWorkspaceBasics = current.workspaceBasics;
+  const updateWorkspaceBasics = useCallback(
+    function updateWorkspaceBasics(workspaceBasics: WorkspaceBasics) {
+      setFormState((current) => {
+        if (createdProfile) {
+          return current;
+        }
 
-      if (
-        currentWorkspaceBasics.name === workspaceBasics.name &&
-        currentWorkspaceBasics.type === workspaceBasics.type
-      ) {
-        return current;
-      }
+        const currentWorkspaceBasics = current.workspaceBasics;
 
-      return {
-        ...current,
-        workspaceBasics,
-      };
-    });
-  }, []);
+        if (
+          currentWorkspaceBasics.name === workspaceBasics.name &&
+          currentWorkspaceBasics.type === workspaceBasics.type
+        ) {
+          return current;
+        }
+
+        return {
+          ...current,
+          workspaceBasics,
+        };
+      });
+    },
+    [createdProfile]
+  );
 
   const updateRegionalPreferences = useCallback(
     function updateRegionalPreferences(
       regionalPreferences: RegionalPreferences
     ) {
       setFormState((current) => {
+        if (createdProfile) {
+          return current;
+        }
+
         const currentRegionalPreferences = current.regionalPreferences;
 
         if (
@@ -149,7 +169,7 @@ export function useOnboardingFlow({
         };
       });
     },
-    []
+    [createdProfile]
   );
 
   const updateFirstAccount = useCallback(function updateFirstAccount(
@@ -173,80 +193,149 @@ export function useOnboardingFlow({
     });
   }, []);
 
-  const submitOnboarding = useCallback(
-    async function submitOnboarding() {
+  const finishOnboarding = useCallback(
+    async function finishOnboarding(hasAccount: boolean) {
+      if (!createdProfile) {
+        return;
+      }
+
+      completeOnboarding(createdProfile, hasAccount);
+      toast.success(
+        hasAccount
+          ? "Workspace and account created successfully"
+          : "Workspace created successfully"
+      );
+      await navigate({ to: DASHBOARD_ROUTE, replace: true });
+    },
+    [completeOnboarding, createdProfile, navigate]
+  );
+
+  const submitWorkspaceProfile = useCallback(
+    async function submitWorkspaceProfile() {
       const payload: CreateOnboardingProfile = {
         ...formState.workspaceBasics,
         ...formState.regionalPreferences,
-        firstAccount: hasFirstAccountData(formState.firstAccount)
-          ? formState.firstAccount
-          : undefined,
       };
 
       try {
         const profile = await createOnboardingProfile.mutateAsync(payload);
-        completeOnboarding(profile);
-        toast.success("Workspace created successfully");
-        await navigate({ to: DASHBOARD_ROUTE, replace: true });
+        setProfileId(profile.id);
+        setCreatedProfile(profile);
+        setStepCompletion(2, true);
+        onStepChange(3);
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to create workspace"
         );
-        throw error;
       }
     },
     [
       createOnboardingProfile,
-      completeOnboarding,
-      formState.firstAccount,
       formState.regionalPreferences,
       formState.workspaceBasics,
-      navigate,
+      onStepChange,
+      setStepCompletion,
     ]
   );
 
+  const submitOptionalAccountStep = useCallback(
+    async function submitOptionalAccountStep() {
+      if (!createdProfile || !hasOptionalFirstAccount) {
+        return;
+      }
+
+      try {
+        await createAccount.mutateAsync({
+          name: formState.firstAccount.name,
+          group: formState.firstAccount.group,
+          balance: formState.firstAccount.balance,
+          currency: formState.regionalPreferences.currency,
+          isActive: true,
+          includeInNetWorth: true,
+          sortOrder: 0,
+        });
+        await finishOnboarding(true);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create account"
+        );
+      }
+    },
+    [
+      createAccount,
+      createdProfile,
+      finishOnboarding,
+      formState.firstAccount,
+      formState.regionalPreferences.currency,
+      hasOptionalFirstAccount,
+    ]
+  );
+
+  const skipOptionalAccountStep = useCallback(
+    async function skipOptionalAccountStep() {
+      await finishOnboarding(false);
+    },
+    [finishOnboarding]
+  );
+
   const goToNextStep = useCallback(
-    function goToNextStep() {
+    async function goToNextStep() {
+      if (step === 2) {
+        await submitWorkspaceProfile();
+        return;
+      }
+
       if (nextStep && canGoNext) {
         onStepChange(nextStep);
       }
     },
-    [canGoNext, nextStep, onStepChange]
+    [canGoNext, nextStep, onStepChange, step, submitWorkspaceProfile]
   );
 
   const goToPreviousStep = useCallback(
     function goToPreviousStep() {
+      if (createdProfile) {
+        return;
+      }
+
       if (previousStep) {
         onStepChange(previousStep);
       }
     },
-    [onStepChange, previousStep]
+    [createdProfile, onStepChange, previousStep]
   );
 
   const goToStep = useCallback(
     function goToStep(nextRequestedStep: OnboardingStep) {
+      if (createdProfile && nextRequestedStep < 3) {
+        return;
+      }
+
       if (canAccessStep(nextRequestedStep, completionState)) {
         onStepChange(nextRequestedStep);
       }
     },
-    [completionState, onStepChange]
+    [completionState, createdProfile, onStepChange]
   );
 
   return {
     step,
     steps: onboardingSteps,
     currentStep,
-    previousStep,
+    previousStep: createdProfile ? null : previousStep,
     nextStep,
     completionState,
     formState,
+    createdProfile,
     canGoNext,
-    isSubmitting: createOnboardingProfile.isPending,
+    canSubmitOptionalAccount,
+    isSubmitting,
     setStepCompletion,
     updateWorkspaceBasics,
     updateRegionalPreferences,
     updateFirstAccount,
-    submitOnboarding,
+    submitOptionalAccountStep,
+    skipOptionalAccountStep,
     goToNextStep,
     goToPreviousStep,
     goToStep,

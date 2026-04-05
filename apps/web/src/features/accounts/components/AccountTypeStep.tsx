@@ -1,3 +1,4 @@
+import type { AccountType } from "@workspace/types";
 import {
   Item,
   ItemContent,
@@ -13,7 +14,6 @@ import {
   SquarePercentIcon,
   UploadIcon,
 } from "lucide-react";
-import type { AccountType } from "../types";
 import React from "react";
 
 const ACCOUNT_TYPES: {
@@ -28,12 +28,12 @@ const ACCOUNT_TYPES: {
     icon: <ChartLineIcon className="size-4" />,
   },
   {
-    type: "credit",
+    type: "credit_card",
     label: "Credit Card",
     icon: <CreditCardIcon className="size-4" />,
   },
   {
-    type: "chequing",
+    type: "checking",
     label: "Chequing",
     icon: <BanknoteIcon className="size-4" />,
   },
@@ -43,8 +43,18 @@ const ACCOUNT_TYPES: {
     icon: <PiggyBankIcon className="size-4" />,
   },
   {
-    type: "gic",
-    label: "GIC",
+    type: "mortgage",
+    label: "Mortgage",
+    icon: <SquarePercentIcon className="size-4" />,
+  },
+  {
+    type: "loan",
+    label: "Loan",
+    icon: <SquarePercentIcon className="size-4" />,
+  },
+  {
+    type: "asset",
+    label: "Asset",
     icon: <SquarePercentIcon className="size-4" />,
   },
   {

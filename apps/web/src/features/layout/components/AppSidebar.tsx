@@ -9,6 +9,7 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { AppLeftSideNav } from "@/features/navigation";
 import { useAppStore } from "@/stores";
+import { AccountRequiredBanner } from "@/components/AccountRequiredBanner";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const sidebarLeftContent = useAppStore((state) => state.sidebarLeftContent);
@@ -37,7 +38,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-0">
+          <SidebarGroup className="p-4">
+            <AccountRequiredBanner />
             <SidebarGroupContent>{sidebarLeftContent}</SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>

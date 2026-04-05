@@ -9,7 +9,7 @@ export const onboardingSteps: readonly OnboardingStepDefinition[] = [
     id: 1,
     title: "Workspace basics",
     description: "Name the workspace and choose the primary setup direction.",
-    actionLabel: "Use workspace defaults",
+    actionLabel: "Next",
     Component: WorkspaceBasicsStep,
   },
   {
@@ -17,14 +17,15 @@ export const onboardingSteps: readonly OnboardingStepDefinition[] = [
     title: "Regional preferences",
     description:
       "Apply date, timezone, and currency defaults for the workspace.",
-    actionLabel: "Apply regional defaults",
+    actionLabel: "Create workspace",
     Component: RegionalPreferencesStep,
   },
   {
     id: 3,
     title: "First account",
-    description: "Create a starter account so the workspace is ready to use.",
-    actionLabel: "Create workspace",
+    description:
+      "Optionally add a starter account now, or skip and do it later.",
+    actionLabel: "Create account",
     Component: FirstAccountStep,
   },
 ] as const;
