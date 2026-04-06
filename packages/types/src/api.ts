@@ -63,7 +63,7 @@ export const ProfileSchema = z.object({
   isDefault: z.boolean().default(false),
   isActive: z.boolean().default(true),
   isSetupComplete: z.boolean().default(false),
-  notes: z.string().optional(),
+  notes: z.string().max(160).optional(),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
 });
@@ -109,6 +109,26 @@ export const CreateOnboardingProfileSchema = z.object({
 export type CreateOnboardingProfile = z.infer<
   typeof CreateOnboardingProfileSchema
 >;
+
+export const ProfileParamsSchema = z.object({
+  id: z.uuid(),
+});
+
+export type ProfileParams = z.infer<typeof ProfileParamsSchema>;
+
+export const UpdateProfileSchema = z.object({
+  icon: z.string().max(10).optional(),
+  type: ProfileTypeSchema.optional(),
+  currency: z.string().length(3).optional(),
+  dateFormat: DateFormatSchema.optional(),
+  weekStart: WeekStartSchema.optional(),
+  notes: z
+    .string()
+    .transform((value) => value.slice(0, 160))
+    .optional(),
+});
+
+export type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
 
 export const InsertProfileSchema = ProfileSchema.omit({
   id: true,

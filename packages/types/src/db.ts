@@ -56,7 +56,7 @@ export const ProfileSchema = z.object({
   isDefault: z.boolean().default(false),
   isActive: z.boolean().default(true),
   isSetupComplete: z.boolean().default(false),
-  notes: z.string().optional(),
+  notes: z.string().max(160).optional(),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
 });
