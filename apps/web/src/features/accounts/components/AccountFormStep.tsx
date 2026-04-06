@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
 import { useCreateAccount } from "../api/use-accounts";
 import { ChevronDownIcon, DollarSignIcon } from "lucide-react";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   InputGroup,
@@ -46,13 +46,15 @@ const ACCOUNT_TYPE_MAP: Record<AccountType, AccountGroup> = {
 
 const accountFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  balance: z.coerce.number({ invalid_type_error: "Balance is required" }),
-  type: z.enum(ACCOUNT_TYPES, { message: "Please select an account type" }),
-  availableCredit: z.coerce.number().optional(),
+  balance: z.string().transform(Number).pipe(z.number()),
+  type: z.enum([...ACCOUNT_TYPES], {
+    message: "Please select an account type",
+  }),
+  availableCredit: z.string().transform(Number).pipe(z.number()).optional(),
   expirationDate: z.date().optional(),
 });
 
-export type AccountFormValues = z.infer<typeof accountFormSchema>;
+type AccountFormValues = z.output<typeof accountFormSchema>;
 
 interface Props {
   type: AccountType;
@@ -65,7 +67,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
   const createAccount = useCreateAccount();
 
   const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
+    resolver: zodResolver(accountFormSchema) as any,
     mode: "onChange",
     defaultValues: {
       name: "",
