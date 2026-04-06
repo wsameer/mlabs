@@ -28,6 +28,7 @@ export type AppSlice = {
   setBackendStatus: (status: BackendStatus) => void;
   setBackendHealth: (health: HealthCheck | null) => void;
   setHasAccount: (value: boolean) => void;
+  syncAppProfile: (profile: Profile) => void;
   completeOnboarding: (profile: Profile, hasAccount: boolean) => void;
   fetchAppData: () => Promise<Bootstrap>;
 };
@@ -60,6 +61,22 @@ export const createAppSlice: StateCreator<
   setHasAccount: (value) =>
     set((state) => {
       state.hasAccount = value;
+    }),
+
+  syncAppProfile: (profile) =>
+    set((state) => {
+      state.appProfile = profile;
+
+      const existingIndex = state.appProfiles.findIndex(
+        (entry) => entry.id === profile.id
+      );
+
+      if (existingIndex >= 0) {
+        state.appProfiles[existingIndex] = profile;
+        return;
+      }
+
+      state.appProfiles.push(profile);
     }),
 
   completeOnboarding: (profile, hasAccount) => {

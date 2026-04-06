@@ -1,175 +1,75 @@
 import { useLayoutConfig } from "@/features/layout";
-import { useTheme } from "@/components/ThemeProvider";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@workspace/ui/components/avatar";
+import { useAppStore } from "@/stores";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-} from "@workspace/ui/components/field";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemMedia,
-  ItemTitle,
-} from "@workspace/ui/components/item";
-import { Switch } from "@workspace/ui/components/switch";
-import {
-  BanknoteArrowDownIcon,
-  BanknoteArrowUpIcon,
-  ChevronRightIcon,
-  HeartIcon,
-  LandmarkIcon,
-  PiggyBankIcon,
-  SendIcon,
-  SunMoonIcon,
-} from "lucide-react";
+
+import { useProfileSettings } from "../api/use-profile-settings";
+import { useProfileSettingsAutosave } from "../hooks/use-profile-settings-autosave";
+import { SettingsPreferencesSection } from "./SettingsPreferencesSection";
+import { SettingsProfileSummary } from "./SettingsProfileSummary";
+import { SettingsReadonlySection } from "./SettingsReadonlySection";
 
 export function SettingsPage() {
   useLayoutConfig({
     pageTitle: "Settings",
   });
 
-  const { theme, setTheme } = useTheme();
+  const appProfile = useAppStore((state) => state.appProfile);
+  const profileId = appProfile?.id ?? "";
+  const profileQuery = useProfileSettings(profileId);
+  const activeProfile = profileQuery.data ?? appProfile;
+  const settings = useProfileSettingsAutosave(activeProfile);
+
+  if (!activeProfile || !settings.draft) {
+    return (
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+        <Card>
+          <CardContent className="p-4 text-sm text-muted-foreground">
+            Loading your workspace settings...
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-      <Item
-        variant="outline"
-        className="items-center"
-        size="sm"
-        render={
-          <button type="button">
-            <ItemMedia>
-              <Avatar className="size-9">
-                <AvatarImage src="https://github.com/evilrabbit.png" />
-                <AvatarFallback>ER</AvatarFallback>
-              </Avatar>
-            </ItemMedia>
-            <ItemContent>
-              <ItemTitle className="text-base">John Doe</ItemTitle>
-              <ItemDescription>View personal details.</ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <ChevronRightIcon className="size-4" />
-            </ItemActions>
-          </button>
-        }
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-8">
+      <SettingsProfileSummary
+        profile={activeProfile}
+        isRefreshing={profileQuery.isFetching}
+        isSaving={settings.isBusy}
+        isNotesDebouncing={settings.isNotesDebouncing}
       />
 
-      <Card className="w-full max-w-sm p-0">
-        <CardContent className="p-0">
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <BanknoteArrowUpIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Income Category Setting</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
+      {profileQuery.isError ? (
+        <Card className="border-amber-300/70 bg-amber-50/70 dark:bg-amber-950/20">
+          <CardContent className="p-4 text-sm text-amber-900 dark:text-amber-100">
+            We could not refresh settings right now. You can still edit the last
+            loaded values and try again.
+          </CardContent>
+        </Card>
+      ) : null}
 
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <BanknoteArrowDownIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Expense Category Setting</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
+      <SettingsReadonlySection profile={activeProfile} />
 
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <LandmarkIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Account Setting</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
-
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <PiggyBankIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Budget Setting</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="w-full max-w-sm p-0">
-        <CardContent className="p-0">
-          <Field orientation="horizontal" className="gap-2.5 px-2.5 py-2">
-            <SunMoonIcon className="size-4" />
-            <FieldContent>
-              <FieldLabel htmlFor="switch-focus-mode">Appearance</FieldLabel>
-              <FieldDescription>
-                Toggle dark theme for the interface
-              </FieldDescription>
-            </FieldContent>
-            <Switch
-              id="switch-focus-mode"
-              checked={theme === "dark"}
-              onCheckedChange={(value) => setTheme(value ? "dark" : "light")}
-            />
-          </Field>
-
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <HeartIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Rate it</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
-
-          <Item
-            size="xs"
-            render={
-              <button className="rounded-none outline-none hover:bg-muted">
-                <ItemMedia variant="icon">
-                  <SendIcon />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Feedback</ItemTitle>
-                </ItemContent>
-              </button>
-            }
-          />
-        </CardContent>
-      </Card>
+      <SettingsPreferencesSection
+        draft={settings.draft}
+        isBusy={settings.isBusy}
+        isNotesDebouncing={settings.isNotesDebouncing}
+        isNotesSaving={settings.isNotesSaving}
+        onIconChange={(value) => settings.updateImmediateField("icon", value)}
+        onTypeChange={(value) => settings.updateImmediateField("type", value)}
+        onCurrencyChange={(value) =>
+          settings.updateImmediateField("currency", value)
+        }
+        onWeekStartChange={(value) =>
+          settings.updateImmediateField("weekStart", value)
+        }
+        onDateFormatChange={(value) =>
+          settings.updateImmediateField("dateFormat", value)
+        }
+        onNotesChange={settings.updateNotesDraft}
+        onNotesSave={settings.saveNotes}
+      />
     </div>
   );
 }

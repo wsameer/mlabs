@@ -1,12 +1,5 @@
 import { Badge } from "@workspace/ui/components/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -93,66 +86,52 @@ const PLACEHOLDER_ACCOUNT_CATEGORIES = [
 
 export function AccountCategoriesSidebar() {
   return (
-    <Card size="sm" className="gap-0 overflow-hidden">
-      <CardHeader className="border-b">
-        <Badge variant="outline" className="mb-2 w-fit">
-          Placeholder data
-        </Badge>
-        <CardTitle>Account categories</CardTitle>
-        <CardDescription>
-          This widget will show real grouped accounts once seeded data is
-          connected.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-0">
-        <div className="flex flex-col">
-          {PLACEHOLDER_ACCOUNT_CATEGORIES.map((category, index) => {
-            const Icon = category.icon;
+    <div className="flex flex-col">
+      {PLACEHOLDER_ACCOUNT_CATEGORIES.map((category, index) => {
+        const Icon = category.icon;
 
-            return (
-              <div key={category.id}>
-                <Collapsible defaultOpen={index === 0}>
-                  <CollapsibleTrigger className="group/account-category flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/50 aria-expanded:bg-muted/40">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <div className="mt-0.5 rounded-md bg-muted p-2 text-muted-foreground">
-                        <Icon className="size-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-medium text-foreground">
-                          {category.label}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {category.description}
-                        </p>
-                      </div>
+        return (
+          <div key={category.id}>
+            <Collapsible defaultOpen={index === 0}>
+              <CollapsibleTrigger className="group/account-category flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/50 aria-expanded:bg-muted/40">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="mt-0.5 rounded-md bg-muted p-2 text-muted-foreground">
+                    <Icon className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-medium text-foreground">
+                      {category.label}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{category.accounts.length}</Badge>
-                      <ChevronDownIcon className="size-4 text-muted-foreground group-aria-expanded/account-category:hidden" />
-                      <ChevronUpIcon className="hidden size-4 text-muted-foreground group-aria-expanded/account-category:inline" />
+                    <p className="text-xs text-muted-foreground">
+                      {category.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{category.accounts.length}</Badge>
+                  <ChevronDownIcon className="size-4 text-muted-foreground group-aria-expanded/account-category:hidden" />
+                  <ChevronUpIcon className="hidden size-4 text-muted-foreground group-aria-expanded/account-category:inline" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="overflow-hidden px-4 pb-3 data-open:animate-accordion-down data-closed:animate-accordion-up">
+                <div className="space-y-2 rounded-lg bg-muted/30 p-3">
+                  {category.accounts.map((accountName) => (
+                    <div
+                      key={accountName}
+                      className="rounded-md bg-background px-3 py-2 text-xs text-foreground ring-1 ring-border/60"
+                    >
+                      {accountName}
                     </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden px-4 pb-3 data-open:animate-accordion-down data-closed:animate-accordion-up">
-                    <div className="space-y-2 rounded-lg bg-muted/30 p-3">
-                      {category.accounts.map((accountName) => (
-                        <div
-                          key={accountName}
-                          className="rounded-md bg-background px-3 py-2 text-xs text-foreground ring-1 ring-border/60"
-                        >
-                          {accountName}
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-                {index < PLACEHOLDER_ACCOUNT_CATEGORIES.length - 1 ? (
-                  <Separator />
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+            {index < PLACEHOLDER_ACCOUNT_CATEGORIES.length - 1 ? (
+              <Separator />
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
   );
 }

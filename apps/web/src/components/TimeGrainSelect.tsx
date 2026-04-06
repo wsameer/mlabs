@@ -29,10 +29,7 @@ export const TimeGrainSelect = () => {
       name="time-grain-selector"
       onValueChange={(v) => v && setTimeGrain(v)}
     >
-      <SelectTrigger
-        className="w-[55px] border-border bg-transparent"
-        size="sm"
-      >
+      <SelectTrigger className="w-13.75 border-border bg-transparent" size="sm">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

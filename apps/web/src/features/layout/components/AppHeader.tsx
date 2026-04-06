@@ -21,13 +21,26 @@ export const AppHeader = () => {
   };
 
   const renderDesktopHeader = () => (
-    <div className="hidden md:flex md:items-center">
-      <SidebarTrigger className="-ml-1" />
-      <Separator
-        orientation="vertical"
-        className="mt-1 mr-2 data-[orientation=vertical]:h-4"
-      />
-      <p className="text-base text-muted-foreground">{pageTitle}</p>
+    <div className="hidden w-full md:flex md:items-center md:justify-between">
+      <div className="flex items-center">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mt-1 mr-2 data-[orientation=vertical]:h-4"
+        />
+        <p className="text-base text-muted-foreground">{pageTitle}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={() => setGlobalSearch(true)}
+          variant="outline"
+          size="sm"
+        >
+          <SearchIcon data-icon="inline-start" />
+          <p className="text-muted-foreground">⌘K</p>
+        </Button>
+        {headerActions}
+      </div>
     </div>
   );
 

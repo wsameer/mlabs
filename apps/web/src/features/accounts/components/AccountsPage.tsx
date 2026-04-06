@@ -36,7 +36,6 @@ export function AccountsPage() {
 
   useLayoutConfig({
     pageTitle: "Accounts",
-    leftSidebarContent,
   });
 
   useEffect(() => {
@@ -60,8 +59,7 @@ export function AccountsPage() {
           <AlertCircleIcon className="size-4" />
           <AlertTitle>Could not load accounts</AlertTitle>
           <AlertDescription>
-            There was a problem fetching accounts. Please try again in a
-            moment.
+            There was a problem fetching accounts. Please try again in a moment.
           </AlertDescription>
         </Alert>
       </div>

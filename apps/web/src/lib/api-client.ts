@@ -3,7 +3,7 @@ import type { ApiResponse } from "@workspace/types";
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 type RequestOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   params?: Record<string, string | number | boolean | undefined | null>;
   signal?: AbortSignal;
