@@ -9,8 +9,10 @@ services:
     env_file:
       - .env
     environment:
+      NODE_ENV: production
       PORT: 3001
       DATABASE_URL: /data/mlabs.db
+      WEB_DIST_PATH: /app/apps/web/dist
     ports:
       - "3001:3001"
     volumes:

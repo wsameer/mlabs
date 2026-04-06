@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@workspace/ui/components/dialog";
 import { useState } from "react";
-import type { AccountType } from "../types";
+import type { AccountType } from "@workspace/types";
 import { AccountTypeStep } from "./AccountTypeStep";
 import { AccountFormStep } from "./AccountFormStep";
 

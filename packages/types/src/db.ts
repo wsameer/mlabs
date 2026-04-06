@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod/v4";
 
 // ============================================================================
 // Enums - Must match packages/db/src/schema.ts

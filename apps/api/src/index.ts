@@ -21,6 +21,20 @@ import { logger } from "./libs/logger.js";
 
 const app = new Hono();
 
+function getWebDistPath() {
+  const explicitPath = process.env.WEB_DIST_PATH;
+  if (explicitPath && existsSync(explicitPath)) {
+    return explicitPath;
+  }
+
+  const candidates = [
+    join(process.cwd(), "apps", "web", "dist"),
+    join(process.cwd(), "..", "web", "dist"),
+  ];
+
+  return candidates.find((candidate) => existsSync(candidate));
+}
+
 // Global Middleware
 // Request ID for tracing
 app.use("*", requestId());
@@ -98,9 +112,9 @@ app.route("/api/accounts", accounts);
 
 // Static File Serving (Production Only)
 if (env.NODE_ENV === "production") {
-  const webDistPath = join(process.cwd(), "..", "web", "dist");
+  const webDistPath = getWebDistPath();
 
-  if (existsSync(webDistPath)) {
+  if (webDistPath) {
     logger.info(`Serving static files from: ${webDistPath}`);
 
     // Serve static assets
@@ -109,7 +123,7 @@ if (env.NODE_ENV === "production") {
     // SPA fallback - serve index.html for all non-API routes
     app.get("*", serveStatic({ path: join(webDistPath, "index.html") }));
   } else {
-    logger.warn(`Web dist directory not found at: ${webDistPath}`);
+    logger.warn("Web dist directory not found; API-only mode enabled");
   }
 }
 

@@ -1,7 +1,5 @@
 import type { ApiResponse } from "@workspace/types";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
-
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
@@ -17,7 +15,8 @@ export async function apiClient<T>(
   const { method = "GET", body, params, signal, includeProfileId = true } =
     options;
 
-  const url = new URL(`/api${path}`, API_BASE);
+  const apiBase = import.meta.env.VITE_API_URL ?? window.location.origin;
+  const url = new URL(`/api${path}`, apiBase);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined && value !== null)

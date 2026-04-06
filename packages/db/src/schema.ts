@@ -1,11 +1,5 @@
-import { relations, sql } from "drizzle-orm";
-import {
-  check,
-  index,
-  integer,
-  sqliteTable,
-  text,
-} from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const DATE_FORMATS = [
   "D MMM, YYYY",
@@ -16,7 +10,6 @@ export const DATE_FORMATS = [
 
 export const WEEK_STARTS = ["SUNDAY", "MONDAY"] as const;
 export const PROFILE_TYPES = ["PERSONAL", "BUSINESS", "SHARED"] as const;
-export const PROFILE_NOTES_MAX_LENGTH = 160;
 export const ACCOUNT_GROUPS = [
   "checking",
   "savings",
@@ -68,10 +61,6 @@ export const profiles = sqliteTable(
   (table) => [
     index("profiles_default_idx").on(table.isDefault),
     index("profiles_active_idx").on(table.isActive),
-    check(
-      "profiles_notes_length_chk",
-      sql`(${table.notes} is null or length(${table.notes}) <= ${PROFILE_NOTES_MAX_LENGTH})`
-    ),
   ]
 );
 

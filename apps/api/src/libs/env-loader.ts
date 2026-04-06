@@ -5,6 +5,9 @@ import { config } from "dotenv";
 export function loadEnvFiles() {
   const nodeEnv = process.env.NODE_ENV || "development";
   const cwd = process.cwd();
+  const explicitEnvEntries = new Map(
+    Object.entries(process.env).filter(([, value]) => value !== undefined)
+  );
 
   // Defines env files in reverse priority order (last one wins)
   const envFiles = [
@@ -35,6 +38,10 @@ export function loadEnvFiles() {
         loadedFiles.push(`${location}:${file.split("/").pop()}`);
       }
     }
+  }
+
+  for (const [key, value] of explicitEnvEntries) {
+    process.env[key] = value;
   }
 
   if (nodeEnv === "development" && loadedFiles.length > 0) {

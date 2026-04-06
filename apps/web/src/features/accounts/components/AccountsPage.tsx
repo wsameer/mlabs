@@ -36,6 +36,7 @@ export function AccountsPage() {
 
   useLayoutConfig({
     pageTitle: "Accounts",
+    leftSidebarContent,
   });
 
   useEffect(() => {

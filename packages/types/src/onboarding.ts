@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod/v4";
 
 export const WORKSPACE_NAME_PATTERN = /^[A-Za-z0-9]+$/;
 export const WORKSPACE_TYPES = ["PERSONAL", "BUSINESS", "SHARED"] as const;
@@ -17,7 +17,7 @@ export const ONBOARDING_ACCOUNT_GROUPS = [
   "credit_card",
 ] as const;
 
-export const WorkspaceTypeSchema = z.enum(WORKSPACE_TYPES);
+export const WorkspaceTypeSchema = z.enum([...WORKSPACE_TYPES]);
 export const DateFormatSchema = z.enum(DATE_FORMATS);
 export const WeekStartSchema = z.enum(WEEK_STARTS);
 export const SupportedCurrencySchema = z.enum(SUPPORTED_CURRENCIES);

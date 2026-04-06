@@ -18,6 +18,7 @@
     "build:api": "pnpm --filter=api build",
     "build:web": "pnpm --filter=web build",
     "start": "pnpm --filter=api start",
+    "start:prod": "pnpm db:setup && pnpm --filter=api start:prod",
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo clean && rm -rf node_modules .turbo",
     "clean:full": "turbo run clean && rm -rf node_modules .turbo",

@@ -14,7 +14,8 @@ export const Route = createFileRoute(ONBOARDING_ROUTE)({
 
 function OnboardingRoute() {
   const navigate = useNavigate();
-  const { step } = Route.useSearch();
+  const search = Route.useSearch();
+  const step = "step" in search ? search.step : parseOnboardingStep(undefined);
 
   return (
     <RequiresNoProfile>
