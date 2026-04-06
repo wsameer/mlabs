@@ -36,7 +36,7 @@ app.use(
   "*",
   cors({
     origin: env.CORS_ORIGIN.split(","),
-    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "X-Profile-Id", "X-Request-Id"],
     credentials: true,
     maxAge: 86400, // 24 hours

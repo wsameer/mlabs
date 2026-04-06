@@ -1,11 +1,39 @@
 import { accounts, profiles } from "@workspace/db";
-import type { CreateOnboardingProfile, Profile } from "@workspace/types";
+import type {
+  CreateOnboardingProfile,
+  Profile,
+  UpdateProfile,
+} from "@workspace/types";
 
 import { db, eq, sql } from "../libs/db.js";
-import { ConflictError, InternalServerError } from "../libs/errors.js";
+import {
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
+} from "../libs/errors.js";
 import { serializeProfile } from "./profile-serializer.js";
 
 export class ProfilesService {
+  private normalizeNotes(notes: string | undefined) {
+    return notes?.slice(0, 160);
+  }
+
+  async getProfileById(id: string): Promise<Profile> {
+    const existingProfiles = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.id, id))
+      .limit(1);
+
+    const profile = existingProfiles[0];
+
+    if (!profile) {
+      throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+    }
+
+    return serializeProfile(profile);
+  }
+
   async isWorkspaceNameAvailable(name: string): Promise<boolean> {
     const normalizedName = name.trim().toLowerCase();
 
@@ -83,6 +111,38 @@ export class ProfilesService {
     });
 
     return serializeProfile(createdProfile);
+  }
+
+  async updateProfile(id: string, payload: UpdateProfile): Promise<Profile> {
+    const updateValues = {
+      ...(payload.icon !== undefined ? { icon: payload.icon } : {}),
+      ...(payload.type !== undefined ? { type: payload.type } : {}),
+      ...(payload.currency !== undefined ? { currency: payload.currency } : {}),
+      ...(payload.dateFormat !== undefined
+        ? { dateFormat: payload.dateFormat }
+        : {}),
+      ...(payload.weekStart !== undefined
+        ? { weekStart: payload.weekStart }
+        : {}),
+      ...(payload.notes !== undefined
+        ? { notes: this.normalizeNotes(payload.notes) }
+        : {}),
+      updatedAt: new Date(),
+    };
+
+    const updatedProfiles = await db
+      .update(profiles)
+      .set(updateValues)
+      .where(eq(profiles.id, id))
+      .returning();
+
+    const updatedProfile = updatedProfiles[0];
+
+    if (!updatedProfile) {
+      throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+    }
+
+    return serializeProfile(updatedProfile);
   }
 }
 

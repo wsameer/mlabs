@@ -2,12 +2,15 @@ import { Hono } from "hono";
 import {
   CheckWorkspaceNameAvailabilityQuerySchema,
   CreateOnboardingProfileSchema,
+  ProfileParamsSchema,
+  UpdateProfileSchema,
 } from "@workspace/types";
 import type {
   ApiResponse,
   CheckWorkspaceNameAvailabilityResult,
   CreateOnboardingProfile,
   Profile,
+  UpdateProfile,
 } from "@workspace/types";
 
 import { validate } from "../middleware/validator.js";
@@ -45,6 +48,40 @@ profilesRoute.get(
         name,
         available,
       },
+    };
+
+    return c.json(response);
+  }
+);
+
+profilesRoute.get(
+  "/:id",
+  validate("param", ProfileParamsSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const profile = await profilesService.getProfileById(id);
+
+    const response: ApiResponse<Profile> = {
+      success: true,
+      data: profile,
+    };
+
+    return c.json(response);
+  }
+);
+
+profilesRoute.put(
+  "/:id",
+  validate("param", ProfileParamsSchema),
+  validate("json", UpdateProfileSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const payload = c.req.valid("json") as UpdateProfile;
+    const updatedProfile = await profilesService.updateProfile(id, payload);
+
+    const response: ApiResponse<Profile> = {
+      success: true,
+      data: updatedProfile,
     };
 
     return c.json(response);
