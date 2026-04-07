@@ -9,8 +9,12 @@ cp .env.example .env
 pnpm db:bootstrap
 pnpm dev
 
-OR 
+# Seed data
+Use `pnpm db:bootstrap:seed` instead of `pnpm db:bootstrap` if you want sample data.
+```
 
+## PROD
+```bash
 # local testing (no domain, Caddy serves on localhost)
 docker compose -f docker-compose.prod.yml up -d
 
@@ -19,12 +23,7 @@ DOMAIN=mlabs.yourdomain.com docker compose -f docker-compose.prod.yml up -d
 
 # Custom image tag or port
 IMAGE_TAG=abc1234 HOST_PORT=8080 docker compose -f docker-compose.prod.yml up -d
-
-
 ```
-
-Use `pnpm db:bootstrap:seed` instead of `pnpm db:bootstrap` if you want sample data.
-
 
 ## Self host
 ```bash
