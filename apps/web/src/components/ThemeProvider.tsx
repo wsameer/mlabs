@@ -89,7 +89,10 @@ export function ThemeProvider({
 
   // Toggle dark/light with "d" key
   const themeRef = React.useRef(theme);
-  themeRef.current = theme;
+
+  React.useLayoutEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

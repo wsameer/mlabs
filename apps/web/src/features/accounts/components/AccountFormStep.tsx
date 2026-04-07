@@ -67,6 +67,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
   const createAccount = useCreateAccount();
 
   const form = useForm<AccountFormValues>({
+    // eslint-disable-next-line
     resolver: zodResolver(accountFormSchema) as any,
     mode: "onChange",
     defaultValues: {
