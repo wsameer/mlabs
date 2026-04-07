@@ -8,24 +8,25 @@ This is a Vite monorepo template with shadcn/ui.
 cp .env.example .env
 pnpm db:bootstrap
 pnpm dev
+
+OR 
+
+# local testing (no domain, Caddy serves on localhost)
+docker compose -f docker-compose.prod.yml up -d
+
+# VPS/Droplet with a real domain
+DOMAIN=mlabs.yourdomain.com docker compose -f docker-compose.prod.yml up -d
+
+# Custom image tag or port
+IMAGE_TAG=abc1234 HOST_PORT=8080 docker compose -f docker-compose.prod.yml up -d
+
+
 ```
 
 Use `pnpm db:bootstrap:seed` instead of `pnpm db:bootstrap` if you want sample data.
 
-## Adding components
 
-To add components to your app, run the following command at the root of your `web` app:
-
+## Self host
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
-
-This will place the ui components in the `packages/ui/src/components` directory.
-
-## Using components
-
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@workspace/ui/components/button";
+docker run -p 3001:3001 -v mlabs_data:/data ghcr.io/<your-username>/mlabs:latest
 ```
