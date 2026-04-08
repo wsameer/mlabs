@@ -38,6 +38,7 @@ export function AppBottombar() {
     >
       <nav className="flex items-center justify-between gap-6 rounded-full bg-secondary p-2 shadow-lg">
         {PRIMARY_NAVIGATION_OPTIONS.map((item) => {
+          if (item.)
           const Icon = item.icon;
           return (
             <React.Fragment key={item.path}>

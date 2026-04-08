@@ -8,6 +8,7 @@ export const DASHBOARD_ROUTE = "/dashboard" as keyof FileRoutesByPath;
 export const TRANSACTIONS_ROUTE = "/transactions" as keyof FileRoutesByPath;
 export const ACCOUNTS_ROUTE = "/accounts" as keyof FileRoutesByPath;
 export const SETTINGS_ROUTE = "/settings" as keyof FileRoutesByPath;
+export const BUDGET_ROUTE = "/budget" as keyof FileRoutesByPath;
 export const MAINTENANCE_ROUTE = "/maintenance" as keyof FileRoutesByPath;
 export const ONBOARDING_ROUTE = "/onboarding" as keyof FileRoutesByPath;
 export const PROFILES_ROUTE = "/profiles" as keyof FileRoutesByPath;
