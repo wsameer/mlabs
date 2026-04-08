@@ -29,7 +29,6 @@ export const PRIMARY_NAVIGATION_OPTIONS = [
     icon: PiggyBankIcon,
     title: "Budget",
     path: BUDGET_ROUTE,
-    hideOnMobile: true,
   },
   { icon: EllipsisIcon, title: "More", path: SETTINGS_ROUTE },
 ].filter(Boolean) as SideNavigationItem[];
