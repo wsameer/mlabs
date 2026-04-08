@@ -47,3 +47,14 @@ export const useAppStore = create<AppStoreState>()(
     { name: "app-store", enabled: import.meta.env.DEV }
   )
 );
+
+// GLOBAL HELPER FOR CONSOLE DEBUGGING (DEV ONLY)
+if (import.meta.env.DEV) {
+  (window as any).store = {
+    get: () => useAppStore.getState(),
+    log: () => console.table(useAppStore.getState()),
+    subscribe: (callback: (state: AppStoreState) => void) =>
+      useAppStore.subscribe(callback),
+  };
+  console.log("🔍 Store helper available: window.store.get() | window.store.log()");
+}

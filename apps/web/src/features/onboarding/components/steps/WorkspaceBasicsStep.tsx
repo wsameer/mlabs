@@ -113,6 +113,7 @@ export function WorkspaceBasicsStep({
                 autoComplete="off"
                 placeholder="personalspace"
                 aria-invalid={fieldState.invalid || hasAvailabilityError}
+                autoFocus
               />
               <FieldDescription>
                 Use letters and numbers only, with no spaces or symbols.

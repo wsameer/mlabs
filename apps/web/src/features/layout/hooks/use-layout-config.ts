@@ -1,5 +1,5 @@
-import { useAppStore } from "@/stores";
 import { useEffect } from "react";
+import { useLayoutActions } from "@/hooks/use-layout";
 
 type LayoutConfig = {
   pageTitle?: string;
@@ -9,13 +9,13 @@ type LayoutConfig = {
 };
 
 export function useLayoutConfig(config: LayoutConfig) {
-  const setHeaderTitle = useAppStore((state) => state.setHeaderTitle);
-  const setHeaderActions = useAppStore((state) => state.setHeaderActions);
-  const setMobileBackPath = useAppStore((state) => state.setMobileBackPath);
-  const setLeftSidebarContent = useAppStore(
-    (state) => state.setSidebarLeftContent
-  );
-  const resetLayout = useAppStore((state) => state.resetLayout);
+  const {
+    setHeaderTitle,
+    setHeaderActions,
+    setMobileBackPath,
+    setSidebarLeftContent: setLeftSidebarContent,
+    resetLayout,
+  } = useLayoutActions();
 
   useEffect(() => {
     if (config.pageTitle !== undefined) setHeaderTitle(config.pageTitle);

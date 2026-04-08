@@ -7,7 +7,7 @@ import {
   PROFILES_ROUTE,
 } from "@/constants";
 import { ProfilePickerPage } from "@/features/profiles";
-import { useAppStore } from "@/stores";
+import { useAppStatus } from "@/hooks/use-app";
 
 export const Route = createFileRoute(PROFILES_ROUTE)({
   component: ProfilesRoute,
@@ -15,7 +15,7 @@ export const Route = createFileRoute(PROFILES_ROUTE)({
 
 function ProfilesRoute() {
   const navigate = useNavigate();
-  const appStatus = useAppStore((state) => state.appStatus);
+  const appStatus = useAppStatus();
 
   useEffect(() => {
     if (appStatus === "onboarding") {

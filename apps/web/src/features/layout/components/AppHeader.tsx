@@ -4,14 +4,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import { useAppStore } from "@/stores";
+import { useHeaderConfig } from "@/hooks/use-layout";
 import { useUiActions } from "@/hooks/use-ui-store";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
-  const pageTitle = useAppStore((state) => state.headerTitle);
-  const mobileBackPath = useAppStore((state) => state.mobileBackPath);
-  const headerActions = useAppStore((state) => state.headerActions);
+  const { title: pageTitle, actions: headerActions, mobileBackPath } = useHeaderConfig();
   const { setGlobalSearch } = useUiActions();
 
   const handleBack = () => {

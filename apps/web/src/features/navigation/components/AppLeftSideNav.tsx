@@ -8,7 +8,7 @@ import {
   SECONDARY_NAV_OPTIONS,
 } from "@/features/navigation/constants";
 import { useUiActions } from "@/hooks/use-ui-store";
-import { useAppStore } from "@/stores/app-store";
+import { useBackendStatus } from "@/hooks/use-app";
 
 import {
   Sidebar,
@@ -30,7 +30,7 @@ export function AppLeftSideNav({
   const { setOpenMobile, isMobile } = useSidebar();
   const { setOpenCreateTransaction } = useUiActions();
   const router = useRouterState();
-  const backendStatus = useAppStore((s) => s.backendStatus);
+  const backendStatus = useBackendStatus();
   const isBackendConnected = backendStatus === "connected";
 
   const currentPath = router.location.pathname;

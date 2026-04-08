@@ -6,10 +6,14 @@ export function serializeAccount(
 ): Account {
   return {
     ...account,
+    institutionName: account.institutionName ?? undefined,
+    accountNumber: account.accountNumber ?? undefined,
+    description: account.description ?? undefined,
     originalAmount: account.originalAmount ?? undefined,
     interestRate: account.interestRate ?? undefined,
-    nextPaymentDate: account.nextPaymentDate ?? undefined,
+    creditLimit: account.creditLimit ?? undefined,
     linkedAccountId: account.linkedAccountId ?? undefined,
+    metadata: (account.metadata as Record<string, unknown>) ?? undefined,
     color: account.color ?? undefined,
     icon: account.icon ?? undefined,
     notes: account.notes ?? undefined,

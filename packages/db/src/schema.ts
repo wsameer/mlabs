@@ -77,10 +77,20 @@ export const accounts = sqliteTable(
     group: text("group", { enum: ACCOUNT_GROUPS }).notNull(),
     balance: text("balance").notNull().default("0"),
     currency: text("currency").notNull().default("CAD"),
+    // Shared optional fields
+    institutionName: text("institution_name"),
+    accountNumber: text("account_number"),
+    description: text("description"),
+    // Loan/mortgage fields
     originalAmount: text("original_amount"),
     interestRate: text("interest_rate"),
-    nextPaymentDate: text("next_payment_date"),
+    // Credit card field (drives utilization calculations)
+    creditLimit: text("credit_limit"),
+    // Generic linking: credit card → payment account, mortgage → property
     linkedAccountId: text("linked_account_id"),
+    // Type-specific extras as JSON
+    metadata: text("metadata", { mode: "json" }),
+    // Display
     color: text("color"),
     icon: text("icon"),
     isActive: integer("is_active", { mode: "boolean" })

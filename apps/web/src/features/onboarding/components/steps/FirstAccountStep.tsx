@@ -110,6 +110,7 @@ export function FirstAccountStep({
                 autoComplete="off"
                 placeholder="Main chequing"
                 disabled={isSubmitting}
+                autoFocus
               />
               <FieldDescription>
                 Optional. Leave this blank if you want to finish onboarding

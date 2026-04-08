@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { AccountMetadataSchemas } from "./account-metadata.js";
 
 // ============================================================================
 // Enums - Must match packages/db/src/schema.ts
@@ -92,23 +93,31 @@ export const AccountSchema = z.object({
   // Negative for liabilities (credit_card, loan, mortgage)
   balance: z.string(), // numeric as string
   currency: z.string().length(3).default("CAD"),
-  // Loan/Mortgage extras
-  originalAmount: z.string().optional(),
-  interestRate: z.string().optional(),
-  nextPaymentDate: z.string().optional(),
+  // Shared optional fields
+  institutionName: z.string().max(100).nullable().optional(),
+  accountNumber: z.string().max(50).nullable().optional(),
+  description: z.string().max(200).nullable().optional(),
+  // Loan/Mortgage fields
+  originalAmount: z.string().nullable().optional(),
+  interestRate: z.string().nullable().optional(),
+  // Credit card (drives utilization calculations)
+  creditLimit: z.string().nullable().optional(),
   // Generic linking: credit_card → payment account, mortgage → property
   linkedAccountId: z.uuid().nullable().optional(),
+  // Type-specific extras as JSON
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   // Display
   color: z
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
+    .nullable()
     .optional(),
-  icon: z.string().max(50).optional(),
+  icon: z.string().max(50).nullable().optional(),
   // Behaviour
   isActive: z.boolean().default(true),
   includeInNetWorth: z.boolean().default(true),
   sortOrder: z.number().int().min(0).default(0),
-  notes: z.string().optional(),
+  notes: z.string().nullable().optional(),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
 });
@@ -132,6 +141,17 @@ export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 
 export const UpdateAccountSchema = CreateAccountSchema.partial();
 export type UpdateAccount = z.infer<typeof UpdateAccountSchema>;
+
+// Helper to validate metadata against the account group
+export function validateAccountMetadata(
+  group: string,
+  metadata: unknown
+): boolean {
+  const schema =
+    AccountMetadataSchemas[group as keyof typeof AccountMetadataSchemas];
+  if (!schema) return false;
+  return schema.safeParse(metadata).success;
+}
 
 // ============================================================================
 // Category Schemas

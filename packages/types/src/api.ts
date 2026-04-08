@@ -152,23 +152,31 @@ export const AccountSchema = z.object({
   // Negative for liabilities (loans, mortgages, credit cards)
   balance: z.string(), // numeric as string
   currency: z.string().length(3).default("CAD"),
+  // Shared optional fields
+  institutionName: z.string().max(100).nullable().optional(),
+  accountNumber: z.string().max(50).nullable().optional(),
+  description: z.string().max(200).nullable().optional(),
   // Loan / mortgage extras
-  originalAmount: z.string().optional(),
-  interestRate: z.string().optional(),
-  nextPaymentDate: z.string().optional(),
+  originalAmount: z.string().nullable().optional(),
+  interestRate: z.string().nullable().optional(),
+  // Credit card (drives utilization calculations)
+  creditLimit: z.string().nullable().optional(),
   // Generic linking: credit card → payment account, mortgage → property
   linkedAccountId: z.uuid().nullable().optional(),
+  // Type-specific extras as JSON
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   // Display
   color: z
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
+    .nullable()
     .optional(),
-  icon: z.string().max(50).optional(),
+  icon: z.string().max(50).nullable().optional(),
   // Behaviour
   isActive: z.boolean().default(true),
   includeInNetWorth: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
-  notes: z.string().optional(),
+  notes: z.string().nullable().optional(),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
 });

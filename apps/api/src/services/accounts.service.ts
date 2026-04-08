@@ -6,7 +6,7 @@ import type {
   UpdateAccount,
 } from "@workspace/types";
 
-import { and, asc, db, desc, eq, sql } from "../libs/db.js";
+import { and, asc, db, eq, sql } from "../libs/db.js";
 import { InternalServerError, NotFoundError } from "../libs/errors.js";
 import { serializeAccount } from "./account-serializer.js";
 
@@ -73,10 +73,14 @@ export class AccountsService {
         group: payload.group,
         balance: payload.balance ?? "0",
         currency: payload.currency,
+        institutionName: payload.institutionName,
+        accountNumber: payload.accountNumber,
+        description: payload.description,
         originalAmount: payload.originalAmount,
         interestRate: payload.interestRate,
-        nextPaymentDate: payload.nextPaymentDate,
+        creditLimit: payload.creditLimit,
         linkedAccountId: payload.linkedAccountId,
+        metadata: payload.metadata,
         color: payload.color,
         icon: payload.icon,
         isActive: payload.isActive,
@@ -110,17 +114,29 @@ export class AccountsService {
       ...(payload.group !== undefined ? { group: payload.group } : {}),
       ...(payload.balance !== undefined ? { balance: payload.balance } : {}),
       ...(payload.currency !== undefined ? { currency: payload.currency } : {}),
+      ...(payload.institutionName !== undefined
+        ? { institutionName: payload.institutionName }
+        : {}),
+      ...(payload.accountNumber !== undefined
+        ? { accountNumber: payload.accountNumber }
+        : {}),
+      ...(payload.description !== undefined
+        ? { description: payload.description }
+        : {}),
       ...(payload.originalAmount !== undefined
         ? { originalAmount: payload.originalAmount }
         : {}),
       ...(payload.interestRate !== undefined
         ? { interestRate: payload.interestRate }
         : {}),
-      ...(payload.nextPaymentDate !== undefined
-        ? { nextPaymentDate: payload.nextPaymentDate }
+      ...(payload.creditLimit !== undefined
+        ? { creditLimit: payload.creditLimit }
         : {}),
       ...(payload.linkedAccountId !== undefined
         ? { linkedAccountId: payload.linkedAccountId }
+        : {}),
+      ...(payload.metadata !== undefined
+        ? { metadata: payload.metadata }
         : {}),
       ...(payload.color !== undefined ? { color: payload.color } : {}),
       ...(payload.icon !== undefined ? { icon: payload.icon } : {}),

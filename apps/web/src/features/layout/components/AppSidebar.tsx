@@ -8,10 +8,10 @@ import {
   SidebarHeader,
 } from "@workspace/ui/components/sidebar";
 import { AppLeftSideNav } from "@/features/navigation";
-import { useAppStore } from "@/stores";
+import { useSidebarLeftContent } from "@/hooks/use-layout";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const sidebarLeftContent = useAppStore((state) => state.sidebarLeftContent);
+  const sidebarLeftContent = useSidebarLeftContent();
 
   const navRef = React.useRef(null);
 
