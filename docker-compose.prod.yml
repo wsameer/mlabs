@@ -1,6 +1,7 @@
 services:
   app:
     image: ghcr.io/${GHCR_USER:-mlabs}/mlabs:${IMAGE_TAG:-latest}
+    platform: linux/arm64
     container_name: mlabs_app
     restart: unless-stopped
     environment:
