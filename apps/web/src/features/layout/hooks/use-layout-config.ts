@@ -5,6 +5,7 @@ type LayoutConfig = {
   pageTitle?: string;
   actions?: React.ReactNode;
   mobileBackPath?: string | null;
+  onMobileBack?: (() => void) | null;
   leftSidebarContent?: React.ReactNode;
 };
 
@@ -13,6 +14,7 @@ export function useLayoutConfig(config: LayoutConfig) {
     setHeaderTitle,
     setHeaderActions,
     setMobileBackPath,
+    setOnMobileBack,
     setSidebarLeftContent: setLeftSidebarContent,
     resetLayout,
   } = useLayoutActions();
@@ -29,6 +31,11 @@ export function useLayoutConfig(config: LayoutConfig) {
     if (config.mobileBackPath !== undefined)
       setMobileBackPath(config.mobileBackPath);
   }, [config.mobileBackPath, setMobileBackPath]);
+
+  useEffect(() => {
+    if (config.onMobileBack !== undefined)
+      setOnMobileBack(config.onMobileBack);
+  }, [config.onMobileBack, setOnMobileBack]);
 
   useEffect(() => {
     if (config.leftSidebarContent !== undefined)

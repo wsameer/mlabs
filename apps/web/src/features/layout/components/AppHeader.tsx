@@ -9,11 +9,14 @@ import { useUiActions } from "@/hooks/use-ui-store";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
-  const { title: pageTitle, actions: headerActions, mobileBackPath } = useHeaderConfig();
+  const { title: pageTitle, actions: headerActions, mobileBackPath, onMobileBack } = useHeaderConfig();
   const { setGlobalSearch } = useUiActions();
+  const showBackButton = Boolean(mobileBackPath || onMobileBack);
 
   const handleBack = () => {
-    if (mobileBackPath) {
+    if (onMobileBack) {
+      onMobileBack();
+    } else if (mobileBackPath) {
       navigate({ to: mobileBackPath });
     }
   };
@@ -45,7 +48,7 @@ export const AppHeader = () => {
   const renderMobileHeader = () => (
     <div className="flex w-full items-center justify-between gap-3 md:hidden">
       <div className="flex">
-        {mobileBackPath && (
+        {showBackButton && (
           <Button
             variant="ghost"
             size="icon"

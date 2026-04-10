@@ -16,7 +16,6 @@ import {
 
 import { useLayoutConfig } from "@/features/layout";
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
-import type { TransactionItemProps } from "../types";
 
 function EmptyTransactions() {
   return (
@@ -51,10 +50,6 @@ export function TransactionsPage() {
     pageTitle: "Transactions",
     actions: <TimeGrainSelect />,
   });
-
-  // TODO: Replace with real transaction data from API
-  const transactions: TransactionItemProps[] = [];
-  const isEmpty = transactions.length === 0;
 
   return (
     <div className="mx-auto my-auto flex w-full flex-col gap-3">
