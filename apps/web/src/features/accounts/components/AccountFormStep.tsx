@@ -122,7 +122,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
                 id="account-creation-form-name"
                 className="text-xs"
                 placeholder={
-                  type === "credit_card" ? "Amex Platinum" : "TD Bank"
+                  type === "credit_card" ? "My Credit Card" : "My Checking Account"
                 }
                 autoComplete="off"
               />

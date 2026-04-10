@@ -111,7 +111,7 @@ export function WorkspaceBasicsStep({
                 {...field}
                 id="workspace-name"
                 autoComplete="off"
-                placeholder="personalspace"
+                placeholder="myworkspace"
                 aria-invalid={fieldState.invalid || hasAvailabilityError}
                 autoFocus
               />

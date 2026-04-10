@@ -12,13 +12,6 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@workspace/ui/components/alert";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -75,23 +68,10 @@ export function AccountsPage() {
     );
   }
 
+  // TODO: Implement accounts list view
   return (
     <div className="mx-auto my-auto w-full max-w-2xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>Accounts</CardTitle>
-          <CardDescription>
-            Account list states are coming next. For now, the empty flow is in
-            place when there are no accounts.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Once seeded data is available, we can replace this placeholder with
-            the populated accounts experience.
-          </p>
-        </CardContent>
-      </Card>
+      <EmptyAccounts />
     </div>
   );
 }
