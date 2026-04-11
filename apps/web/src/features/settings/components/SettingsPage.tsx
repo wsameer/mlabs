@@ -44,20 +44,20 @@ export function SettingsPage() {
     ? SETTINGS_SECTIONS.find((s) => s.id === activeSection)?.label
     : null;
 
+  // On desktop, default to "profile" when nothing selected
+  const resolvedSection = activeSection ?? (isMobile ? null : "profile");
+
   // Desktop: show nav in left sidebar
   const sidebarContent = useMemo(() => {
     if (isMobile) return null;
     return (
       <SettingsNav
-        activeSection={activeSection}
+        activeSection={resolvedSection}
         onSelect={handleSelectSection}
         variant="sidebar"
       />
     );
-  }, [isMobile, activeSection, handleSelectSection]);
-
-  // On desktop, default to "profile" when nothing selected
-  const resolvedSection = activeSection ?? (isMobile ? null : "profile");
+  }, [isMobile, resolvedSection, handleSelectSection]);
 
   useLayoutConfig({
     pageTitle: isMobile && activeSectionLabel ? activeSectionLabel : "Settings",
@@ -84,7 +84,6 @@ export function SettingsPage() {
   if (isMobile && resolvedSection === null) {
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-        {/* iOS-style profile card */}
         <button
           type="button"
           className="flex w-full items-center gap-3.5 rounded-xl bg-card py-3 text-left active:bg-muted/60"

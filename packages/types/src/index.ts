@@ -8,11 +8,16 @@ export {
   CreateAccountSchema,
   UpdateAccountSchema,
   validateAccountMetadata,
+  CategoryQuerySchema,
+  CreateCategorySchema,
+  UpdateCategorySchema,
 } from "./db.js";
 export type {
   AccountQuery,
   CreateAccount,
+  CreateCategory,
   CategoryQuery,
+  CategoryWithSubcategories,
   TransactionQuery,
   UpdateAccount,
   UpdateCategory,

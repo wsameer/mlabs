@@ -29,7 +29,7 @@ export function SettingsNav({
   // Desktop sidebar — flat list, no groups
   if (variant === "sidebar") {
     return (
-      <div className="flex flex-col gap-1">
+      <div className="mt-2 flex flex-col gap-1">
         {SETTINGS_SECTIONS.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -38,13 +38,15 @@ export function SettingsNav({
             <Item
               key={section.id}
               size="sm"
-              variant={isActive ? "muted" : "default"}
               render={
                 <button
                   type="button"
                   className={cn(
-                    "w-full text-left transition-colors hover:bg-muted/50",
-                    isActive && "bg-muted"
+                    "w-full p-1.5! text-left hover:bg-primary-foreground",
+                    {
+                      "bg-sidebar-primary hover:bg-sidebar-primary/90":
+                        isActive,
+                    }
                   )}
                   onClick={() => onSelect(section.id)}
                 />

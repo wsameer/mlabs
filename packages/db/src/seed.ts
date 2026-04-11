@@ -5,6 +5,7 @@ import {
   transactions,
   profiles,
   eq,
+  DEFAULT_CATEGORIES,
 } from "./index.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -57,150 +58,16 @@ async function seed() {
     const profileId: string = defaultProfile.id;
 
     // ============================================================================
-    // Seed Income Categories
+    // Seed Default Categories
     // ============================================================================
-    console.log("📥 Seeding income categories...");
+    console.log("📥 Seeding default categories...");
 
-    const incomeCategories = await db
+    const seededCategories = await db
       .insert(categories)
-      .values([
-        {
-          profileId,
-          name: "Salary",
-          type: "INCOME",
-          icon: "💼",
-          color: "#10b981",
-          sortOrder: 1,
-        },
-        {
-          profileId,
-          name: "Freelance",
-          type: "INCOME",
-          icon: "💻",
-          color: "#3b82f6",
-          sortOrder: 2,
-        },
-        {
-          profileId,
-          name: "Investment",
-          type: "INCOME",
-          icon: "📈",
-          color: "#8b5cf6",
-          sortOrder: 3,
-        },
-        {
-          profileId,
-          name: "Gift",
-          type: "INCOME",
-          icon: "🎁",
-          color: "#ec4899",
-          sortOrder: 4,
-        },
-        {
-          profileId,
-          name: "Other Income",
-          type: "INCOME",
-          icon: "💰",
-          color: "#6366f1",
-          sortOrder: 5,
-        },
-      ])
+      .values(DEFAULT_CATEGORIES.map((cat) => ({ ...cat, profileId })))
       .returning();
 
-    console.log(`✅ Created ${incomeCategories.length} income categories`);
-
-    // ============================================================================
-    // Seed Expense Categories
-    // ============================================================================
-    console.log("📤 Seeding expense categories...");
-
-    const expenseCategories = await db
-      .insert(categories)
-      .values([
-        {
-          profileId,
-          name: "Housing",
-          type: "EXPENSE",
-          icon: "🏠",
-          color: "#ef4444",
-          sortOrder: 1,
-        },
-        {
-          profileId,
-          name: "Transportation",
-          type: "EXPENSE",
-          icon: "🚗",
-          color: "#f97316",
-          sortOrder: 2,
-        },
-        {
-          profileId,
-          name: "Food & Dining",
-          type: "EXPENSE",
-          icon: "🍽️",
-          color: "#84cc16",
-          sortOrder: 3,
-        },
-        {
-          profileId,
-          name: "Utilities",
-          type: "EXPENSE",
-          icon: "⚡",
-          color: "#06b6d4",
-          sortOrder: 4,
-        },
-        {
-          profileId,
-          name: "Healthcare",
-          type: "EXPENSE",
-          icon: "🏥",
-          color: "#ef4444",
-          sortOrder: 5,
-        },
-        {
-          profileId,
-          name: "Entertainment",
-          type: "EXPENSE",
-          icon: "🎬",
-          color: "#ec4899",
-          sortOrder: 6,
-        },
-        {
-          profileId,
-          name: "Shopping",
-          type: "EXPENSE",
-          icon: "🛍️",
-          color: "#a855f7",
-          sortOrder: 7,
-        },
-        {
-          profileId,
-          name: "Subscriptions",
-          type: "EXPENSE",
-          icon: "📱",
-          color: "#3b82f6",
-          sortOrder: 8,
-        },
-        {
-          profileId,
-          name: "Personal Care",
-          type: "EXPENSE",
-          icon: "💆",
-          color: "#8b5cf6",
-          sortOrder: 9,
-        },
-        {
-          profileId,
-          name: "Other Expense",
-          type: "EXPENSE",
-          icon: "📦",
-          color: "#64748b",
-          sortOrder: 10,
-        },
-      ])
-      .returning();
-
-    console.log(`✅ Created ${expenseCategories.length} expense categories`);
+    console.log(`✅ Created ${seededCategories.length} categories`);
 
     // ============================================================================
     // Seed Accounts

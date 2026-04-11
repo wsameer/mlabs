@@ -63,7 +63,7 @@ export const AppHeader = () => {
             <ArrowLeftIcon className="size-5" />
           </Button>
         )}
-        <h4 className="flex-1 scroll-m-20 text-lg font-semibold tracking-wide">
+        <h4 className="flex-1 scroll-m-20 text-lg font-medium tracking-wide">
           {pageTitle}
         </h4>
       </div>

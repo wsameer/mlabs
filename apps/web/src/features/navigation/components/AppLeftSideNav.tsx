@@ -99,10 +99,10 @@ export function AppLeftSideNav({
             <SidebarMenuItem className="mb-2">
               <SidebarMenuButton
                 className={cn(
-                  "rounded-full bg-primary/80 px-2.5 text-secondary md:px-2",
+                  "rounded-full bg-primary/80 px-2.5 text-background md:px-2",
                   {
                     "bg-muted": !isBackendConnected,
-                    "hover:bg-primary hover:text-white active:bg-primary":
+                    "hover:bg-primary hover:text-background active:bg-primary":
                       isBackendConnected,
                   }
                 )}
