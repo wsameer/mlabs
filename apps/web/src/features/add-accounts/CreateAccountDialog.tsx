@@ -7,8 +7,8 @@ import {
   DialogDescription,
 } from "@workspace/ui/components/dialog";
 import { useState } from "react";
-import type { AccountType } from "@workspace/types";
-import { AccountTypeStep } from "./AccountTypeStep";
+import type { AccountGroup } from "@workspace/types";
+import { AccountGroupStep } from "./AccountGroupStep";
 import { AccountFormStep } from "./AccountFormStep";
 
 type Step = "select" | "form";
@@ -18,9 +18,9 @@ export function CreateAccountDialog() {
   const { setOpenCreateAccount } = useUiActions();
 
   const [step, setStep] = useState<Step>("select");
-  const [selectedType, setSelectedType] = useState<AccountType | null>(null);
+  const [selectedType, setSelectedType] = useState<AccountGroup | null>(null);
 
-  function handleTypeSelect(type: AccountType) {
+  function handleTypeSelect(type: AccountGroup) {
     setSelectedType(type);
     setStep("form");
   }
@@ -46,7 +46,7 @@ export function CreateAccountDialog() {
 
   const content =
     step === "select" ? (
-      <AccountTypeStep onSelect={handleTypeSelect} />
+      <AccountGroupStep onSelect={handleTypeSelect} />
     ) : (
       <AccountFormStep
         type={selectedType!}

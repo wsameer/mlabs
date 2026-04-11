@@ -1,4 +1,4 @@
-import type { AccountType } from "@workspace/types";
+import type { AccountGroup } from "@workspace/types";
 import {
   Item,
   ItemContent,
@@ -17,7 +17,7 @@ import {
 import React from "react";
 
 const ACCOUNT_TYPES: {
-  type: AccountType;
+  type: AccountGroup;
   label: string;
   icon: React.ReactNode;
 }[] = [
@@ -64,10 +64,10 @@ const ACCOUNT_TYPES: {
   },
 ] as const;
 
-export function AccountTypeStep({
+export function AccountGroupStep({
   onSelect,
 }: {
-  onSelect: (type: AccountType) => void;
+  onSelect: (type: AccountGroup) => void;
 }) {
   return (
     <div className="flex flex-col pb-6">

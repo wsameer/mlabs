@@ -28,10 +28,10 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
-import { ACCOUNT_TYPES, type AccountGroup, type AccountType } from "@workspace/types";
+import { ACCOUNT_GROUPS, type AccountGroup } from "@workspace/types";
 
-// Which account types are held at a financial institution
-const BANK_HELD_TYPES: AccountType[] = [
+// Which account groups are held at a financial institution
+const BANK_HELD_GROUPS: AccountGroup[] = [
   "chequing",
   "savings",
   "credit_card",
@@ -40,19 +40,7 @@ const BANK_HELD_TYPES: AccountType[] = [
   "mortgage",
 ];
 
-const ACCOUNT_TYPE_MAP: Record<AccountType, AccountGroup> = {
-  cash: "cash",
-  chequing: "chequing",
-  savings: "savings",
-  credit_card: "credit_card",
-  investment: "investment",
-  loan: "loan",
-  mortgage: "mortgage",
-  asset: "asset",
-  other: "other",
-};
-
-const PLACEHOLDER_NAMES: Record<AccountType, string> = {
+const PLACEHOLDER_NAMES: Record<AccountGroup, string> = {
   chequing: "TD Chequing",
   savings: "High Interest Savings",
   cash: "Wallet",
@@ -67,7 +55,7 @@ const PLACEHOLDER_NAMES: Record<AccountType, string> = {
 const accountFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   balance: z.string().min(1, "Balance is required"),
-  type: z.enum([...ACCOUNT_TYPES], {
+  type: z.enum([...ACCOUNT_GROUPS], {
     message: "Please select an account type",
   }),
 
@@ -123,7 +111,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.output<typeof accountFormSchema>;
 
 interface Props {
-  type: AccountType;
+  type: AccountGroup;
   onSuccess: (data: AccountFormValues) => void;
   onBack: () => void;
 }
@@ -174,7 +162,7 @@ function buildMetadata(data: AccountFormValues): Record<string, unknown> | undef
 export function AccountFormStep({ type, onSuccess, onBack }: Props) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const createAccount = useCreateAccount();
-  const isBankHeld = BANK_HELD_TYPES.includes(type);
+  const isBankHeld = BANK_HELD_GROUPS.includes(type);
 
   const form = useForm<AccountFormValues>({
     // eslint-disable-next-line
@@ -193,7 +181,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
     createAccount.mutate(
       {
         name: data.name,
-        group: ACCOUNT_TYPE_MAP[data.type],
+        group: data.type,
         balance: data.balance,
         currency: "CAD",
         isActive: true,

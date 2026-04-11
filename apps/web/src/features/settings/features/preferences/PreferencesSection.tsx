@@ -21,8 +21,8 @@ import {
   DATE_FORMAT_LABELS,
   WEEK_START_LABELS,
   type SettingsFormValues,
-} from "../settings-shared";
-import type { SettingsSectionProps } from "./types";
+} from "../../components/settings-shared";
+import type { SettingsSectionProps } from "../../types";
 
 export function PreferencesSection({ settings }: SettingsSectionProps) {
   if (!settings.draft) return null;

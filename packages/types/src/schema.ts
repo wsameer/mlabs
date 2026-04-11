@@ -1,22 +1,36 @@
 import { z } from "zod/v4";
-import { AccountMetadataSchemas } from "./account-metadata.js";
+import {
+  DateFormatSchema,
+  FirstAccountSchema,
+  WeekStartSchema,
+  WorkspaceNameSchema,
+  WorkspaceTypeSchema,
+} from "./onboarding.js";
 
 // ============================================================================
-// Enums - Must match packages/db/src/schema.ts
+// Health Check
 // ============================================================================
 
-export const DateFormatEnum = z.enum([
-  "D MMM, YYYY",
-  "DD/MM/YYYY",
-  "MM/DD/YYYY",
-  "YYYY-MM-DD",
-]);
+export const HealthCheckSchema = z.object({
+  status: z.enum(["ok", "error"]),
+  timestamp: z.string(),
+  version: z.string().optional(),
+  database: z.enum(["connected", "disconnected"]).optional(),
+  responseTime: z.string().optional(),
+  uptime: z.number().optional(),
+  error: z.string().optional(),
+});
 
-export const WeekStartEnum = z.enum(["SUNDAY", "MONDAY"]);
+export type HealthCheck = z.infer<typeof HealthCheckSchema>;
 
-export const ProfileTypeEnum = z.enum(["PERSONAL", "BUSINESS", "SHARED"]);
+// ============================================================================
+// Enums
+// ============================================================================
 
-export const AccountGroupEnum = z.enum([
+export const ProfileTypeSchema = z.enum(["PERSONAL", "BUSINESS", "SHARED"]);
+export type ProfileType = z.infer<typeof ProfileTypeSchema>;
+
+export const AccountGroupSchema = z.enum([
   "chequing",
   "savings",
   "cash",
@@ -27,33 +41,31 @@ export const AccountGroupEnum = z.enum([
   "asset",
   "other",
 ]);
+export type AccountGroup = z.infer<typeof AccountGroupSchema>;
 
-export const CategoryTypeEnum = z.enum(["INCOME", "EXPENSE"]);
+export const CategoryTypeSchema = z.enum(["INCOME", "EXPENSE"]);
+export type CategoryType = z.infer<typeof CategoryTypeSchema>;
 
-export const TransactionTypeEnum = z.enum(["INCOME", "EXPENSE", "TRANSFER"]);
+export const TransactionTypeSchema = z.enum(["INCOME", "EXPENSE", "TRANSFER"]);
+export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
-export type DateFormat = z.infer<typeof DateFormatEnum>;
-export type WeekStart = z.infer<typeof WeekStartEnum>;
-export type ProfileType = z.infer<typeof ProfileTypeEnum>;
-export type AccountGroup = z.infer<typeof AccountGroupEnum>;
-export type CategoryType = z.infer<typeof CategoryTypeEnum>;
-export type TransactionType = z.infer<typeof TransactionTypeEnum>;
+// Re-export onboarding enums used as profile fields
+export type DateFormat = z.infer<typeof DateFormatSchema>;
+export type WeekStart = z.infer<typeof WeekStartSchema>;
 
 // ============================================================================
-// Profile Schemas
+// Profile / Workspace
 // ============================================================================
 
 export const ProfileSchema = z.object({
   id: z.uuid(),
   name: z.string().min(1).max(100),
   icon: z.string().max(10).optional(),
-  type: ProfileTypeEnum.default("PERSONAL"),
-  // Regional preferences
+  type: ProfileTypeSchema.default("PERSONAL"),
   currency: z.string().length(3).default("CAD"),
-  dateFormat: DateFormatEnum.default("D MMM, YYYY"),
-  weekStart: WeekStartEnum.default("MONDAY"),
+  dateFormat: DateFormatSchema.default("D MMM, YYYY"),
+  weekStart: WeekStartSchema.default("MONDAY"),
   timezone: z.string().default("America/Toronto"),
-  // State
   isDefault: z.boolean().default(false),
   isActive: z.boolean().default(true),
   isSetupComplete: z.boolean().default(false),
@@ -64,56 +76,96 @@ export const ProfileSchema = z.object({
 
 export type Profile = z.infer<typeof ProfileSchema>;
 
-// profileId injected by middleware from X-Profile-Id header
-export const CreateProfileSchema = ProfileSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  isDefault: true,
-  isActive: true,
-  isSetupComplete: true,
-}).extend({
-  id: z.uuid().optional(),
+export const UpdateProfileSchema = z.object({
+  icon: z.string().max(10).optional(),
+  type: ProfileTypeSchema.optional(),
+  currency: z.string().length(3).optional(),
+  dateFormat: DateFormatSchema.optional(),
+  weekStart: WeekStartSchema.optional(),
+  notes: z
+    .string()
+    .transform((value) => value.slice(0, 160))
+    .optional(),
 });
 
-export type CreateProfile = z.infer<typeof CreateProfileSchema>;
-
-export const UpdateProfileSchema = CreateProfileSchema.partial();
 export type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
 
+export const ProfileParamsSchema = z.object({
+  id: z.uuid(),
+});
+
+export type ProfileParams = z.infer<typeof ProfileParamsSchema>;
+
 // ============================================================================
-// Account Schemas
+// Bootstrap
+// ============================================================================
+
+export const BootstrapStatusSchema = z.enum(["onboarding", "pick", "ready"]);
+
+export const BootstrapSchema = z.object({
+  status: BootstrapStatusSchema,
+  profile: ProfileSchema.nullable().optional(),
+  profiles: z.array(ProfileSchema).default([]),
+  hasAccount: z.boolean().default(false),
+});
+
+export type Bootstrap = z.infer<typeof BootstrapSchema>;
+export type BootstrapStatus = z.infer<typeof BootstrapStatusSchema>;
+
+// ============================================================================
+// Onboarding (API-specific)
+// ============================================================================
+
+export const OnboardingAccountSchema = FirstAccountSchema.refine(
+  (value) => AccountGroupSchema.safeParse(value.group).success,
+  {
+    message: "Unsupported account group",
+    path: ["group"],
+  }
+);
+
+export type OnboardingAccount = z.infer<typeof OnboardingAccountSchema>;
+
+export const CreateOnboardingProfileSchema = z.object({
+  name: WorkspaceNameSchema,
+  icon: z.string().max(10).optional(),
+  type: WorkspaceTypeSchema.default("PERSONAL"),
+  currency: z.string().length(3).default("CAD"),
+  dateFormat: DateFormatSchema.default("D MMM, YYYY"),
+  weekStart: WeekStartSchema.default("MONDAY"),
+  timezone: z.string().min(1),
+  firstAccount: OnboardingAccountSchema.optional(),
+});
+
+export type CreateOnboardingProfile = z.infer<
+  typeof CreateOnboardingProfileSchema
+>;
+
+// ============================================================================
+// Account
 // ============================================================================
 
 export const AccountSchema = z.object({
   id: z.uuid(),
   profileId: z.uuid(),
   name: z.string().min(1).max(100),
-  group: AccountGroupEnum,
-  // Negative for liabilities (credit_card, loan, mortgage)
-  balance: z.string(), // numeric as string
+  group: AccountGroupSchema,
+  balance: z.string(),
   currency: z.string().length(3).default("CAD"),
-  // Shared optional fields
   institutionName: z.string().max(100).nullable().optional(),
   accountNumber: z.string().max(50).nullable().optional(),
   description: z.string().max(200).nullable().optional(),
-  // Loan/Mortgage fields
   originalAmount: z.string().nullable().optional(),
   interestRate: z.string().nullable().optional(),
-  // Credit card (drives utilization calculations)
   creditLimit: z.string().nullable().optional(),
-  // Generic linking: credit_card → payment account, mortgage → property
   linkedAccountId: z.uuid().nullable().optional(),
-  // Type-specific extras as JSON
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
-  // Display
   color: z
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
     .nullable()
     .optional(),
   icon: z.string().max(50).nullable().optional(),
-  // Behaviour
   isActive: z.boolean().default(true),
   includeInNetWorth: z.boolean().default(true),
   sortOrder: z.number().int().min(0).default(0),
@@ -124,7 +176,7 @@ export const AccountSchema = z.object({
 
 export type Account = z.infer<typeof AccountSchema>;
 
-// profileId injected by middleware
+// API payload — profileId injected by middleware
 export const CreateAccountSchema = AccountSchema.omit({
   id: true,
   profileId: true,
@@ -142,7 +194,12 @@ export type CreateAccount = z.infer<typeof CreateAccountSchema>;
 export const UpdateAccountSchema = CreateAccountSchema.partial();
 export type UpdateAccount = z.infer<typeof UpdateAccountSchema>;
 
-// Helper to validate metadata against the account group
+// ============================================================================
+// Account Metadata Validation
+// ============================================================================
+
+import { AccountMetadataSchemas } from "./account-metadata.js";
+
 export function validateAccountMetadata(
   group: string,
   metadata: unknown
@@ -154,23 +211,20 @@ export function validateAccountMetadata(
 }
 
 // ============================================================================
-// Category Schemas
+// Category
 // ============================================================================
 
 export const CategorySchema = z.object({
   id: z.uuid(),
   profileId: z.uuid(),
   name: z.string().min(1).max(100),
-  type: CategoryTypeEnum,
-  // UI customization
+  type: CategoryTypeSchema,
   icon: z.string().max(50).optional(),
   color: z
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
     .optional(),
-  // Single level of nesting
   parentId: z.uuid().nullable().optional(),
-  // State
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().min(0).default(0),
   createdAt: z.iso.date(),
@@ -179,7 +233,6 @@ export const CategorySchema = z.object({
 
 export type Category = z.infer<typeof CategorySchema>;
 
-// Category with nested subcategories
 export const CategoryWithSubcategoriesSchema = CategorySchema.extend({
   subcategories: z.array(CategorySchema).optional(),
 });
@@ -188,7 +241,7 @@ export type CategoryWithSubcategories = z.infer<
   typeof CategoryWithSubcategoriesSchema
 >;
 
-// profileId injected by middleware
+// API payload — profileId injected by middleware
 export const CreateCategorySchema = CategorySchema.omit({
   id: true,
   profileId: true,
@@ -204,27 +257,20 @@ export const UpdateCategorySchema = CreateCategorySchema.partial();
 export type UpdateCategory = z.infer<typeof UpdateCategorySchema>;
 
 // ============================================================================
-// Transaction Schemas
+// Transaction
 // ============================================================================
 
 export const TransactionSchema = z.object({
   id: z.uuid(),
   profileId: z.uuid(),
   accountId: z.uuid(),
-  // null for TRANSFER transactions
   categoryId: z.uuid().nullable().optional(),
-  type: TransactionTypeEnum,
-  // Always positive - type determines direction
-  amount: z.string(), // numeric as string
-  // Short memo
+  type: TransactionTypeSchema,
+  amount: z.string(),
   description: z.string().max(200).optional(),
-  // Long-form details
   notes: z.string().optional(),
-  // Transaction date
-  date: z.string(), // YYYY-MM-DD
-  // Double-entry transfers: both records share this UUID
-  transferId: z.uuid().optional(),
-  // Reconciliation
+  date: z.string(),
+  transferId: z.uuid().nullable().optional(),
   isCleared: z.boolean().default(false),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
@@ -232,7 +278,6 @@ export const TransactionSchema = z.object({
 
 export type Transaction = z.infer<typeof TransactionSchema>;
 
-// Lightweight transaction for lists
 export const TransactionSummarySchema = TransactionSchema.pick({
   id: true,
   date: true,
@@ -252,7 +297,7 @@ export const TransactionSummarySchema = TransactionSchema.pick({
 
 export type TransactionSummary = z.infer<typeof TransactionSummarySchema>;
 
-// profileId injected by middleware
+// API payload — profileId injected by middleware
 export const CreateTransactionSchema = TransactionSchema.omit({
   id: true,
   profileId: true,
@@ -270,11 +315,11 @@ export const UpdateTransactionSchema = CreateTransactionSchema.partial();
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
 
 // ============================================================================
-// Query Schemas (for API endpoints)
+// Query Schemas (API endpoint parameters)
 // ============================================================================
 
 export const AccountQuerySchema = z.object({
-  group: AccountGroupEnum.optional(),
+  group: AccountGroupSchema.optional(),
   isActive: z.boolean().optional(),
   includeInNetWorth: z.boolean().optional(),
   search: z.string().optional(),
@@ -283,7 +328,7 @@ export const AccountQuerySchema = z.object({
 export type AccountQuery = z.infer<typeof AccountQuerySchema>;
 
 export const CategoryQuerySchema = z.object({
-  type: CategoryTypeEnum.optional(),
+  type: CategoryTypeSchema.optional(),
   isActive: z.boolean().optional(),
   parentId: z.uuid().optional().nullable(),
   search: z.string().optional(),
@@ -294,7 +339,7 @@ export type CategoryQuery = z.infer<typeof CategoryQuerySchema>;
 export const TransactionQuerySchema = z.object({
   accountId: z.uuid().optional(),
   categoryId: z.uuid().optional(),
-  type: TransactionTypeEnum.optional(),
+  type: TransactionTypeSchema.optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   minAmount: z.string().optional(),
@@ -309,42 +354,27 @@ export const TransactionQuerySchema = z.object({
 
 export type TransactionQuery = z.infer<typeof TransactionQuerySchema>;
 
-export const ProfileQuerySchema = z.object({
-  isActive: z.boolean().optional(),
-  isDefault: z.boolean().optional(),
-  search: z.string().optional(),
-});
-
-export type ProfileQuery = z.infer<typeof ProfileQuerySchema>;
-
 // ============================================================================
-// Pagination
+// API Response Wrapper
 // ============================================================================
 
-export const PaginationSchema = z.object({
-  page: z.number().int().positive().default(1),
-  pageSize: z.number().int().min(1).max(100).default(20),
-});
+export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
+  z.object({
+    success: z.boolean(),
+    data: dataSchema.optional(),
+    error: z
+      .object({
+        message: z.string(),
+        code: z.string().optional(),
+      })
+      .optional(),
+  });
 
-export type Pagination = z.infer<typeof PaginationSchema>;
-
-export const PaginatedResponseSchema = <T>(
-  items: T[],
-  total: number,
-  page: number,
-  pageSize: number
-) => ({
-  items,
-  total,
-  page,
-  pageSize,
-  hasMore: page * pageSize < total,
-});
-
-export type PaginatedResponse<T> = {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
+export type ApiResponse<T> = {
+  success: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+  };
 };

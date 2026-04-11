@@ -22,7 +22,7 @@ import {
 import type { OnboardingStepComponentProps } from "../../types";
 
 const ACCOUNT_GROUP_LABELS: Record<FirstAccount["group"], string> = {
-  checking: "Chequing",
+  chequing: "Chequing",
   savings: "Savings",
   cash: "Cash",
   credit_card: "Credit card",

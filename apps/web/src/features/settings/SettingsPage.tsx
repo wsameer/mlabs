@@ -7,18 +7,18 @@ import { useLayoutConfig } from "@/features/layout";
 import { useAppStore } from "@/stores";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { useProfileSettings } from "../api/use-profile-settings";
-import { useProfileSettingsAutosave } from "../hooks/use-profile-settings-autosave";
-import { SettingsNav } from "./SettingsNav";
-import { SETTINGS_SECTIONS, type SettingsSectionId } from "../constants";
-import { getInitials, WORKSPACE_TYPE_LABELS } from "./settings-shared";
+import { useProfileSettings } from "./api/use-profile-settings";
+import { useProfileSettingsAutosave } from "./hooks/use-profile-settings-autosave";
+import { SettingsNav } from "./components/SettingsNav";
+import { SETTINGS_SECTIONS, type SettingsSectionId } from "./constants";
+import { getInitials, WORKSPACE_TYPE_LABELS } from "./components/settings-shared";
 
-import { ProfileSection } from "./sections/ProfileSection";
-import { PreferencesSection } from "./sections/PreferencesSection";
-import { NotificationsSection } from "./sections/NotificationsSection";
-import { CategoriesSection } from "./sections/CategoriesSection";
-import { AccountsSection } from "./sections/AccountsSection";
-import { BackupSection } from "./sections/BackupSection";
+import { ProfileSection } from "./features/profile";
+import { PreferencesSection } from "./features/preferences";
+import { NotificationsSection } from "./features/notifications";
+import { CategoriesSection } from "./features/category-management";
+import { AccountsSection } from "./features/accounts";
+import { BackupSection } from "./features/backup";
 
 export function SettingsPage() {
   const isMobile = useIsMobile();

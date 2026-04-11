@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { toast } from "sonner";
 import {
   ChevronDownIcon,
   PencilIcon,
@@ -12,25 +11,12 @@ import type {
   CategoryType,
   CategoryWithSubcategories,
 } from "@workspace/types";
-import {
-  useCategories,
-  useDeleteCategory,
-} from "@/features/categories/api/use-categories";
+import { useCategories } from "@/features/categories/api/use-categories";
 
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { Button } from "@workspace/ui/components/button";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { ButtonGroup } from "@workspace/ui/components/button-group";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@workspace/ui/components/alert-dialog";
 import {
   Item,
   ItemGroup,
@@ -40,6 +26,7 @@ import {
 
 import { AddCategoryDialog } from "./AddCategoryDialog";
 import { EditCategoryDialog } from "./EditCategoryDialog";
+import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
 export function CategoriesSection() {
   const [activeTab, setActiveTab] = useState<CategoryType>("EXPENSE");
@@ -57,7 +44,6 @@ export function CategoriesSection() {
   // Delete dialog state
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
-  const deleteCategory = useDeleteCategory();
 
   // Expanded parents
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -91,21 +77,6 @@ export function CategoriesSection() {
   function handleDeleteRequest(category: Category) {
     setDeleteTarget(category);
     setDeleteOpen(true);
-  }
-
-  function handleDeleteConfirm() {
-    if (!deleteTarget) return;
-
-    deleteCategory.mutate(deleteTarget.id, {
-      onSuccess: () => {
-        toast.success("Category deleted");
-        setDeleteOpen(false);
-        setDeleteTarget(null);
-      },
-      onError: (err) => {
-        toast.error(err.message || "Failed to delete category");
-      },
-    });
   }
 
   return (
@@ -256,35 +227,11 @@ export function CategoriesSection() {
         category={editCategory}
       />
 
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader className="text-left">
-            <AlertDialogTitle className="text-left">
-              Are you absolutely sure?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will unlink all associated transactions. Those
-              transactions will be marked as uncategorized and won't be counted
-              in category reports. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              variant="outline"
-              onClick={() => setDeleteOpen(false)}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={deleteCategory.isPending}
-            >
-              {deleteCategory.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteCategoryDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        category={deleteTarget}
+      />
     </div>
   );
 }

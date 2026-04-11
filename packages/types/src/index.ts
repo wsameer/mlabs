@@ -1,25 +1,167 @@
-export * from "./api.js";
-export * from "./env.js";
-export * from "./app.js";
-export * from "./onboarding.js";
-export * from "./account-metadata.js";
+// =============================================================================
+// Schema — entities, enums, API payloads, query schemas
+// =============================================================================
+
 export {
-  AccountQuerySchema,
+  // Health
+  HealthCheckSchema,
+  // Enum schemas
+  ProfileTypeSchema,
+  AccountGroupSchema,
+  CategoryTypeSchema,
+  TransactionTypeSchema,
+  // Entity schemas
+  ProfileSchema,
+  AccountSchema,
+  CategorySchema,
+  CategoryWithSubcategoriesSchema,
+  TransactionSchema,
+  TransactionSummarySchema,
+  // API payloads (profileId injected by middleware)
   CreateAccountSchema,
   UpdateAccountSchema,
-  validateAccountMetadata,
-  CategoryQuerySchema,
   CreateCategorySchema,
   UpdateCategorySchema,
-} from "./db.js";
+  CreateTransactionSchema,
+  UpdateTransactionSchema,
+  UpdateProfileSchema,
+  CreateOnboardingProfileSchema,
+  // Query schemas
+  AccountQuerySchema,
+  CategoryQuerySchema,
+  TransactionQuerySchema,
+  // Bootstrap / onboarding
+  BootstrapStatusSchema,
+  BootstrapSchema,
+  OnboardingAccountSchema,
+  ProfileParamsSchema,
+  // API response
+  ApiResponseSchema,
+  // Validation
+  validateAccountMetadata,
+} from "./schema.js";
+
 export type {
-  AccountQuery,
-  CreateAccount,
-  CreateCategory,
-  CategoryQuery,
+  // Health
+  HealthCheck,
+  // Enum types
+  ProfileType,
+  AccountGroup,
+  CategoryType,
+  TransactionType,
+  DateFormat,
+  WeekStart,
+  // Entity types
+  Profile,
+  Account,
+  Category,
   CategoryWithSubcategories,
-  TransactionQuery,
+  Transaction,
+  TransactionSummary,
+  // API payload types
+  CreateAccount,
   UpdateAccount,
+  CreateCategory,
   UpdateCategory,
+  CreateTransaction,
   UpdateTransaction,
-} from "./db.js";
+  UpdateProfile,
+  CreateOnboardingProfile,
+  OnboardingAccount,
+  // Query types
+  AccountQuery,
+  CategoryQuery,
+  TransactionQuery,
+  // Bootstrap
+  Bootstrap,
+  BootstrapStatus,
+  ProfileParams,
+  // API response
+  ApiResponse,
+} from "./schema.js";
+
+// =============================================================================
+// Environment
+// =============================================================================
+
+export { BaseEnvSchema, ApiEnvSchema, WebEnvSchema } from "./env.js";
+export type { ApiEnv, WebEnv } from "./env.js";
+
+// =============================================================================
+// App-level types (non-database)
+// =============================================================================
+
+export { ACCOUNT_GROUPS } from "./app.js";
+export type {
+  TimeGrain,
+  BackendStatus,
+  DateRange,
+  DateNavDirections,
+} from "./app.js";
+
+// =============================================================================
+// Onboarding
+// =============================================================================
+
+export {
+  WORKSPACE_TYPES,
+  DATE_FORMATS,
+  WEEK_STARTS,
+  SUPPORTED_CURRENCIES,
+  ONBOARDING_ACCOUNT_GROUPS,
+  WorkspaceTypeSchema,
+  DateFormatSchema,
+  WeekStartSchema,
+  SupportedCurrencySchema,
+  OnboardingAccountGroupSchema,
+  WorkspaceNameSchema,
+  WorkspaceBasicsSchema,
+  RegionalPreferencesSchema,
+  FirstAccountSchema,
+  CheckWorkspaceNameAvailabilityQuerySchema,
+  CheckWorkspaceNameAvailabilityResultSchema,
+  hasFirstAccountData,
+} from "./onboarding.js";
+
+export type {
+  WorkspaceBasics,
+  WorkspaceName,
+  WorkspaceType,
+  SupportedCurrency,
+  RegionalPreferences,
+  OnboardingAccountGroup,
+  FirstAccount,
+  CheckWorkspaceNameAvailabilityQuery,
+  CheckWorkspaceNameAvailabilityResult,
+} from "./onboarding.js";
+
+// =============================================================================
+// Account Metadata
+// =============================================================================
+
+export {
+  AccountMetadataSchemas,
+  ChequingMetadataSchema,
+  SavingsMetadataSchema,
+  CashMetadataSchema,
+  CreditCardMetadataSchema,
+  InvestmentMetadataSchema,
+  LoanMetadataSchema,
+  MortgageMetadataSchema,
+  AssetMetadataSchema,
+  OtherMetadataSchema,
+} from "./account-metadata.js";
+
+export type {
+  ChequingMetadata,
+  SavingsMetadata,
+  CashMetadata,
+  CreditCardMetadata,
+  InvestmentMetadata,
+  LoanMetadata,
+  MortgageMetadata,
+  AssetMetadata,
+  OtherMetadata,
+  AccountMetadataMap,
+  AccountMetadata,
+} from "./account-metadata.js";

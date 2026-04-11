@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
 import type {
   Transaction,
-  InsertTransaction,
+  CreateTransaction,
   UpdateTransaction,
   TransactionQuery,
 } from "@workspace/types";
@@ -39,7 +39,7 @@ export function useTransaction(id: string) {
 export function useCreateTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: InsertTransaction) =>
+    mutationFn: (data: CreateTransaction) =>
       apiClient<Transaction>("/transactions", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });

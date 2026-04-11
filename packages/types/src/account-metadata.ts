@@ -107,5 +107,4 @@ export type AccountMetadataMap = {
   other: OtherMetadata;
 };
 
-export type AccountGroup = keyof AccountMetadataMap;
-export type AccountMetadata = AccountMetadataMap[AccountGroup];
+export type AccountMetadata = AccountMetadataMap[keyof AccountMetadataMap];

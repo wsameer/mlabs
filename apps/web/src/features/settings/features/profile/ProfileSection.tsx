@@ -26,12 +26,12 @@ import {
   InputGroupTextarea,
 } from "@workspace/ui/components/input-group";
 
-import { SettingsProfileSummary } from "../SettingsProfileSummary";
+import { SettingsProfileSummary } from "../../components/SettingsProfileSummary";
 import {
   WORKSPACE_TYPE_LABELS,
   type SettingsFormValues,
-} from "../settings-shared";
-import type { SettingsSectionProps } from "./types";
+} from "../../components/settings-shared";
+import type { SettingsSectionProps } from "../../types";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ProfileSection({

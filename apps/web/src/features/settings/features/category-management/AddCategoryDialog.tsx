@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
 import { toast } from "sonner";
-import type { Category } from "@workspace/types";
-import { useUpdateCategory } from "@/features/categories/api/use-categories";
+import type { CategoryType } from "@workspace/types";
+import { useCreateCategory } from "@/features/categories/api/use-categories";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -33,60 +33,82 @@ import {
   FieldLabel,
 } from "@workspace/ui/components/field";
 
-// Form schema for category editing
-const EditCategoryFormSchema = z.object({
+// Form schema for category creation
+const AddCategoryFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  isActive: z.boolean(),
+  sortOrder: z.number().int().min(0),
 });
 
-type EditCategoryFormData = z.infer<typeof EditCategoryFormSchema>;
+type AddCategoryFormData = z.infer<typeof AddCategoryFormSchema>;
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category: Category | null;
+  type: CategoryType;
+  parentId?: string;
+  parentName?: string;
 }
 
-export function EditCategoryDialog({ open, onOpenChange, category }: Props) {
+export function AddCategoryDialog({
+  open,
+  onOpenChange,
+  type,
+  parentId,
+  parentName,
+}: Props) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const updateCategory = useUpdateCategory();
+  const createCategory = useCreateCategory();
 
-  const form = useForm<EditCategoryFormData>({
-    resolver: zodResolver(EditCategoryFormSchema),
+  const form = useForm<AddCategoryFormData>({
+    resolver: zodResolver(AddCategoryFormSchema),
     defaultValues: {
       name: "",
+      isActive: true,
+      sortOrder: 0,
     },
   });
 
-  // Update form when category changes
-  useEffect(() => {
-    if (category) {
-      form.reset({ name: category.name });
-    }
-  }, [category, form]);
-
   function handleClose() {
     onOpenChange(false);
+    form.reset();
   }
 
-  function onSubmit(data: EditCategoryFormData) {
-    if (!category) return;
-
-    updateCategory.mutate(
-      { id: category.id, data: { name: data.name.trim() } },
+  function onSubmit(data: AddCategoryFormData) {
+    createCategory.mutate(
+      {
+        name: data.name.trim(),
+        type,
+        parentId: parentId ?? null,
+        isActive: data.isActive,
+        sortOrder: data.sortOrder,
+      },
       {
         onSuccess: () => {
-          toast.success("Category updated");
+          toast.success(parentId ? "Subcategory created" : "Category created");
           handleClose();
         },
         onError: (err) => {
-          toast.error(err.message || "Failed to update category");
+          toast.error(err.message || "Failed to create category");
         },
       }
     );
   }
 
-  const title = "Edit category";
-  const description = "Update the category name.";
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [open, form]);
+
+  const title = parentId
+    ? `Add subcategory to ${parentName}`
+    : `Add ${type.toLowerCase()} category`;
+
+  const description = parentId
+    ? "This will be nested under the parent category."
+    : `Add a new ${type.toLowerCase()} category.`;
 
   if (isDesktop) {
     return (
@@ -96,11 +118,10 @@ export function EditCategoryDialog({ open, onOpenChange, category }: Props) {
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <EditForm
+          <CategoryForm
             form={form}
             onSubmit={onSubmit}
-            onCancel={handleClose}
-            isPending={updateCategory.isPending}
+            isPending={createCategory.isPending}
           />
         </DialogContent>
       </Dialog>
@@ -110,15 +131,16 @@ export function EditCategoryDialog({ open, onOpenChange, category }: Props) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{description}</DrawerDescription>
+        <DrawerHeader>
+          <DrawerTitle className="text-left">{title}</DrawerTitle>
+          <DrawerDescription className="text-left">
+            {description}
+          </DrawerDescription>
         </DrawerHeader>
-        <EditForm
+        <CategoryForm
           form={form}
           onSubmit={onSubmit}
-          onCancel={handleClose}
-          isPending={updateCategory.isPending}
+          isPending={createCategory.isPending}
           className="px-4"
         />
         <DrawerFooter className="pt-2">
@@ -131,21 +153,19 @@ export function EditCategoryDialog({ open, onOpenChange, category }: Props) {
   );
 }
 
-interface EditFormProps {
-  form: ReturnType<typeof useForm<EditCategoryFormData>>;
-  onSubmit: (data: EditCategoryFormData) => void;
-  onCancel: () => void;
+interface CategoryFormProps {
+  form: ReturnType<typeof useForm<AddCategoryFormData>>;
+  onSubmit: (data: AddCategoryFormData) => void;
   isPending: boolean;
   className?: string;
 }
 
-function EditForm({
+function CategoryForm({
   form,
   onSubmit,
-  onCancel,
   isPending,
   className,
-}: EditFormProps) {
+}: CategoryFormProps) {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
@@ -157,6 +177,7 @@ function EditForm({
           <Input
             id="name"
             {...form.register("name")}
+            placeholder="e.g. Groceries"
             autoComplete="off"
             autoFocus
           />
@@ -167,20 +188,14 @@ function EditForm({
       </FieldGroup>
 
       <div className="flex justify-end gap-2 md:hidden">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Saving..." : "Save"}
+        <Button type="submit" disabled={isPending} className="w-full">
+          {isPending ? "Creating..." : "Create"}
         </Button>
       </div>
 
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? "Creating..." : "Create"}
         </Button>
       </div>
     </form>
