@@ -1,11 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { AlertCircleIcon } from "lucide-react";
 import { useLayoutConfig } from "@/features/layout";
 import { useAccounts } from "../api/use-accounts";
 import { EmptyAccounts } from "./EmptyAccounts";
-import { AccountCategoriesSidebar } from "./AccountCategoriesSidebar";
+import { AccountsView } from "./AccountsView";
 import { useAppStore } from "@/stores";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Spinner } from "@workspace/ui/components/spinner";
 import {
   Alert,
@@ -14,22 +13,13 @@ import {
 } from "@workspace/ui/components/alert";
 
 export function AccountsPage() {
-  const { data: accounts, isPending, isError } = useAccounts();
+  const { data: accounts, isPending, isError, refetch } = useAccounts();
   const setHasAccount = useAppStore((state) => state.setHasAccount);
-  const isMobile = useIsMobile();
   const hasAccounts = (accounts?.length ?? 0) > 0;
-
-  const leftSidebarContent = useMemo(() => {
-    if (isMobile || isPending || isError || hasAccounts) {
-      return null;
-    }
-
-    return <AccountCategoriesSidebar />;
-  }, [hasAccounts, isError, isMobile, isPending]);
 
   useLayoutConfig({
     pageTitle: "Accounts",
-    leftSidebarContent,
+    leftSidebarContent: null,
   });
 
   useEffect(() => {
@@ -68,10 +58,11 @@ export function AccountsPage() {
     );
   }
 
-  // TODO: Implement accounts list view
   return (
-    <div className="mx-auto my-auto w-full max-w-2xl">
-      <EmptyAccounts />
-    </div>
+    <AccountsView
+      accounts={accounts}
+      onRefresh={() => refetch()}
+      isRefreshing={isPending}
+    />
   );
 }
