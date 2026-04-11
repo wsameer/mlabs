@@ -37,7 +37,7 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
   };
 
   return (
-    <Item variant="default" size="xs">
+    <Item variant="outline" size="xs" role="listitem">
       <ItemMedia>
         <Avatar className="size-8">
           <AvatarFallback
@@ -63,9 +63,9 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
           <ItemDescription>{account.institutionName}</ItemDescription>
         )}
       </ItemContent>
-      <ItemActions>
-        <p>{formatCurrency(balance)}</p>
-      </ItemActions>
+      <ItemContent className="flex-none text-center">
+        <ItemDescription>{formatCurrency(balance)}</ItemDescription>
+      </ItemContent>
     </Item>
   );
 }

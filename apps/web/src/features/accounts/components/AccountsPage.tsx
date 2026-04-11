@@ -11,6 +11,25 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@workspace/ui/components/alert";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemFooter,
+  ItemGroup,
+} from "@workspace/ui/components/item";
+import { Progress } from "@workspace/ui/components/progress";
+import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError, refetch } = useAccounts();
@@ -59,10 +78,31 @@ export function AccountsPage() {
   }
 
   return (
-    <AccountsView
-      accounts={accounts}
-      onRefresh={() => refetch()}
-      isRefreshing={isPending}
-    />
+    <div className="flex flex-row flex-wrap gap-4 md:flex-wrap-reverse">
+      <div className="grow">
+        <AccountsView
+          accounts={accounts}
+          onRefresh={() => refetch()}
+          isRefreshing={isPending}
+        />
+      </div>
+      <Card className="grow">
+        <CardHeader>
+          <CardTitle>Summary</CardTitle>
+          <CardDescription>Active milestones for 2024</CardDescription>
+          <CardAction>
+            <Tabs defaultValue="totals">
+              <TabsList>
+                <TabsTrigger value="totals">Totals</TabsTrigger>
+                <TabsTrigger value="percent">Percent</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <div className="h-2/4">Dummy data</div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

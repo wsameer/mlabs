@@ -82,7 +82,7 @@ function RootComponent() {
         <div className="relative flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-4">
           <Outlet />
           {/* Progressive fade for mobile bottom bar */}
-          <div className="pointer-events-none fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/50 to-transparent md:hidden" />
+          <div className="pointer-events-none fixed right-0 bottom-0 left-0 h-32 bg-linear-to-t from-background via-background/50 to-transparent md:hidden" />
         </div>
         <AppBottombar />
         <SearchDialog />
