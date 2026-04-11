@@ -3,41 +3,22 @@ import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import type { Account } from "@workspace/types";
 import {
   Item,
-  ItemActions,
   ItemContent,
   ItemDescription,
   ItemMedia,
   ItemTitle,
 } from "@workspace/ui/components/item";
+import { formatCurrency, getInitials } from "../lib/format-utils";
 
 interface AccountCardProps {
   account: Account;
-  onClick?: () => void;
 }
 
-export function AccountCard({ account, onClick }: AccountCardProps) {
+export function AccountCard({ account }: AccountCardProps) {
   const balance = parseFloat(account.balance);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: account.currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
-    <Item variant="outline" size="xs" role="listitem">
+    <Item variant="muted" size="xs" role="listitem">
       <ItemMedia>
         <Avatar className="size-8">
           <AvatarFallback
@@ -64,7 +45,9 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
         )}
       </ItemContent>
       <ItemContent className="flex-none text-center">
-        <ItemDescription>{formatCurrency(balance)}</ItemDescription>
+        <ItemDescription>
+          {formatCurrency(balance, account.currency)}
+        </ItemDescription>
       </ItemContent>
     </Item>
   );

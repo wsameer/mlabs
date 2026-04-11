@@ -5,6 +5,7 @@ import {
   CollapsibleTrigger,
 } from "@workspace/ui/components/collapsible";
 import { ItemGroup } from "@workspace/ui/components/item";
+import { formatCurrency } from "../lib/format-utils";
 
 interface AccountGroupSectionProps {
   id: string;
@@ -27,18 +28,13 @@ export function AccountGroupSection({
   defaultOpen = false,
   children,
 }: AccountGroupSectionProps) {
-  const formatted = new Intl.NumberFormat("en-CA", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(total);
+  const formatted = formatCurrency(total, currency);
 
   return (
     <Collapsible
       id={id}
       defaultOpen={defaultOpen}
-      className="rounded-md bg-muted"
+      className="rounded-md border bg-background"
     >
       <CollapsibleTrigger
         className="group flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-left"

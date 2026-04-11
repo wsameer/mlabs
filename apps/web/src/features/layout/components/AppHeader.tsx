@@ -9,7 +9,12 @@ import { useUiActions } from "@/hooks/use-ui-store";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
-  const { title: pageTitle, actions: headerActions, mobileBackPath, onMobileBack } = useHeaderConfig();
+  const {
+    title: pageTitle,
+    actions: headerActions,
+    mobileBackPath,
+    onMobileBack,
+  } = useHeaderConfig();
   const { setGlobalSearch } = useUiActions();
   const showBackButton = Boolean(mobileBackPath || onMobileBack);
 
@@ -63,6 +68,7 @@ export const AppHeader = () => {
         </h4>
       </div>
       <div className="flex gap-1">
+        {headerActions}
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
@@ -71,7 +77,6 @@ export const AppHeader = () => {
           <SearchIcon data-icon="inline-start" />
           <p className="text-muted-foreground">⌘K</p>
         </Button>
-        {headerActions}
       </div>
     </div>
   );

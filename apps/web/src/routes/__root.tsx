@@ -19,12 +19,13 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
-import { NotFoundComponent } from "./404";
 import { AppHeader, AppSidebar } from "@/features/layout";
 import { SearchDialog } from "@/components/SearchDialog";
-import { CreateAccountDialog } from "@/features/accounts";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { AddTransactionPopover } from "@/features/transactions";
+import { CreateAccountDialog } from "@/features/add-accounts/CreateAccountDialog";
+
+import { NotFoundComponent } from "./404";
 
 interface RouterContext {
   queryClient: QueryClient;

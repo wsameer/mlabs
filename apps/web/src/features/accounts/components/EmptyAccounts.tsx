@@ -1,5 +1,4 @@
-import { LandmarkIcon, LinkIcon, PlusIcon } from "lucide-react";
-import { useUiActions } from "@/hooks/use-ui-store";
+import { LandmarkIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Empty,
@@ -14,18 +13,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
-import { toast } from "sonner";
+import { AddAccount } from "@/features/add-accounts/AddAccount";
 
 export function EmptyAccounts() {
-  const { setOpenCreateAccount } = useUiActions();
-
   return (
     <Empty>
       <EmptyHeader>
@@ -39,31 +29,7 @@ export function EmptyAccounts() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button />}>
-            Add account
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => setOpenCreateAccount(true)}>
-                <PlusIcon />
-                Create account
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  toast("Coming later", {
-                    description:
-                      "This functionality is little complex. I will work on it later once v1 is done",
-                  })
-                }
-              >
-                <LinkIcon />
-                Link account
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+        <AddAccount />
         <Tooltip>
           <TooltipTrigger
             render={<Button variant="outline">Import Accounts</Button>}

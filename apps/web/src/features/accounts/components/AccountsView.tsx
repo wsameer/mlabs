@@ -4,11 +4,10 @@ import type { Account, AccountGroup } from "@workspace/types";
 import { ACCOUNT_GROUP_METADATA } from "../lib/account-groups";
 import { AccountGroupSection } from "./AccountGroupSection";
 import { AccountCard } from "./AccountCard";
+import { calculateGroupTotal } from "../lib/account-calculations";
 
 interface AccountsViewProps {
   accounts: Account[];
-  onRefresh?: () => void;
-  isRefreshing?: boolean;
 }
 
 export function AccountsView({ accounts }: AccountsViewProps) {
@@ -44,9 +43,7 @@ export function AccountsView({ accounts }: AccountsViewProps) {
       {/* Account Groups */}
       {Object.entries(groupedAccounts).map(([group, groupAccounts], index) => {
         const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroup];
-        const groupTotal = groupAccounts.reduce((sum, account) => {
-          return sum + parseFloat(account.balance);
-        }, 0);
+        const groupTotal = calculateGroupTotal(groupAccounts);
 
         return (
           <AccountGroupSection
@@ -60,14 +57,7 @@ export function AccountsView({ accounts }: AccountsViewProps) {
             defaultOpen={index === 0}
           >
             {groupAccounts.map((account) => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                onClick={() => {
-                  // TODO: Navigate to account details
-                  console.log("Navigate to account:", account.id);
-                }}
-              />
+              <AccountCard key={account.id} account={account} />
             ))}
           </AccountGroupSection>
         );
