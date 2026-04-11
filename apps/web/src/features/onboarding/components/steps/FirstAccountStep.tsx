@@ -108,7 +108,7 @@ export function FirstAccountStep({
                 {...field}
                 id="first-account-name"
                 autoComplete="off"
-                placeholder="My Checking"
+                placeholder="My Chequing"
                 disabled={isSubmitting}
                 autoFocus
               />

@@ -17,7 +17,7 @@ export const WeekStartEnum = z.enum(["SUNDAY", "MONDAY"]);
 export const ProfileTypeEnum = z.enum(["PERSONAL", "BUSINESS", "SHARED"]);
 
 export const AccountGroupEnum = z.enum([
-  "checking",
+  "chequing",
   "savings",
   "cash",
   "credit_card",

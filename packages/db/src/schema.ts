@@ -11,7 +11,7 @@ export const DATE_FORMATS = [
 export const WEEK_STARTS = ["SUNDAY", "MONDAY"] as const;
 export const PROFILE_TYPES = ["PERSONAL", "BUSINESS", "SHARED"] as const;
 export const ACCOUNT_GROUPS = [
-  "checking",
+  "chequing",
   "savings",
   "cash",
   "credit_card",

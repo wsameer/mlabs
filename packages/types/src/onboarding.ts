@@ -11,7 +11,7 @@ export const DATE_FORMATS = [
 export const WEEK_STARTS = ["SUNDAY", "MONDAY"] as const;
 export const SUPPORTED_CURRENCIES = ["CAD", "USD", "EUR", "GBP"] as const;
 export const ONBOARDING_ACCOUNT_GROUPS = [
-  "checking",
+  "chequing",
   "savings",
   "cash",
   "credit_card",

@@ -24,6 +24,7 @@ import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { AddAccount } from "@/features/add-accounts/AddAccount";
 import { calculateAccountTotals } from "../lib/account-calculations";
 import { formatCurrency } from "../lib/format-utils";
+import { NetWorthChart } from "@/features/net-worth-chart";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -94,11 +95,7 @@ export function AccountsPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Line chart with timegrain selector</CardTitle>
-        </CardHeader>
-      </Card>
+      <NetWorthChart />
 
       <div className="flex flex-row flex-wrap gap-4 md:flex-wrap-reverse">
         <div className="grow">

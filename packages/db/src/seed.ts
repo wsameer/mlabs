@@ -212,11 +212,11 @@ async function seed() {
       .values({
         profileId,
         name: "TD Chequing",
-        group: "checking",
+        group: "chequing",
         balance: "4250.75",
         currency: "CAD",
         icon: "wallet",
-        notes: "Primary checking account",
+        notes: "Primary chequing account",
         includeInNetWorth: true,
         sortOrder: 1,
       })

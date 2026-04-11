@@ -30,7 +30,7 @@ export type HealthCheck = z.infer<typeof HealthCheckSchema>;
 export const ProfileTypeSchema = z.enum(["PERSONAL", "BUSINESS", "SHARED"]);
 
 export const AccountGroupSchema = z.enum([
-  "checking",
+  "chequing",
   "savings",
   "cash",
   "credit_card",

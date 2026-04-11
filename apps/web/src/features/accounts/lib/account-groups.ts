@@ -19,8 +19,8 @@ export interface AccountGroupMetadata {
 }
 
 export const ACCOUNT_GROUP_METADATA: Record<AccountGroup, AccountGroupMetadata> = {
-  checking: {
-    label: "Cash",
+  chequing: {
+    label: "Chequing",
     icon: BuildingIcon,
     color: "hsl(200, 70%, 50%)",
     isLiability: false,
