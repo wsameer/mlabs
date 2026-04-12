@@ -10,11 +10,7 @@ import { useCategories } from "@/features/categories/api/use-categories";
 import { useCreateTransaction } from "../api/use-transactions";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { useTimezone } from "@/hooks/use-timezone";
-import {
-  parseDateString,
-  toDateString,
-  todayString,
-} from "@/lib/timezone";
+import { parseDateString, toDateString, todayString } from "@/lib/timezone";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
@@ -114,9 +110,6 @@ function DatePickerField({
   const [open, setOpen] = useState(false);
   const selectedDate = value ? parseDateString(value) : undefined;
   const [month, setMonth] = useState<Date | undefined>(selectedDate);
-  const [displayValue, setDisplayValue] = useState(
-    formatDisplayDate(selectedDate)
-  );
 
   return (
     <Field data-invalid={!!error}>
@@ -124,11 +117,10 @@ function DatePickerField({
       <InputGroup>
         <InputGroupInput
           id={id}
-          value={displayValue}
+          value={formatDisplayDate(selectedDate)}
           placeholder="January 01, 2026"
           className="text-xs"
           onChange={(e) => {
-            setDisplayValue(e.target.value);
             const parsed = new Date(e.target.value);
             if (isValidDate(parsed)) {
               onChange(toDateString(parsed));
@@ -165,7 +157,7 @@ function DatePickerField({
                 onSelect={(date) => {
                   if (date) {
                     onChange(toDateString(date));
-                    setDisplayValue(formatDisplayDate(date));
+                    setMonth(date);
                   }
                   setOpen(false);
                 }}
@@ -222,6 +214,7 @@ function IncomeExpenseForm({
   const today = todayString(tz);
 
   const form = useForm<IncomeExpenseFormValues>({
+    // eslint-disable-next-line
     resolver: zodResolver(IncomeExpenseFormSchema) as any,
     mode: "onChange",
     defaultValues: {
@@ -466,6 +459,7 @@ function TransferForm({ className }: { className?: string }) {
   const today = todayString(tz);
 
   const form = useForm<TransferFormValues>({
+    // eslint-disable-next-line
     resolver: zodResolver(TransferFormSchema) as any,
     mode: "onChange",
     defaultValues: {

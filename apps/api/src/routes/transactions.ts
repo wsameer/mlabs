@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod/v4";
 import {
   CreateTransactionSchema,
+  BulkCreateTransactionsSchema,
   TransactionQuerySchema,
   UpdateIncomeExpenseSchema,
   UpdateTransferSchema,
@@ -10,6 +11,8 @@ import type {
   ApiResponse,
   Transaction,
   TransactionQuery,
+  BulkCreateTransactions,
+  BulkImportResult,
   CreateIncomeExpense,
   CreateTransfer,
   UpdateIncomeExpense,
@@ -91,6 +94,29 @@ transactionsRoute.get(
     };
 
     return c.json(response);
+  }
+);
+
+// ---------------------------------------------------------------------------
+// POST /bulk  — Bulk import transactions (income/expense only)
+// ---------------------------------------------------------------------------
+transactionsRoute.post(
+  "/bulk",
+  validate("json", BulkCreateTransactionsSchema),
+  async (c) => {
+    const profileId = c.get("profileId");
+    const payload = c.req.valid("json") as BulkCreateTransactions;
+    const result = await transactionsService.bulkCreateIncomeExpense(
+      profileId,
+      payload.transactions
+    );
+
+    const response: ApiResponse<BulkImportResult> = {
+      success: true,
+      data: result,
+    };
+
+    return c.json(response, 201);
   }
 );
 

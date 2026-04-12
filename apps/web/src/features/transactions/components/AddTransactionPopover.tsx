@@ -3,18 +3,6 @@ import {
   useTransactionType,
   useUiActions,
 } from "@/hooks/use-ui-store";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@workspace/ui/components/drawer";
-import { TransactionsWrapper } from "./TransactionsWrapper";
-import { useIsMobile } from "@workspace/ui/hooks/use-mobile";
 import {
   Dialog,
   DialogClose,
@@ -24,43 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
+import { Button } from "@workspace/ui/components/button";
+
+import { TransactionsWrapper } from "./TransactionsWrapper";
 
 export function AddTransactionPopover() {
   const isOpen = useOpenCreateTransaction();
   const selectedTransactionType = useTransactionType();
-  const isMobile = useIsMobile();
 
   const { setOpenCreateTransaction } = useUiActions();
   const isTransfer = selectedTransactionType === "TRANSFER";
-
-  if (isMobile) {
-    return (
-      <Drawer open={isOpen} onOpenChange={setOpenCreateTransaction}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="text-left text-xl font-light">
-              Record
-              {isTransfer ? " a " : " an "}
-              {selectedTransactionType}
-            </DrawerTitle>
-            <DrawerDescription className="text-left">
-              Fill in the details below to record your transaction.
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="px-4">
-            <TransactionsWrapper />
-          </div>
-          <DrawerFooter className="pt-2">
-            <DrawerClose asChild>
-              <Button className="w-full" variant="secondary">
-                Cancel
-              </Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpenCreateTransaction}>
@@ -78,7 +39,7 @@ export function AddTransactionPopover() {
         <div className="-mx-4 no-scrollbar max-h-[50vh] overflow-y-auto px-4">
           <TransactionsWrapper />
         </div>
-        <DialogFooter className="pt-2">
+        <DialogFooter>
           <DialogClose
             className="w-full"
             render={<Button variant="secondary">Cancel</Button>}

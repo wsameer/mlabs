@@ -31,6 +31,10 @@ export {
   UpdateTransferSchema,
   UpdateProfileSchema,
   CreateOnboardingProfileSchema,
+  // Bulk import
+  BulkCreateIncomeExpenseSchema,
+  BulkCreateTransactionsSchema,
+  BulkImportResultSchema,
   // Query schemas
   AccountQuerySchema,
   CategoryQuerySchema,
@@ -78,6 +82,10 @@ export type {
   UpdateProfile,
   CreateOnboardingProfile,
   OnboardingAccount,
+  // Bulk import types
+  BulkCreateIncomeExpense,
+  BulkCreateTransactions,
+  BulkImportResult,
   // Query types
   AccountQuery,
   CategoryQuery,

@@ -23,6 +23,7 @@ import { NotificationsSection } from "./features/notifications";
 import { CategoriesSection } from "./features/category-management";
 import { AccountsSection } from "./features/accounts";
 import { BackupSection } from "./features/backup";
+import { ImportSection } from "./features/import-transactions";
 
 export function SettingsPage() {
   const isMobile = useIsMobile();
@@ -128,6 +129,7 @@ export function SettingsPage() {
       {resolvedSection === "notifications" && <NotificationsSection />}
       {resolvedSection === "categories" && <CategoriesSection />}
       {resolvedSection === "accounts" && <AccountsSection />}
+      {resolvedSection === "import" && <ImportSection />}
       {resolvedSection === "backup" && <BackupSection />}
     </div>
   );

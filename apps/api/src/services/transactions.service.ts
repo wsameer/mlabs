@@ -2,6 +2,8 @@ import { accounts, transactions } from "@workspace/db";
 import type {
   Transaction,
   TransactionQuery,
+  BulkCreateIncomeExpense,
+  BulkImportResult,
   CreateIncomeExpense,
   CreateTransfer,
   UpdateIncomeExpense,
@@ -229,6 +231,90 @@ export class TransactionsService {
 
       return serializeTransaction(inserted);
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // BULK CREATE INCOME/EXPENSE (CSV import)
+  // ---------------------------------------------------------------------------
+  async bulkCreateIncomeExpense(
+    profileId: string,
+    items: BulkCreateIncomeExpense[]
+  ): Promise<BulkImportResult> {
+    let imported = 0;
+    const errors: { index: number; message: string }[] = [];
+
+    // Pre-validate: collect unique account IDs and verify they belong to profile
+    const uniqueAccountIds = [...new Set(items.map((i) => i.accountId))];
+    const validAccountIds = new Set<string>();
+
+    for (const accountId of uniqueAccountIds) {
+      const [account] = await db
+        .select()
+        .from(accounts)
+        .where(
+          and(eq(accounts.id, accountId), eq(accounts.profileId, profileId))
+        )
+        .limit(1);
+
+      if (account) {
+        validAccountIds.add(accountId);
+      }
+    }
+
+    for (const [i, item] of items.entries()) {
+      if (!validAccountIds.has(item.accountId)) {
+        errors.push({ index: i, message: "Account not found" });
+        continue;
+      }
+
+      try {
+        await db.transaction(async (tx) => {
+          const [account] = await tx
+            .select()
+            .from(accounts)
+            .where(eq(accounts.id, item.accountId))
+            .limit(1);
+
+          if (!account) {
+            throw new Error("Account not found");
+          }
+
+          await tx.insert(transactions).values({
+            profileId,
+            accountId: item.accountId,
+            categoryId: item.categoryId ?? null,
+            type: item.type,
+            amount: item.amount,
+            description: item.description,
+            notes: item.notes,
+            date: item.date,
+            isCleared: item.isCleared,
+          });
+
+          const balanceDelta =
+            item.type === "INCOME"
+              ? Number(item.amount)
+              : -Number(item.amount);
+
+          await tx
+            .update(accounts)
+            .set({
+              balance: String(Number(account.balance) + balanceDelta),
+              updatedAt: new Date(),
+            })
+            .where(eq(accounts.id, item.accountId));
+        });
+
+        imported++;
+      } catch (err) {
+        errors.push({
+          index: i,
+          message: err instanceof Error ? err.message : "Unknown error",
+        });
+      }
+    }
+
+    return { imported, failed: errors.length, errors };
   }
 
   // ---------------------------------------------------------------------------

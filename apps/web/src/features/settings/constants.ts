@@ -6,6 +6,7 @@ import {
   TagsIcon,
   WalletCardsIcon,
   DatabaseBackupIcon,
+  ImportIcon,
 } from "lucide-react";
 import { z } from "zod/v4";
 
@@ -15,6 +16,7 @@ export type SettingsSectionId =
   | "notifications"
   | "categories"
   | "accounts"
+  | "import"
   | "backup";
 
 export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
@@ -23,6 +25,7 @@ export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
   "notifications",
   "categories",
   "accounts",
+  "import",
   "backup",
 ];
 
@@ -78,6 +81,14 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     label: "Accounts",
     description: "Bank accounts and credit cards",
     icon: WalletCardsIcon,
+    iconBg: "bg-gray-200",
+    group: "data",
+  },
+  {
+    id: "import",
+    label: "Import",
+    description: "Import transactions from CSV",
+    icon: ImportIcon,
     iconBg: "bg-gray-200",
     group: "data",
   },

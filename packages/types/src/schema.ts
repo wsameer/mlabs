@@ -348,6 +348,42 @@ export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 export type CreateIncomeExpense = z.infer<typeof CreateIncomeExpenseSchema>;
 export type CreateTransfer = z.infer<typeof CreateTransferSchema>;
 
+// Bulk import — categoryId is optional since CSV imports may lack categories
+export const BulkCreateIncomeExpenseSchema = z.object({
+  type: z.enum(["INCOME", "EXPENSE"]),
+  accountId: z.uuid(),
+  categoryId: z.uuid().optional(),
+  amount: z.string(),
+  description: z.string().max(200).optional(),
+  notes: z.string().optional(),
+  date: z.string(),
+  isCleared: z.boolean().default(false),
+});
+
+export const BulkCreateTransactionsSchema = z.object({
+  transactions: z.array(BulkCreateIncomeExpenseSchema).min(1).max(500),
+});
+
+export type BulkCreateIncomeExpense = z.infer<
+  typeof BulkCreateIncomeExpenseSchema
+>;
+export type BulkCreateTransactions = z.infer<
+  typeof BulkCreateTransactionsSchema
+>;
+
+export const BulkImportResultSchema = z.object({
+  imported: z.number(),
+  failed: z.number(),
+  errors: z.array(
+    z.object({
+      index: z.number(),
+      message: z.string(),
+    })
+  ),
+});
+
+export type BulkImportResult = z.infer<typeof BulkImportResultSchema>;
+
 // Update payloads — type cannot be changed
 export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
   {
