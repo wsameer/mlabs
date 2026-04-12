@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { Transaction } from "@workspace/types";
 
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
@@ -7,6 +7,7 @@ import { useLayoutConfig } from "@/features/layout";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 import { useTransactions } from "../api/use-transactions";
 import { TransactionItem } from "./TransactionItem";
@@ -40,6 +41,8 @@ export function TransactionsPage() {
 
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTx, setDeleteTx] = useState<Transaction | null>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
 
   // Build lookup maps
   const accountMap = useMemo(() => {
@@ -94,6 +97,7 @@ export function TransactionsPage() {
   return (
     <div className="max-full flex flex-col gap-3">
       <DateRangeFilter />
+
       {sortedDates.map((date) => {
         const groupedTransactions = grouped[date];
         const totals = totalsByDate[date] ?? { income: 0, debit: 0 };
@@ -105,7 +109,8 @@ export function TransactionsPage() {
           >
             <Item
               variant="outline"
-              className="sticky top-0 z-10 mx-1 mt-1 w-auto px-2"
+              id={`summary-${date}`}
+              className="sticky z-10 mx-1 mt-1 mb-2 w-auto px-2 shadow-xs"
             >
               <ItemContent>
                 <ItemTitle>

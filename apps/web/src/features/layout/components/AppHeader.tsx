@@ -83,7 +83,7 @@ export const AppHeader = () => {
   );
 
   return (
-    <header className="sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b bg-background p-3">
+    <header className="sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b bg-background p-3">
       {renderDesktopHeader()}
       {renderMobileHeader()}
     </header>
