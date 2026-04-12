@@ -33,8 +33,7 @@ export function useLayoutConfig(config: LayoutConfig) {
   }, [config.mobileBackPath, setMobileBackPath]);
 
   useEffect(() => {
-    if (config.onMobileBack !== undefined)
-      setOnMobileBack(config.onMobileBack);
+    if (config.onMobileBack !== undefined) setOnMobileBack(config.onMobileBack);
   }, [config.onMobileBack, setOnMobileBack]);
 
   useEffect(() => {

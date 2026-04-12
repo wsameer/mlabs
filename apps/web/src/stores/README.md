@@ -30,12 +30,23 @@ export type ExampleSlice = {
   increment: () => void;
 };
 
-export const createExampleSlice: StateCreator<AppStoreState, [["zustand/immer", never]], [], ExampleSlice> = (set) => ({
+export const createExampleSlice: StateCreator<
+  AppStoreState,
+  [["zustand/immer", never]],
+  [],
+  ExampleSlice
+> = (set) => ({
   value: "",
   count: 0,
 
-  setValue: (value) => set((state) => { state.value = value }),
-  increment: () => set((state) => { state.count += 1 }),
+  setValue: (value) =>
+    set((state) => {
+      state.value = value;
+    }),
+  increment: () =>
+    set((state) => {
+      state.count += 1;
+    }),
 });
 ```
 
@@ -50,6 +61,7 @@ export const countSelector = (state: AppStoreState) => state.count;
 ```
 
 **Why selectors?**
+
 - Auto-optimization (component only re-renders when selected value changes)
 - Reusable across components
 - Easy to test
@@ -63,7 +75,10 @@ Hooks are the **primary way** components should consume the store:
 // hooks/use-example.ts
 import { useShallow } from "zustand/react/shallow";
 import { useAppStore } from "@/stores";
-import { valueSelector, countSelector } from "@/stores/selectors/example-selectors";
+import {
+  valueSelector,
+  countSelector,
+} from "@/stores/selectors/example-selectors";
 
 // ✅ ATOMIC HOOKS (use by default)
 export const useValue = () => useAppStore(valueSelector);
@@ -121,6 +136,7 @@ function MyComponent() {
 ## When to Use Each Pattern
 
 ### Atomic Hooks (Default Choice)
+
 Use when a component needs **one or a few independent values**:
 
 ```typescript
@@ -129,11 +145,13 @@ const status = useAppStatus();
 ```
 
 **Pros:**
+
 - Maximum optimization
 - Clear dependencies
 - Easy to track what causes re-renders
 
 ### Grouped Hooks (Use Sparingly)
+
 Use when values are **always consumed together** and change together:
 
 ```typescript
@@ -141,16 +159,19 @@ const { profile, profiles, hasAccount } = useAppProfileData();
 ```
 
 **Use when:**
+
 - Values have semantic relationship (e.g., profile + hasAccount)
 - Always accessed together in the same component
 - Simplifies component API
 
 **Avoid when:**
+
 - Values change at different frequencies
 - Only sometimes needed together
 - "Convenience" grouping (use atomic instead)
 
 ### Actions Hooks
+
 Always separate actions from state:
 
 ```typescript
@@ -158,6 +179,7 @@ const { syncProfile, completeOnboarding } = useAppActions();
 ```
 
 **Why?**
+
 - Actions are stable references (don't cause re-renders)
 - Clear separation of concerns
 - Better code organization
@@ -188,6 +210,7 @@ When adding new state:
 ### Real-World Example: Layout State
 
 **Components using atomic hooks:**
+
 ```typescript
 // AppSidebar.tsx - needs only sidebar content
 import { useSidebarLeftContent } from "@/hooks/use-layout";
@@ -199,6 +222,7 @@ function AppSidebar() {
 ```
 
 **Components using grouped hooks:**
+
 ```typescript
 // AppHeader.tsx - needs title, actions, and mobileBackPath together
 import { useHeaderConfig } from "@/hooks/use-layout";
@@ -216,6 +240,7 @@ function AppHeader() {
 ```
 
 **Components using action hooks:**
+
 ```typescript
 // SettingsPage.tsx - only needs to set values
 import { useLayoutActions } from "@/hooks/use-layout";
@@ -233,12 +258,13 @@ function SettingsPage() {
 ## DevTools
 
 Access store in browser console:
+
 ```js
 // Get current state
-window.store.get()
+window.store.get();
 
 // Pretty print
-window.store.log()
+window.store.log();
 ```
 
 Install [Redux DevTools](https://github.com/reduxjs/redux-devtools) for time-travel debugging!

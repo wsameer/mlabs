@@ -67,25 +67,21 @@ categoriesRoute.get(
   }
 );
 
-categoriesRoute.post(
-  "/",
-  validate("json", CreateCategorySchema),
-  async (c) => {
-    const payload = c.req.valid("json") as CreateCategory;
-    const profileId = c.get("profileId");
-    const createdCategory = await categoriesService.createCategory(
-      profileId,
-      payload
-    );
+categoriesRoute.post("/", validate("json", CreateCategorySchema), async (c) => {
+  const payload = c.req.valid("json") as CreateCategory;
+  const profileId = c.get("profileId");
+  const createdCategory = await categoriesService.createCategory(
+    profileId,
+    payload
+  );
 
-    const response: ApiResponse<Category> = {
-      success: true,
-      data: createdCategory,
-    };
+  const response: ApiResponse<Category> = {
+    success: true,
+    data: createdCategory,
+  };
 
-    return c.json(response, 201);
-  }
-);
+  return c.json(response, 201);
+});
 
 categoriesRoute.patch(
   "/:id",

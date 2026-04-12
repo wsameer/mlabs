@@ -30,7 +30,9 @@ export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
 ];
 
 export const SettingsSearchSchema = z.object({
-  section: z.enum(SETTINGS_SECTION_IDS as [SettingsSectionId, ...SettingsSectionId[]]).optional(),
+  section: z
+    .enum(SETTINGS_SECTION_IDS as [SettingsSectionId, ...SettingsSectionId[]])
+    .optional(),
 });
 
 export type SettingsSection = {

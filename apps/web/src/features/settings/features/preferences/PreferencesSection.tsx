@@ -6,11 +6,7 @@ import {
   WEEK_STARTS,
 } from "@workspace/types";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import {
   NativeSelect,
   NativeSelectOption,

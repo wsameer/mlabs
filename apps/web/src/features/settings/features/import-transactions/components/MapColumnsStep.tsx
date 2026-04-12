@@ -5,11 +5,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Badge } from "@workspace/ui/components/badge";
 
@@ -41,7 +37,8 @@ export function MapColumnsStep({
 }: MapColumnsStepProps) {
   // Filter fields based on amount mode
   const visibleFields = MAPPABLE_FIELDS.filter((f) => {
-    if (amountMode === "signed") return f.field !== "debit" && f.field !== "credit";
+    if (amountMode === "signed")
+      return f.field !== "debit" && f.field !== "credit";
     if (amountMode === "split") return f.field !== "amount";
     return true;
   });
@@ -85,15 +82,13 @@ export function MapColumnsStep({
         {visibleFields.map(({ field, label, required }) => {
           const selectedIndex = mapping[field];
           const sampleValue =
-            selectedIndex != null ? sampleRow[selectedIndex] ?? "" : "";
+            selectedIndex != null ? (sampleRow[selectedIndex] ?? "") : "";
 
           return (
             <Field key={field}>
               <FieldLabel>
                 {label}
-                {required && (
-                  <span className="ml-1 text-destructive">*</span>
-                )}
+                {required && <span className="ml-1 text-destructive">*</span>}
               </FieldLabel>
               <div className="flex items-center gap-2">
                 <NativeSelect
@@ -112,7 +107,10 @@ export function MapColumnsStep({
                   ))}
                 </NativeSelect>
                 {sampleValue && (
-                  <Badge variant="outline" className="max-w-32 truncate text-xs">
+                  <Badge
+                    variant="outline"
+                    className="max-w-32 truncate text-xs"
+                  >
                     {sampleValue}
                   </Badge>
                 )}

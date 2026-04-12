@@ -128,7 +128,6 @@ export function TransactionsPage() {
                           className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none border-b-border bg-muted px-3"
                         >
                           <ItemContent className="flex flex-row items-center gap-2">
-
                             <Badge className="rounded-sm" variant="default">
                               {format(parseDateString(date), "EEE")}
                             </Badge>

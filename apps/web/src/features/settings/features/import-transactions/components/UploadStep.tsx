@@ -7,11 +7,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Badge } from "@workspace/ui/components/badge";
 import { Spinner } from "@workspace/ui/components/spinner";

@@ -116,7 +116,11 @@ export class TransactionsService {
             .where(
               and(
                 eq(transactions.profileId, profileId),
-                or(...transferIds.map((transferId) => eq(transactions.transferId, transferId)))
+                or(
+                  ...transferIds.map((transferId) =>
+                    eq(transactions.transferId, transferId)
+                  )
+                )
               )
             );
 
@@ -136,15 +140,14 @@ export class TransactionsService {
     const rows = await db
       .select()
       .from(transactions)
-      .where(and(eq(transactions.id, id), eq(transactions.profileId, profileId)))
+      .where(
+        and(eq(transactions.id, id), eq(transactions.profileId, profileId))
+      )
       .limit(1);
 
     const transaction = rows[0];
     if (!transaction) {
-      throw new NotFoundError(
-        "Transaction not found",
-        "TRANSACTION_NOT_FOUND"
-      );
+      throw new NotFoundError("Transaction not found", "TRANSACTION_NOT_FOUND");
     }
 
     if (transaction.type !== "TRANSFER" || !transaction.transferId) {
@@ -166,7 +169,9 @@ export class TransactionsService {
       (row) => row.id === transaction.id
     );
 
-    return serialized ?? serializeTransaction(transaction, { direction: "OUTFLOW" });
+    return (
+      serialized ?? serializeTransaction(transaction, { direction: "OUTFLOW" })
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -292,9 +297,7 @@ export class TransactionsService {
           });
 
           const balanceDelta =
-            item.type === "INCOME"
-              ? Number(item.amount)
-              : -Number(item.amount);
+            item.type === "INCOME" ? Number(item.amount) : -Number(item.amount);
 
           await tx
             .update(accounts)
@@ -498,7 +501,8 @@ export class TransactionsService {
 
       // Build updates
       const updates: Record<string, unknown> = { updatedAt: new Date() };
-      if (payload.accountId !== undefined) updates.accountId = payload.accountId;
+      if (payload.accountId !== undefined)
+        updates.accountId = payload.accountId;
       if (payload.categoryId !== undefined)
         updates.categoryId = payload.categoryId;
       if (payload.amount !== undefined) updates.amount = payload.amount;
@@ -506,7 +510,8 @@ export class TransactionsService {
         updates.description = payload.description;
       if (payload.notes !== undefined) updates.notes = payload.notes;
       if (payload.date !== undefined) updates.date = payload.date;
-      if (payload.isCleared !== undefined) updates.isCleared = payload.isCleared;
+      if (payload.isCleared !== undefined)
+        updates.isCleared = payload.isCleared;
 
       const [updated] = await tx
         .update(transactions)
@@ -849,10 +854,7 @@ export class TransactionsService {
         const [deletedRow] = await tx
           .delete(transactions)
           .where(
-            and(
-              eq(transactions.id, id),
-              eq(transactions.profileId, profileId)
-            )
+            and(eq(transactions.id, id), eq(transactions.profileId, profileId))
           )
           .returning();
 

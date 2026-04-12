@@ -1,4 +1,9 @@
-import { accounts, categories, profiles, DEFAULT_CATEGORIES } from "@workspace/db";
+import {
+  accounts,
+  categories,
+  profiles,
+  DEFAULT_CATEGORIES,
+} from "@workspace/db";
 import type {
   CreateOnboardingProfile,
   Profile,

@@ -82,21 +82,19 @@ export function serializeTransactionsWithContext(
     });
   }
 
-  return rows.map((row) =>
-    {
-      const transferGroup =
-        row.type === "TRANSFER" && row.transferId
-          ? transferGroups.get(row.transferId)
-          : undefined;
-      const linkedRow = transferGroup?.find(
-        (candidate) => candidate.id !== row.id
-      );
+  return rows.map((row) => {
+    const transferGroup =
+      row.type === "TRANSFER" && row.transferId
+        ? transferGroups.get(row.transferId)
+        : undefined;
+    const linkedRow = transferGroup?.find(
+      (candidate) => candidate.id !== row.id
+    );
 
-      return serializeTransaction(row, {
-        direction: directionById.get(row.id),
-        linkedAccountId: linkedRow?.accountId,
-        linkedTransactionId: linkedRow?.id,
-      });
-    }
-  );
+    return serializeTransaction(row, {
+      direction: directionById.get(row.id),
+      linkedAccountId: linkedRow?.accountId,
+      linkedTransactionId: linkedRow?.id,
+    });
+  });
 }

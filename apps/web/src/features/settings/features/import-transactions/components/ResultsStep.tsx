@@ -71,9 +71,7 @@ export function ResultsStep({
         <Button variant="outline" onClick={onImportMore}>
           Import More
         </Button>
-        <Button
-          onClick={() => navigate({ to: TRANSACTIONS_ROUTE })}
-        >
+        <Button onClick={() => navigate({ to: TRANSACTIONS_ROUTE })}>
           View Transactions
         </Button>
       </div>

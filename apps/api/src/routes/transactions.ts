@@ -183,10 +183,7 @@ transactionsRoute.patch(
     if (existing.type === "TRANSFER") {
       const parsed = UpdateTransferSchema.safeParse(body);
       if (!parsed.success) {
-        throw new BadRequestError(
-          "Validation error",
-          "VALIDATION_ERROR"
-        );
+        throw new BadRequestError("Validation error", "VALIDATION_ERROR");
       }
       const updated = await transactionsService.updateTransfer(
         profileId,
@@ -205,10 +202,7 @@ transactionsRoute.patch(
     // INCOME or EXPENSE
     const parsed = UpdateIncomeExpenseSchema.safeParse(body);
     if (!parsed.success) {
-      throw new BadRequestError(
-        "Validation error",
-        "VALIDATION_ERROR"
-      );
+      throw new BadRequestError("Validation error", "VALIDATION_ERROR");
     }
 
     const updated = await transactionsService.updateIncomeExpense(

@@ -54,21 +54,17 @@ profilesRoute.get(
   }
 );
 
-profilesRoute.get(
-  "/:id",
-  validate("param", ProfileParamsSchema),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const profile = await profilesService.getProfileById(id);
+profilesRoute.get("/:id", validate("param", ProfileParamsSchema), async (c) => {
+  const { id } = c.req.valid("param");
+  const profile = await profilesService.getProfileById(id);
 
-    const response: ApiResponse<Profile> = {
-      success: true,
-      data: profile,
-    };
+  const response: ApiResponse<Profile> = {
+    success: true,
+    data: profile,
+  };
 
-    return c.json(response);
-  }
-);
+  return c.json(response);
+});
 
 profilesRoute.put(
   "/:id",

@@ -6,7 +6,9 @@ let dbInstance: ReturnType<typeof getDatabase> | null = null;
 export function getDb() {
   if (!dbInstance) {
     if (!env.DATABASE_URL) {
-      throw new Error("DATABASE_URL is not defined. Please set it in your environment variables.");
+      throw new Error(
+        "DATABASE_URL is not defined. Please set it in your environment variables."
+      );
     }
     dbInstance = getDatabase(env.DATABASE_URL);
   }
@@ -16,4 +18,15 @@ export function getDb() {
 // Export singleton db instance for convenience
 export const db = getDb();
 
-export { sql, eq, and, or, desc, asc, count, sum, gte, lte } from "@workspace/db";
+export {
+  sql,
+  eq,
+  and,
+  or,
+  desc,
+  asc,
+  count,
+  sum,
+  gte,
+  lte,
+} from "@workspace/db";

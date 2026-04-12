@@ -116,7 +116,9 @@ interface Props {
   onBack: () => void;
 }
 
-function buildMetadata(data: AccountFormValues): Record<string, unknown> | undefined {
+function buildMetadata(
+  data: AccountFormValues
+): Record<string, unknown> | undefined {
   const type = data.type;
   const meta: Record<string, unknown> = {};
 
@@ -467,9 +469,7 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
       {/* ── Advanced (optional) fields ── */}
       {hasAdvancedFields && (
         <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-          <CollapsibleTrigger
-            className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-          >
+          <CollapsibleTrigger className="flex w-full items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
             <ChevronDownIcon
               className={`size-3.5 transition-transform ${advancedOpen ? "rotate-0" : "-rotate-90"}`}
             />

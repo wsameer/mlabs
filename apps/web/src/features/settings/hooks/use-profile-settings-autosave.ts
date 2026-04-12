@@ -18,9 +18,9 @@ type ScopedDraft = {
 export function useProfileSettingsAutosave(profile: Profile | null) {
   const updateProfile = useUpdateProfileSettings(profile?.id ?? "");
   const [localDraft, setLocalDraft] = useState<ScopedDraft | null>(null);
-  const [savingField, setSavingField] = useState<keyof SettingsFormValues | null>(
-    null
-  );
+  const [savingField, setSavingField] = useState<
+    keyof SettingsFormValues | null
+  >(null);
 
   const serverValues = useMemo(
     () => (profile ? profileToFormValues(profile) : null),
@@ -123,7 +123,10 @@ export function useProfileSettingsAutosave(profile: Profile | null) {
   );
 
   const updateImmediateField = useCallback(
-    async <K extends ImmediateField>(field: K, value: SettingsFormValues[K]) => {
+    async <K extends ImmediateField>(
+      field: K,
+      value: SettingsFormValues[K]
+    ) => {
       if (!profile || !draft || savingField) {
         return;
       }
@@ -135,7 +138,9 @@ export function useProfileSettingsAutosave(profile: Profile | null) {
       const didSave = await persist({ [field]: value } as UpdateProfile, field);
 
       if (!didSave) {
-        patchLocalDraft({ [field]: previousValue } as Partial<SettingsFormValues>);
+        patchLocalDraft({
+          [field]: previousValue,
+        } as Partial<SettingsFormValues>);
         clearLocalField(field);
       }
     },

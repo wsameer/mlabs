@@ -62,9 +62,7 @@ export function parseAmount(value: string): number | null {
 
   // Handle accounting format: (100.00) means -100.00
   const isNegativeParens = /^\([\d.]+\)$/.test(cleaned);
-  const numStr = isNegativeParens
-    ? "-" + cleaned.slice(1, -1)
-    : cleaned;
+  const numStr = isNegativeParens ? "-" + cleaned.slice(1, -1) : cleaned;
 
   const num = Number(numStr);
   return Number.isFinite(num) ? num : null;

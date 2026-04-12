@@ -8,7 +8,6 @@ export function getDefaultRange(
   tz: string = DEFAULT_TIMEZONE
 ): DateRange {
   const now = nowInTz(tz);
-
   switch (grain) {
     case "daily":
       return { from: startOfDay(now), to: now };

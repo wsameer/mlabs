@@ -1,9 +1,5 @@
 import type { Category, BulkCreateIncomeExpense } from "@workspace/types";
-import type {
-  AmountMode,
-  ColumnMapping,
-  ValidatedRow,
-} from "../types";
+import type { AmountMode, ColumnMapping, ValidatedRow } from "../types";
 import { parseDate, parseAmount, validateRow } from "./csv-validators";
 
 function getCell(row: string[], index: number | null | undefined): string {

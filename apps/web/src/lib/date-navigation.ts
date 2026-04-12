@@ -29,6 +29,7 @@ type NavigateOptions = {
   grain: TimeGrain;
   direction: DateNavDirections;
   tz?: string;
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export function navigateDateRange({
@@ -36,6 +37,7 @@ export function navigateDateRange({
   grain,
   direction,
   tz = DEFAULT_TIMEZONE,
+  weekStartsOn = 1,
 }: NavigateOptions): DateRange {
   const today = nowInTz(tz);
   const isPrev = direction === "prev";
@@ -101,7 +103,8 @@ export function getNavigationBoundaries(
   const today = nowInTz(tz);
 
   const prevDisabled = !isAfter(current.from, ALL_DATA_START);
-  const nextDisabled = isSameDay(current.to, today) || isAfter(current.to, today);
+  const nextDisabled =
+    isSameDay(current.to, today) || isAfter(current.to, today);
 
   return { prevDisabled, nextDisabled };
 }

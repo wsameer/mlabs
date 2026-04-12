@@ -220,7 +220,9 @@ export const DateRangeFilter = () => {
               disabled={!pickerEnabled}
             >
               {getDisplayLabel(timeGrain, { from, to })}
-              {pickerEnabled && <ChevronDownIcon className="size-4 opacity-60" />}
+              {pickerEnabled && (
+                <ChevronDownIcon className="size-4 opacity-60" />
+              )}
             </Button>
           }
         />

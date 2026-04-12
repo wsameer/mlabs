@@ -99,7 +99,8 @@ export function ProfileSection({
                   />
                 </div>
                 <FieldDescription>
-                  Timezone is locked for now and cannot be changed from settings.
+                  Timezone is locked for now and cannot be changed from
+                  settings.
                 </FieldDescription>
               </Field>
             </FieldGroup>

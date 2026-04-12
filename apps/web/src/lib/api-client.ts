@@ -12,8 +12,13 @@ export async function apiClient<T>(
   path: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { method = "GET", body, params, signal, includeProfileId = true } =
-    options;
+  const {
+    method = "GET",
+    body,
+    params,
+    signal,
+    includeProfileId = true,
+  } = options;
 
   const apiBase = import.meta.env.VITE_API_URL ?? window.location.origin;
   const url = new URL(`/api${path}`, apiBase);

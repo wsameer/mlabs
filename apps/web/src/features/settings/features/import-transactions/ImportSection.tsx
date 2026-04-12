@@ -38,7 +38,12 @@ export function ImportSection() {
       columnMapping.amountMode,
       categories ?? []
     );
-  }, [csvParser.rows, columnMapping.mapping, columnMapping.amountMode, categories]);
+  }, [
+    csvParser.rows,
+    columnMapping.mapping,
+    columnMapping.amountMode,
+    categories,
+  ]);
 
   const accountName = useMemo(
     () => accounts?.find((a) => a.id === accountId)?.name ?? "Unknown",

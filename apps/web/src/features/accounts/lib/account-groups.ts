@@ -18,7 +18,10 @@ export interface AccountGroupMetadata {
   isLiability: boolean;
 }
 
-export const ACCOUNT_GROUP_METADATA: Record<AccountGroup, AccountGroupMetadata> = {
+export const ACCOUNT_GROUP_METADATA: Record<
+  AccountGroup,
+  AccountGroupMetadata
+> = {
   chequing: {
     label: "Chequing",
     icon: BuildingIcon,
@@ -75,6 +78,8 @@ export const ACCOUNT_GROUP_METADATA: Record<AccountGroup, AccountGroupMetadata> 
   },
 };
 
-export function getAccountGroupMetadata(group: AccountGroup): AccountGroupMetadata {
+export function getAccountGroupMetadata(
+  group: AccountGroup
+): AccountGroupMetadata {
   return ACCOUNT_GROUP_METADATA[group];
 }
