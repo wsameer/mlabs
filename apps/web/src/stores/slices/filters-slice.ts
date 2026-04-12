@@ -5,6 +5,7 @@ import type { AppStoreState } from "@/stores/app-store";
 import type { DateNavDirections, DateRange, TimeGrain } from "@workspace/types";
 import { navigateDateRange } from "@/lib/date-navigation";
 import { DEFAULT_GRAIN } from "@/constants";
+import { DEFAULT_TIMEZONE } from "@/lib/timezone";
 
 export type FiltersSlice = {
   // State
@@ -28,18 +29,21 @@ export const createFiltersSlice: StateCreator<
 
   setTimeGrain: (grain) =>
     set((state) => {
+      const tz = state.appProfile?.timezone ?? DEFAULT_TIMEZONE;
       state.timeGrain = grain;
-      state.dateRange = getDefaultRange(grain);
+      state.dateRange = getDefaultRange(grain, tz);
     }),
 
   setDateRange: (range) => set((state) => (state.dateRange = range)),
 
   navigate: (direction) =>
     set((state) => {
+      const tz = state.appProfile?.timezone ?? DEFAULT_TIMEZONE;
       const next = navigateDateRange({
         current: { from: state.dateRange.from, to: state.dateRange.to },
         grain: state.timeGrain,
         direction,
+        tz,
       });
       state.dateRange.from = next.from;
       state.dateRange.to = next.to;

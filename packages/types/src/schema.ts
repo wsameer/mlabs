@@ -409,7 +409,7 @@ export const TransactionQuerySchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
-export type TransactionQuery = z.infer<typeof TransactionQuerySchema>;
+export type TransactionQuery = z.input<typeof TransactionQuerySchema>;
 
 // ============================================================================
 // API Response Wrapper

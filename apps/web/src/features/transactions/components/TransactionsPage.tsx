@@ -14,12 +14,12 @@ import { TListLoader } from "./TListLoader";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { EmptyTransactions } from "./EmptyTransactions";
+import { TransactionSummaryCard } from "./TransactionSummaryCard";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemGroup,
-  ItemTitle,
 } from "@workspace/ui/components/item";
 import { format, getDate } from "date-fns";
 import { Badge } from "@workspace/ui/components/badge";
@@ -28,6 +28,9 @@ import { DateRangeFilter } from "@/components/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
+import { useDateRange } from "@/hooks/use-filters";
+import { parseDateString, toDateString } from "@/lib/timezone";
+import { cn } from "@workspace/ui/lib/utils";
 
 export function TransactionsPage() {
   useLayoutConfig({
@@ -35,9 +38,19 @@ export function TransactionsPage() {
     actions: <TimeGrainSelect />,
   });
 
+  const { to, from } = useDateRange();
+
   const { setOpenCreateTransaction } = useUiActions();
 
-  const { data, isLoading } = useTransactions();
+  const filters = useMemo(
+    () => ({
+      startDate: toDateString(from),
+      endDate: toDateString(to),
+    }),
+    [from, to]
+  );
+
+  const { data, isLoading } = useTransactions(filters);
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
 
@@ -86,207 +99,114 @@ export function TransactionsPage() {
     );
   }
 
-  if (transactions.length === 0) {
-    return (
-      <div className="mx-auto my-auto flex w-full flex-col gap-3">
-        <EmptyTransactions openCreateTransaction={setOpenCreateTransaction} />
-      </div>
-    );
-  }
-
   return (
     <div className="max-full flex flex-col gap-3">
       <DateRangeFilter />
 
-      <Card className="p-2">
-        <CardContent className="p-0">
-          <div className="grid w-full grid-cols-3 divide-x divide-border/60">
-            <div className="px-2 text-center">
-              <div className="text-[0.65rem] text-muted-foreground uppercase">
-                Income
-              </div>
-              <div className="text-sm font-medium">{1224}</div>
-            </div>
-            <div className="px-2 text-center">
-              <div className="text-[0.65rem] text-muted-foreground uppercase">
-                Expense
-              </div>
-              <div className="text-sm font-medium">{869}</div>
-            </div>
-            <div className="px-2 text-center">
-              <div className="text-[0.65rem] text-muted-foreground uppercase">
-                Total
-              </div>
-              <div className="text-sm font-medium">$1000</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {transactions.length === 0 ? (
+        <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
+          <EmptyTransactions openCreateTransaction={setOpenCreateTransaction} />
+        </div>
+      ) : (
+        <>
+          <TransactionSummaryCard transactions={transactions} />
 
-      <Card className="p-0">
-        <CardContent className="p-0">
-          <ScrollArea className="h-[70svh]">
-            <div>
-              {sortedDates.map((date) => {
-                const groupedTransactions = grouped[date];
-                const totals = totalsByDate[date] ?? { income: 0, debit: 0 };
+          <Card className="p-0">
+            <CardContent className="p-0">
+              <ScrollArea className="h-[70svh]">
+                <div>
+                  {sortedDates.map((date) => {
+                    const groupedTransactions = grouped[date];
+                    const totals = totalsByDate[date] ?? {
+                      income: 0,
+                      debit: 0,
+                    };
 
-                return (
-                  <section key={date}>
-                    <Item
-                      id={`summary-${date}`}
-                      className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none bg-muted px-3"
-                    >
-                      <ItemContent className="flex flex-row items-center gap-1">
-                        <p className="text-base">{getDate(date)}</p>
-                        <Badge variant="secondary">{format(date, "EEE")}</Badge>
-                      </ItemContent>
-                      <ItemActions>
-                        <small className="w-16 truncate text-xs text-foreground">
-                          {formatCurrency(totals.income)}
-                        </small>
-                        <small className="w-16 truncate text-right text-xs text-foreground">
-                          {formatCurrency(totals.debit)}
-                        </small>
-                      </ItemActions>
-                    </Item>
-                    <ItemGroup className="flex flex-col gap-0 divide-y divide-border">
-                      {groupedTransactions.map((tx, index) => {
-                        const cat = tx.categoryId
-                          ? categoryMap.get(tx.categoryId)
-                          : undefined;
-                        const accountName =
-                          accountMap.get(tx.accountId) ?? "Unknown";
-                        const linkedAccountName = tx.linkedAccountId
-                          ? (accountMap.get(tx.linkedAccountId) ?? "Unknown")
-                          : undefined;
-                        const categoryName =
-                          tx.type === "TRANSFER"
-                            ? tx.direction === "OUTFLOW"
-                              ? "Transfer out"
-                              : "Transfer in"
-                            : (cat?.name ?? "Uncategorized");
-                        const formattedAmount = formatCurrency(
-                          Number(tx.signedAmount)
-                        );
-                        const merchantSub =
-                          tx.type === "TRANSFER" && linkedAccountName
-                            ? tx.direction === "OUTFLOW"
-                              ? `${accountName} -> ${linkedAccountName}`
-                              : `${linkedAccountName} -> ${accountName}`
-                            : accountName;
+                    return (
+                      <section key={date}>
+                        <Item
+                          id={`summary-${date}`}
+                          className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none border-b-border bg-muted px-3"
+                        >
+                          <ItemContent className="flex flex-row items-center gap-2">
+                            <p className="text-sm">
+                              {format(parseDateString(date), "EEE")}
+                            </p>
+                            <Badge className="rounded-sm" variant="default">
+                              {getDate(parseDateString(date))}
+                            </Badge>
+                          </ItemContent>
+                          <ItemActions>
+                            <small className="w-16 truncate text-xs text-foreground">
+                              {formatCurrency(totals.income)}
+                            </small>
+                            <small className="w-16 truncate text-right text-xs text-foreground">
+                              {formatCurrency(totals.debit)}
+                            </small>
+                          </ItemActions>
+                        </Item>
 
-                        return (
-                          <React.Fragment key={tx.id}>
-                            <TransactionItem
-                              className={
-                                groupedTransactions.length - 1 === index
-                                  ? "rounded-t-none! rounded-b-sm"
-                                  : "rounded-none!"
-                              }
-                              id={Number(tx.id) || 0}
-                              category={categoryName}
-                              categorySub={cat?.icon ?? undefined}
-                              merchant={tx.description || tx.type.toLowerCase()}
-                              merchantSub={merchantSub}
-                              amount={formattedAmount}
-                              type={tx.type}
-                              onClick={() => setEditTx(tx)}
-                              aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
-                            />
-                            <Separator className="m-0" />
-                          </React.Fragment>
-                        );
-                      })}
-                    </ItemGroup>
-                  </section>
-                );
-              })}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                        <ItemGroup className="flex flex-col gap-0">
+                          {groupedTransactions.map((tx, index) => {
+                            const cat = tx.categoryId
+                              ? categoryMap.get(tx.categoryId)
+                              : undefined;
+                            const accountName =
+                              accountMap.get(tx.accountId) ?? "Unknown";
+                            const linkedAccountName = tx.linkedAccountId
+                              ? (accountMap.get(tx.linkedAccountId) ??
+                                "Unknown")
+                              : undefined;
+                            const categoryName =
+                              tx.type === "TRANSFER"
+                                ? tx.direction === "OUTFLOW"
+                                  ? "Transfer out"
+                                  : "Transfer in"
+                                : (cat?.name ?? "Uncategorized");
+                            const formattedAmount = formatCurrency(
+                              Number(tx.signedAmount)
+                            );
+                            const merchantSub =
+                              tx.type === "TRANSFER" && linkedAccountName
+                                ? tx.direction === "OUTFLOW"
+                                  ? `${accountName} -> ${linkedAccountName}`
+                                  : `${linkedAccountName} -> ${accountName}`
+                                : accountName;
 
-      {/*<ScrollArea className="h-[70svh]">
-        {sortedDates.map((date) => {
-          const groupedTransactions = grouped[date];
-          const totals = totalsByDate[date] ?? { income: 0, debit: 0 };
-
-          return (
-            <section
-              key={date}
-              className="w-full overflow-hidden rounded-md border"
-            >
-              <Item
-                variant="outline"
-                id={`summary-${date}`}
-                className="sticky top-0 mx-1 mt-1 mb-2 h-12 w-auto px-2 shadow-xs"
-              >
-                <ItemContent>
-                  <ItemTitle>
-                    <Badge className="rounded-sm">{format(date, "EEE")}</Badge>
-                    <p className="font-semibold">{getDate(date)}</p>
-                  </ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <p className="w-16 text-end text-xs text-blue-600">
-                    {formatCurrency(totals.income)}
-                  </p>
-                  <p className="w-16 text-end text-xs text-red-600">
-                    {formatCurrency(totals.debit)}
-                  </p>
-                </ItemActions>
-              </Item>
-              <ItemGroup className="flex flex-col gap-0 divide-y divide-border">
-                {groupedTransactions.map((tx, index) => {
-                  const cat = tx.categoryId
-                    ? categoryMap.get(tx.categoryId)
-                    : undefined;
-                  const accountName = accountMap.get(tx.accountId) ?? "Unknown";
-                  const linkedAccountName = tx.linkedAccountId
-                    ? (accountMap.get(tx.linkedAccountId) ?? "Unknown")
-                    : undefined;
-                  const categoryName =
-                    tx.type === "TRANSFER"
-                      ? tx.direction === "OUTFLOW"
-                        ? "Transfer out"
-                        : "Transfer in"
-                      : (cat?.name ?? "Uncategorized");
-                  const formattedAmount = formatCurrency(
-                    Number(tx.signedAmount)
-                  );
-                  const merchantSub =
-                    tx.type === "TRANSFER" && linkedAccountName
-                      ? tx.direction === "OUTFLOW"
-                        ? `${accountName} -> ${linkedAccountName}`
-                        : `${linkedAccountName} -> ${accountName}`
-                      : accountName;
-
-                  return (
-                    <TransactionItem
-                      key={tx.id}
-                      className={
-                        groupedTransactions.length - 1 === index
-                          ? "rounded-t-none! rounded-b-sm"
-                          : "rounded-none!"
-                      }
-                      id={Number(tx.id) || 0}
-                      category={categoryName}
-                      categorySub={cat?.icon ?? undefined}
-                      merchant={tx.description || tx.type.toLowerCase()}
-                      merchantSub={merchantSub}
-                      amount={formattedAmount}
-                      type={tx.type}
-                      onClick={() => setEditTx(tx)}
-                      aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
-                    />
-                  );
-                })}
-              </ItemGroup>
-            </section>
-          );
-        })}
-      </ScrollArea>*/}
+                            return (
+                              <React.Fragment key={tx.id}>
+                                <TransactionItem
+                                  className={
+                                    groupedTransactions.length - 1 === index
+                                      ? "rounded-t-none! rounded-b-sm"
+                                      : "rounded-none!"
+                                  }
+                                  id={Number(tx.id) || 0}
+                                  category={categoryName}
+                                  categorySub={cat?.icon ?? undefined}
+                                  merchant={
+                                    tx.description || tx.type.toLowerCase()
+                                  }
+                                  merchantSub={merchantSub}
+                                  amount={formattedAmount}
+                                  type={tx.type}
+                                  onClick={() => setEditTx(tx)}
+                                  aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
+                                />
+                                <Separator className="m-0" />
+                              </React.Fragment>
+                            );
+                          })}
+                        </ItemGroup>
+                      </section>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       <EditTransactionDialog
         open={!!editTx}

@@ -9,6 +9,12 @@ import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { useCreateTransaction } from "../api/use-transactions";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useTimezone } from "@/hooks/use-timezone";
+import {
+  parseDateString,
+  toDateString,
+  todayString,
+} from "@/lib/timezone";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
@@ -77,22 +83,6 @@ type TransferFormValues = z.infer<typeof TransferFormSchema>;
 // Date Picker Field
 // ---------------------------------------------------------------------------
 
-/** Parse YYYY-MM-DD to a local Date (avoids timezone shift from new Date("YYYY-MM-DD")) */
-function parseLocalDate(dateStr: string): Date | undefined {
-  if (!dateStr) return undefined;
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-
-/** Format Date to YYYY-MM-DD */
-function toDateString(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-/** Format Date for display in the input */
 function formatDisplayDate(date: Date | undefined): string {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
@@ -122,7 +112,7 @@ function DatePickerField({
   error,
 }: DatePickerFieldProps) {
   const [open, setOpen] = useState(false);
-  const selectedDate = parseLocalDate(value);
+  const selectedDate = value ? parseDateString(value) : undefined;
   const [month, setMonth] = useState<Date | undefined>(selectedDate);
   const [displayValue, setDisplayValue] = useState(
     formatDisplayDate(selectedDate)
@@ -222,13 +212,14 @@ function IncomeExpenseForm({
 }) {
   const createTransaction = useCreateTransaction();
   const { setOpenCreateTransaction } = useUiActions();
+  const tz = useTimezone();
   const { data: accounts } = useAccounts({ isActive: true });
   const { data: categories } = useCategories({
     type,
     isActive: true,
   });
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayString(tz);
 
   const form = useForm<IncomeExpenseFormValues>({
     resolver: zodResolver(IncomeExpenseFormSchema) as any,
@@ -469,9 +460,10 @@ function IncomeExpenseForm({
 function TransferForm({ className }: { className?: string }) {
   const createTransaction = useCreateTransaction();
   const { setOpenCreateTransaction } = useUiActions();
+  const tz = useTimezone();
   const { data: accounts } = useAccounts({ isActive: true });
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayString(tz);
 
   const form = useForm<TransferFormValues>({
     resolver: zodResolver(TransferFormSchema) as any,

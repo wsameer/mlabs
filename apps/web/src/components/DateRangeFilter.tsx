@@ -5,6 +5,7 @@ import {
   useFiltersActions,
   useTimeGrain,
 } from "@/hooks/use-filters";
+import { useTimezone } from "@/hooks/use-timezone";
 import { Button } from "@workspace/ui/components/button";
 import {
   getDisplayLabel,
@@ -15,9 +16,11 @@ export const DateRangeFilter = () => {
   const timeGrain = useTimeGrain();
   const { to, from } = useDateRange();
   const { navigate } = useFiltersActions();
+  const tz = useTimezone();
   const { prevDisabled, nextDisabled } = getNavigationBoundaries(
     { from, to },
-    timeGrain
+    timeGrain,
+    tz
   );
 
   return (
