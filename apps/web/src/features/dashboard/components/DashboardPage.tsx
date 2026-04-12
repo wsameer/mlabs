@@ -9,7 +9,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { CategoryStatList } from "@/components/CategoryStatList";
-import { DateRangeFilter } from "@/components/DateRangeFilter";
+import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 
 export function DashboardPage() {
   useLayoutConfig({

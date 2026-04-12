@@ -80,7 +80,7 @@ function RootComponent() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <div className="relative mb-16 flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-3">
+        <div className="relative mb-24 flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-3 md:mb-8">
           <Outlet />
           {/* Progressive fade for mobile bottom bar */}
           <div className="pointer-events-none fixed right-0 bottom-0 left-0 h-32 bg-linear-to-t from-background via-background/50 to-transparent md:hidden" />

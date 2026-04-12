@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { Transaction } from "@workspace/types";
 
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
@@ -21,16 +21,15 @@ import {
   ItemContent,
   ItemGroup,
 } from "@workspace/ui/components/item";
-import { format, getDate } from "date-fns";
+import { format } from "date-fns";
 import { Badge } from "@workspace/ui/components/badge";
 import { calculateTransactionGroupTotals, groupByDate } from "../utils";
-import { DateRangeFilter } from "@/components/DateRangeFilter";
+import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 import { useDateRange } from "@/hooks/use-filters";
 import { parseDateString, toDateString } from "@/lib/timezone";
-import { cn } from "@workspace/ui/lib/utils";
 
 export function TransactionsPage() {
   useLayoutConfig({
@@ -129,12 +128,13 @@ export function TransactionsPage() {
                           className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none border-b-border bg-muted px-3"
                         >
                           <ItemContent className="flex flex-row items-center gap-2">
-                            <p className="text-sm">
-                              {format(parseDateString(date), "EEE")}
-                            </p>
+
                             <Badge className="rounded-sm" variant="default">
-                              {getDate(parseDateString(date))}
+                              {format(parseDateString(date), "EEE")}
                             </Badge>
+                            <p className="text-xs">
+                              {format(parseDateString(date), "dd MMM, Y")}
+                            </p>
                           </ItemContent>
                           <ItemActions>
                             <small className="w-16 truncate text-xs text-foreground">

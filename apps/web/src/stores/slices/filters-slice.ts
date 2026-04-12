@@ -34,7 +34,10 @@ export const createFiltersSlice: StateCreator<
       state.dateRange = getDefaultRange(grain, tz);
     }),
 
-  setDateRange: (range) => set((state) => (state.dateRange = range)),
+  setDateRange: (range) =>
+    set((state) => {
+      state.dateRange = range;
+    }),
 
   navigate: (direction) =>
     set((state) => {
