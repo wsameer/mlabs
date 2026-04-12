@@ -7,7 +7,6 @@ import { useLayoutConfig } from "@/features/layout";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 import { useTransactions } from "../api/use-transactions";
 import { TransactionItem } from "./TransactionItem";
@@ -41,8 +40,6 @@ export function TransactionsPage() {
 
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTx, setDeleteTx] = useState<Transaction | null>(null);
-  const pageRef = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
 
   // Build lookup maps
   const accountMap = useMemo(() => {
