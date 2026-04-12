@@ -36,6 +36,7 @@ import {
 } from "@workspace/ui/components/popover";
 import { Calendar } from "@workspace/ui/components/calendar";
 import { CalendarIcon, DollarSignIcon } from "lucide-react";
+import { Input } from "@workspace/ui/components/input";
 
 // ---------------------------------------------------------------------------
 // Schemas
@@ -155,10 +156,7 @@ function DatePickerField({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger
               render={
-                <InputGroupButton
-                  variant="ghost"
-                  aria-label="Select date"
-                >
+                <InputGroupButton variant="ghost" aria-label="Select date">
                   <CalendarIcon />
                 </InputGroupButton>
               }
