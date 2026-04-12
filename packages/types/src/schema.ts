@@ -49,6 +49,9 @@ export type CategoryType = z.infer<typeof CategoryTypeSchema>;
 export const TransactionTypeSchema = z.enum(["INCOME", "EXPENSE", "TRANSFER"]);
 export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
+export const TransactionDirectionSchema = z.enum(["INFLOW", "OUTFLOW"]);
+export type TransactionDirection = z.infer<typeof TransactionDirectionSchema>;
+
 // Re-export onboarding enums used as profile fields
 export type DateFormat = z.infer<typeof DateFormatSchema>;
 export type WeekStart = z.infer<typeof WeekStartSchema>;
@@ -264,13 +267,17 @@ export const TransactionSchema = z.object({
   id: z.uuid(),
   profileId: z.uuid(),
   accountId: z.uuid(),
+  linkedAccountId: z.uuid().nullable().optional(),
   categoryId: z.uuid().nullable().optional(),
   type: TransactionTypeSchema,
+  direction: TransactionDirectionSchema,
   amount: z.string(),
+  signedAmount: z.string(),
   description: z.string().max(200).optional(),
   notes: z.string().optional(),
   date: z.string(),
   transferId: z.uuid().nullable().optional(),
+  linkedTransactionId: z.uuid().nullable().optional(),
   isCleared: z.boolean().default(false),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
@@ -282,10 +289,13 @@ export const TransactionSummarySchema = TransactionSchema.pick({
   id: true,
   date: true,
   type: true,
+  direction: true,
   amount: true,
+  signedAmount: true,
   description: true,
   isCleared: true,
   transferId: true,
+  linkedTransactionId: true,
 }).extend({
   accountName: z.string(),
   categoryName: z.string().nullable(),
@@ -295,7 +305,6 @@ export const TransactionSummarySchema = TransactionSchema.pick({
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
     .optional(),
   subcategoryName: z.string().nullable().optional(),
-  linkedTransactionId: z.uuid().nullable().optional(),
   linkedAccountName: z.string().nullable().optional(),
 });
 

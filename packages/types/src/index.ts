@@ -10,6 +10,7 @@ export {
   AccountGroupSchema,
   CategoryTypeSchema,
   TransactionTypeSchema,
+  TransactionDirectionSchema,
   // Entity schemas
   ProfileSchema,
   AccountSchema,
@@ -53,6 +54,7 @@ export type {
   AccountGroup,
   CategoryType,
   TransactionType,
+  TransactionDirection,
   DateFormat,
   WeekStart,
   // Entity types

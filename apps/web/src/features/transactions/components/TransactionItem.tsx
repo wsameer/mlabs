@@ -1,5 +1,8 @@
+import { TableCell, TableRow } from "@workspace/ui/components/table";
 import type { TransactionItemProps } from "../types";
 import React from "react";
+import { Item } from "@workspace/ui/components/item";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface CellProps {
   primary: string;
@@ -11,7 +14,7 @@ const Cell = ({ primary, secondary, align = "left" }: CellProps) => (
   <div
     className={`flex min-w-0 flex-col gap-0.5 ${align === "right" ? "items-end text-right" : "items-start"}`}
   >
-    <span className="block w-full truncate text-xs leading-snug font-medium text-foreground">
+    <span className="block w-full truncate text-[11px] leading-snug font-medium text-foreground">
       {primary}
     </span>
     {secondary && (
@@ -23,7 +26,7 @@ const Cell = ({ primary, secondary, align = "left" }: CellProps) => (
 );
 
 export const TransactionItem = React.forwardRef<
-  HTMLLIElement,
+  HTMLDivElement,
   TransactionItemProps
 >(
   (
@@ -47,34 +50,38 @@ export const TransactionItem = React.forwardRef<
         : "text-foreground";
 
     return (
-      <li ref={ref} className={className}>
-        <button
-          type="button"
-          tabIndex={0}
-          aria-label={ariaLabel ?? `${merchant} - ${amount}`}
-          onClick={onClick}
-          className={[
-            "group w-full cursor-pointer text-left outline-none hover:bg-primary/20",
-            "grid grid-cols-[1fr_2fr_1fr] items-center gap-x-1 gap-y-0 px-3 py-2",
-            "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
-          ].join(" ")}
-        >
-          <Cell
-            primary={category}
-            secondary={categorySub ? [categorySub] : undefined}
-          />
+      <Item
+        ref={ref}
+        className={className}
+        render={
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label={ariaLabel ?? `${merchant} - ${amount}`}
+            onClick={onClick}
+            className={[
+              "group w-full cursor-pointer text-left outline-none hover:bg-accent",
+              "grid grid-cols-[1fr_3fr_1fr] items-center gap-x-1 gap-y-0 rounded-none px-2! py-1!",
+              "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
+            ].join(" ")}
+          >
+            <Cell
+              primary={category}
+              secondary={categorySub ? [categorySub] : undefined}
+            />
 
-          <Cell primary={merchant} secondary={[merchantSub ?? "", txDate]} />
+            <Cell primary={merchant} secondary={[merchantSub ?? "", txDate]} />
 
-          <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
-            <span
-              className={`block truncate text-xs text-foreground tabular-nums ${amountColor}`}
-            >
-              {amount}
-            </span>
-          </div>
-        </button>
-      </li>
+            <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
+              <span
+                className={`block truncate text-xs text-foreground tabular-nums ${amountColor}`}
+              >
+                {amount}
+              </span>
+            </div>
+          </button>
+        }
+      />
     );
   }
 );

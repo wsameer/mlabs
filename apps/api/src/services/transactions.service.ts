@@ -8,13 +8,17 @@ import type {
   UpdateTransfer,
 } from "@workspace/types";
 
-import { and, asc, db, desc, eq, gte, lte, sql } from "../libs/db.js";
+import { and, asc, db, desc, eq, gte, lte, or, sql } from "../libs/db.js";
 import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
 } from "../libs/errors.js";
-import { serializeTransaction } from "./transaction-serializer.js";
+import {
+  serializeTransaction,
+  serializeTransactions,
+  serializeTransactionsWithContext,
+} from "./transaction-serializer.js";
 
 export class TransactionsService {
   // ---------------------------------------------------------------------------
@@ -91,8 +95,31 @@ export class TransactionsService {
       .limit(limit)
       .offset(offset);
 
+    const transferIds = [
+      ...new Set(
+        rows
+          .map((row) =>
+            row.type === "TRANSFER" && row.transferId ? row.transferId : null
+          )
+          .filter((transferId): transferId is string => transferId !== null)
+      ),
+    ];
+
+    const transferContextRows =
+      transferIds.length === 0
+        ? rows
+        : await db
+            .select()
+            .from(transactions)
+            .where(
+              and(
+                eq(transactions.profileId, profileId),
+                or(...transferIds.map((transferId) => eq(transactions.transferId, transferId)))
+              )
+            );
+
     return {
-      transactions: rows.map(serializeTransaction),
+      transactions: serializeTransactionsWithContext(rows, transferContextRows),
       total,
     };
   }
@@ -118,7 +145,26 @@ export class TransactionsService {
       );
     }
 
-    return serializeTransaction(transaction);
+    if (transaction.type !== "TRANSFER" || !transaction.transferId) {
+      return serializeTransaction(transaction);
+    }
+
+    const pairedRows = await db
+      .select()
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.transferId, transaction.transferId),
+          eq(transactions.profileId, profileId)
+        )
+      )
+      .limit(2);
+
+    const [serialized] = serializeTransactions(pairedRows).filter(
+      (row) => row.id === transaction.id
+    );
+
+    return serialized ?? serializeTransaction(transaction, { direction: "OUTFLOW" });
   }
 
   // ---------------------------------------------------------------------------
@@ -290,7 +336,7 @@ export class TransactionsService {
         })
         .where(eq(accounts.id, payload.toAccountId));
 
-      return [serializeTransaction(outflow), serializeTransaction(inflow)];
+      return serializeTransactions([outflow, inflow]);
     });
   }
 
@@ -611,10 +657,7 @@ export class TransactionsService {
         })
         .where(eq(accounts.id, newToAccountId));
 
-      return [
-        serializeTransaction(updatedOutflow),
-        serializeTransaction(updatedInflow),
-      ];
+      return serializeTransactions([updatedOutflow, updatedInflow]);
     });
   }
 
@@ -693,7 +736,7 @@ export class TransactionsService {
           )
           .returning();
 
-        deleted.push(...deletedRows.map(serializeTransaction));
+        deleted.push(...serializeTransactions(deletedRows));
       } else {
         // Single transaction: reverse balance and delete
         const [account] = await tx

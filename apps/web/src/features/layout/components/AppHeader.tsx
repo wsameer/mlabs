@@ -52,18 +52,19 @@ export const AppHeader = () => {
 
   const renderMobileHeader = () => (
     <div className="flex w-full items-center justify-between gap-3 md:hidden">
-      <div className="flex">
+      <div className="flex gap-1">
         {showBackButton && (
           <Button
             variant="ghost"
             size="icon"
             onClick={handleBack}
+            className="justify-start"
             aria-label="Go back"
           >
             <ArrowLeftIcon className="size-5" />
           </Button>
         )}
-        <h4 className="flex-1 scroll-m-20 text-lg font-medium tracking-wide">
+        <h4 className="flex-1 scroll-m-20 text-xl font-medium tracking-wide">
           {pageTitle}
         </h4>
       </div>
@@ -82,7 +83,7 @@ export const AppHeader = () => {
   );
 
   return (
-    <header className="sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+    <header className="sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b bg-background p-3">
       {renderDesktopHeader()}
       {renderMobileHeader()}
     </header>

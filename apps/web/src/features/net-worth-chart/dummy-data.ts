@@ -7,7 +7,11 @@ export interface NetWorthDataPoint {
   netWorth: number;
 }
 
-function randomWalk(start: number, steps: number, volatility: number): number[] {
+function randomWalk(
+  start: number,
+  steps: number,
+  volatility: number
+): number[] {
   const values = [start];
   for (let i = 1; i < steps; i++) {
     const change = (Math.random() - 0.4) * volatility;
@@ -18,8 +22,18 @@ function randomWalk(start: number, steps: number, volatility: number): number[] 
 
 function formatDate(d: Date, grain: TimeGrain): string {
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   if (grain === "yearly" || grain === "all") {

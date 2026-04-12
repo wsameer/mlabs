@@ -131,8 +131,10 @@ export function EditTransactionDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-131.25">
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
+            <DialogTitle className="text-left">{title}</DialogTitle>
+            <DialogDescription className="text-left">
+              {description}
+            </DialogDescription>
           </DialogHeader>
           {content}
         </DialogContent>
@@ -143,9 +145,11 @@ export function EditTransactionDialog({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{description}</DrawerDescription>
+        <DrawerHeader>
+          <DrawerTitle className="text-left">{title}</DrawerTitle>
+          <DrawerDescription className="text-left">
+            {description}
+          </DrawerDescription>
         </DrawerHeader>
         <div className="px-4">{content}</div>
         <DrawerFooter className="pt-2">
@@ -439,12 +443,15 @@ function EditTransferForm({
 
   useEffect(() => {
     if (transaction) {
-      // For a transfer, the transaction we're editing is one side.
-      // The accountId on this row is the "from" or "to" depending on context.
-      // Since we only have one side, populate what we can.
       form.reset({
-        fromAccountId: transaction.accountId,
-        toAccountId: "",
+        fromAccountId:
+          transaction.direction === "OUTFLOW"
+            ? transaction.accountId
+            : (transaction.linkedAccountId ?? ""),
+        toAccountId:
+          transaction.direction === "INFLOW"
+            ? transaction.accountId
+            : (transaction.linkedAccountId ?? ""),
         amount: transaction.amount,
         description: transaction.description ?? "",
         notes: transaction.notes ?? "",

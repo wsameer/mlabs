@@ -1,6 +1,7 @@
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { toast } from "sonner";
 import type { Transaction } from "@workspace/types";
+import { formatCurrency } from "@/features/accounts/lib/format-utils";
 import { useDeleteTransaction } from "../api/use-transactions";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -124,7 +125,7 @@ function DeleteContent({
 
   const label =
     transaction.description ||
-    `${transaction.type.toLowerCase()} of $${transaction.amount}`;
+    `${transaction.type.toLowerCase()} of ${formatCurrency(Number(transaction.signedAmount))}`;
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
