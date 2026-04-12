@@ -16,4 +16,4 @@ export function getDb() {
 // Export singleton db instance for convenience
 export const db = getDb();
 
-export { sql, eq, and, or, desc, asc, count, sum } from "@workspace/db";
+export { sql, eq, and, or, desc, asc, count, sum, gte, lte } from "@workspace/db";

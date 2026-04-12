@@ -285,6 +285,7 @@ export const TransactionSummarySchema = TransactionSchema.pick({
   amount: true,
   description: true,
   isCleared: true,
+  transferId: true,
 }).extend({
   accountName: z.string(),
   categoryName: z.string().nullable(),
@@ -293,26 +294,71 @@ export const TransactionSummarySchema = TransactionSchema.pick({
     .string()
     .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
     .optional(),
+  subcategoryName: z.string().nullable().optional(),
+  linkedTransactionId: z.uuid().nullable().optional(),
+  linkedAccountName: z.string().nullable().optional(),
 });
 
 export type TransactionSummary = z.infer<typeof TransactionSummarySchema>;
 
-// API payload — profileId injected by middleware
-export const CreateTransactionSchema = TransactionSchema.omit({
-  id: true,
-  profileId: true,
-  createdAt: true,
-  updatedAt: true,
-}).extend({
-  id: z.uuid().optional(),
+// API payloads — profileId injected by middleware
+
+// Base fields shared by all transaction types
+const TransactionBaseSchema = z.object({
   amount: z.string(),
-  transferId: z.uuid().optional(),
+  description: z.string().max(200).optional(),
+  notes: z.string().optional(),
+  date: z.string(),
+  isCleared: z.boolean().default(false),
 });
 
-export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
+// INCOME / EXPENSE: single account, category required
+export const CreateIncomeExpenseSchema = TransactionBaseSchema.extend({
+  type: z.enum(["INCOME", "EXPENSE"]),
+  accountId: z.uuid(),
+  categoryId: z.uuid(),
+  subcategoryId: z.uuid().optional(),
+});
 
-export const UpdateTransactionSchema = CreateTransactionSchema.partial();
+// TRANSFER: from/to accounts, no category
+export const CreateTransferSchema = TransactionBaseSchema.extend({
+  type: z.literal("TRANSFER"),
+  fromAccountId: z.uuid(),
+  toAccountId: z.uuid(),
+}).refine((data) => data.fromAccountId !== data.toAccountId, {
+  message: "From and to accounts must be different",
+  path: ["toAccountId"],
+});
+
+export const CreateTransactionSchema = z.union([
+  CreateIncomeExpenseSchema,
+  CreateTransferSchema,
+]);
+
+export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
+export type CreateIncomeExpense = z.infer<typeof CreateIncomeExpenseSchema>;
+export type CreateTransfer = z.infer<typeof CreateTransferSchema>;
+
+// Update payloads — type cannot be changed
+export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend({
+  accountId: z.uuid().optional(),
+  categoryId: z.uuid().optional(),
+  subcategoryId: z.uuid().nullable().optional(),
+});
+
+export const UpdateTransferSchema = TransactionBaseSchema.partial().extend({
+  fromAccountId: z.uuid().optional(),
+  toAccountId: z.uuid().optional(),
+});
+
+export const UpdateTransactionSchema = z.union([
+  UpdateIncomeExpenseSchema,
+  UpdateTransferSchema,
+]);
+
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
+export type UpdateIncomeExpense = z.infer<typeof UpdateIncomeExpenseSchema>;
+export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>;
 
 // ============================================================================
 // Query Schemas (API endpoint parameters)

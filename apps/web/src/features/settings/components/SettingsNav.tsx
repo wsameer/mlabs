@@ -16,7 +16,7 @@ import {
 } from "../constants";
 
 type SettingsNavProps = {
-  activeSection: SettingsSectionId | null;
+  activeSection: SettingsSectionId | undefined;
   onSelect: (id: SettingsSectionId) => void;
   variant?: "sidebar" | "list";
 };

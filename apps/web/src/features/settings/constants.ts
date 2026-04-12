@@ -7,6 +7,7 @@ import {
   WalletCardsIcon,
   DatabaseBackupIcon,
 } from "lucide-react";
+import { z } from "zod/v4";
 
 export type SettingsSectionId =
   | "profile"
@@ -15,6 +16,19 @@ export type SettingsSectionId =
   | "categories"
   | "accounts"
   | "backup";
+
+export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
+  "profile",
+  "preferences",
+  "notifications",
+  "categories",
+  "accounts",
+  "backup",
+];
+
+export const SettingsSearchSchema = z.object({
+  section: z.enum(SETTINGS_SECTION_IDS as [SettingsSectionId, ...SettingsSectionId[]]).optional(),
+});
 
 export type SettingsSection = {
   id: SettingsSectionId;

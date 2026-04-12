@@ -8,6 +8,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -18,6 +19,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -41,11 +43,14 @@ export function AddTransactionPopover() {
               {isTransfer ? " a " : " an "}
               {selectedTransactionType}
             </DrawerTitle>
+            <DrawerDescription className="text-left">
+              Fill in the details below to record your transaction.
+            </DrawerDescription>
           </DrawerHeader>
-          <div className="mb-10 px-4">
+          <div className="px-4">
             <TransactionsWrapper />
           </div>
-          <DrawerFooter>
+          <DrawerFooter className="pt-2">
             <DrawerClose asChild>
               <Button className="w-full" variant="secondary">
                 Cancel
@@ -66,11 +71,14 @@ export function AddTransactionPopover() {
             {isTransfer ? " a " : " an "}
             {selectedTransactionType}
           </DialogTitle>
+          <DialogDescription>
+            Fill in the details below to record your transaction.
+          </DialogDescription>
         </DialogHeader>
         <div className="-mx-4 no-scrollbar max-h-[50vh] overflow-y-auto px-4">
           <TransactionsWrapper />
         </div>
-        <DialogFooter>
+        <DialogFooter className="pt-2">
           <DialogClose
             className="w-full"
             render={<Button variant="secondary">Cancel</Button>}

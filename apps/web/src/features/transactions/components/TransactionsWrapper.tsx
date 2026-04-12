@@ -6,6 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { TransactionForm } from "./TransactionForm";
 
 export const TransactionsWrapper = () => {
   const selectedTransactionType = useTransactionType();
@@ -31,7 +32,7 @@ export const TransactionsWrapper = () => {
       </TabsList>
       {transactionTypes.map((type) => (
         <TabsContent key={type} value={type} className="mt-4">
-          <h1>{type}</h1>
+          <TransactionForm type={type} />
         </TabsContent>
       ))}
     </Tabs>

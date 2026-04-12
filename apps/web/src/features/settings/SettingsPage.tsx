@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ChevronRightIcon } from "lucide-react";
+import { Route } from "@/routes/settings";
 
 import { Spinner } from "@workspace/ui/components/spinner";
 
@@ -11,7 +12,10 @@ import { useProfileSettings } from "./api/use-profile-settings";
 import { useProfileSettingsAutosave } from "./hooks/use-profile-settings-autosave";
 import { SettingsNav } from "./components/SettingsNav";
 import { SETTINGS_SECTIONS, type SettingsSectionId } from "./constants";
-import { getInitials, WORKSPACE_TYPE_LABELS } from "./components/settings-shared";
+import {
+  getInitials,
+  WORKSPACE_TYPE_LABELS,
+} from "./components/settings-shared";
 
 import { ProfileSection } from "./features/profile";
 import { PreferencesSection } from "./features/preferences";
@@ -22,9 +26,9 @@ import { BackupSection } from "./features/backup";
 
 export function SettingsPage() {
   const isMobile = useIsMobile();
-  const [activeSection, setActiveSection] = useState<SettingsSectionId | null>(
-    null
-  );
+  const search = Route.useSearch() as { section?: SettingsSectionId };
+  const activeSection = search.section;
+  const navigate = Route.useNavigate();
 
   const appProfile = useAppStore((state) => state.appProfile);
   const profileId = appProfile?.id ?? "";
@@ -32,20 +36,23 @@ export function SettingsPage() {
   const activeProfile = profileQuery.data ?? appProfile;
   const settings = useProfileSettingsAutosave(activeProfile);
 
-  const handleSelectSection = useCallback((id: SettingsSectionId) => {
-    setActiveSection(id);
-  }, []);
+  const handleSelectSection = useCallback(
+    (id: SettingsSectionId) => {
+      navigate({ search: { section: id } });
+    },
+    [navigate]
+  );
 
   const handleBack = useCallback(() => {
-    setActiveSection(null);
-  }, []);
+    navigate({ search: {} });
+  }, [navigate]);
 
   const activeSectionLabel = activeSection
     ? SETTINGS_SECTIONS.find((s) => s.id === activeSection)?.label
     : null;
 
   // On desktop, default to "profile" when nothing selected
-  const resolvedSection = activeSection ?? (isMobile ? null : "profile");
+  const resolvedSection = activeSection ?? (isMobile ? undefined : "profile");
 
   // Desktop: show nav in left sidebar
   const sidebarContent = useMemo(() => {
@@ -81,7 +88,7 @@ export function SettingsPage() {
   };
 
   // Mobile: show iOS-style settings list
-  if (isMobile && resolvedSection === null) {
+  if (isMobile && resolvedSection === undefined) {
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
         <button
@@ -104,7 +111,7 @@ export function SettingsPage() {
         </button>
 
         <SettingsNav
-          activeSection={null}
+          activeSection={undefined}
           onSelect={handleSelectSection}
           variant="list"
         />
