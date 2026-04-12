@@ -1,8 +1,9 @@
-import { TableCell, TableRow } from "@workspace/ui/components/table";
-import type { TransactionItemProps } from "../types";
 import React from "react";
+
 import { Item } from "@workspace/ui/components/item";
-import { cn } from "@workspace/ui/lib/utils";
+
+import type { TransactionItemProps } from "../types";
+import type { TransactionType } from "@workspace/types";
 
 interface CellProps {
   primary: string;
@@ -36,23 +37,28 @@ export const TransactionItem = React.forwardRef<
       merchant,
       merchantSub,
       amount,
-      sign = "debit",
-      txDate,
+      type,
       className = "",
       onClick,
       "aria-label": ariaLabel,
     },
     ref
   ) => {
-    const amountColor =
-      sign === "credit"
-        ? "text-emerald-600 dark:text-emerald-400"
-        : "text-foreground";
+    function getAmountColor(type: TransactionType) {
+      if (type === "EXPENSE") {
+        return "text-red-600";
+      }
+
+      if (type === "INCOME") {
+        return "text-emerald-600 dark:text-emerald-400";
+      }
+
+      return "text-foreground";
+    }
 
     return (
       <Item
         ref={ref}
-        className={className}
         render={
           <button
             type="button"
@@ -60,9 +66,10 @@ export const TransactionItem = React.forwardRef<
             aria-label={ariaLabel ?? `${merchant} - ${amount}`}
             onClick={onClick}
             className={[
-              "group w-full cursor-pointer text-left outline-none hover:bg-accent",
-              "grid grid-cols-[1fr_3fr_1fr] items-center gap-x-1 gap-y-0 rounded-none px-2! py-1!",
+              "group w-full cursor-pointer border-none text-left outline-none hover:bg-accent",
+              "grid grid-cols-[1fr_3fr_1fr] items-center gap-x-1 gap-y-0 px-2! py-1!",
               "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
+              className,
             ].join(" ")}
           >
             <Cell
@@ -70,14 +77,14 @@ export const TransactionItem = React.forwardRef<
               secondary={categorySub ? [categorySub] : undefined}
             />
 
-            <Cell primary={merchant} secondary={[merchantSub ?? "", txDate]} />
+            <Cell primary={merchant} secondary={[merchantSub ?? ""]} />
 
             <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
-              <span
-                className={`block truncate text-xs text-foreground tabular-nums ${amountColor}`}
+              <small
+                className={`block truncate text-xs tabular-nums ${getAmountColor(type)}`}
               >
                 {amount}
-              </span>
+              </small>
             </div>
           </button>
         }

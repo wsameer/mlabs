@@ -14,31 +14,17 @@ import { TListLoader } from "./TListLoader";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { EmptyTransactions } from "./EmptyTransactions";
-import { ItemGroup } from "@workspace/ui/components/item";
-import { Separator } from "@workspace/ui/components/separator";
-import { format } from "date-fns";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemTitle,
+} from "@workspace/ui/components/item";
+import { format, getDate } from "date-fns";
 import { Badge } from "@workspace/ui/components/badge";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Group transactions by date for display */
-function groupByDate(
-  transactions: Transaction[]
-): Record<string, Transaction[]> {
-  const groups: Record<string, Transaction[]> = {};
-  for (const tx of transactions) {
-    const key = tx.date;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(tx);
-  }
-  return groups;
-}
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+import { calculateTransactionGroupTotals, groupByDate } from "../utils";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 
 export function TransactionsPage() {
   useLayoutConfig({
@@ -73,8 +59,17 @@ export function TransactionsPage() {
     return map;
   }, [categories]);
 
-  const transactions = data?.transactions ?? [];
+  const transactions = useMemo(() => data?.transactions ?? [], [data]);
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
+  const totalsByDate = useMemo(() => {
+    const totals: Record<string, { income: number; debit: number }> = {};
+
+    for (const dateKey of Object.keys(grouped)) {
+      totals[dateKey] = calculateTransactionGroupTotals(grouped[dateKey]);
+    }
+
+    return totals;
+  }, [grouped]);
   const sortedDates = useMemo(
     () => Object.keys(grouped).sort((a, b) => b.localeCompare(a)),
     [grouped]
@@ -97,22 +92,38 @@ export function TransactionsPage() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-3">
+    <div className="max-full flex flex-col gap-3">
+      <DateRangeFilter />
       {sortedDates.map((date) => {
         const groupedTransactions = grouped[date];
+        const totals = totalsByDate[date] ?? { income: 0, debit: 0 };
 
         return (
-          <section key={date} className="rounded-md border">
-            <div className="sticky flex items-center justify-between px-2 py-1.5">
-              <h3 className="z-10 flex flex-2 items-center gap-2 text-[0.65rem] font-semibold tracking-wider text-muted-foreground uppercase">
-                <Badge>{format(date, "EEE")}</Badge>
-                {format(date, "MMM d, yyyy")}
-              </h3>
-              <p className="flex-1 text-end text-xs">$1000</p>
-              <p className="flex-1 text-end text-xs">$1000</p>
-            </div>
+          <section
+            key={date}
+            className="w-full overflow-hidden rounded-md border"
+          >
+            <Item
+              variant="outline"
+              className="sticky top-0 z-10 mx-1 mt-1 w-auto px-2"
+            >
+              <ItemContent>
+                <ItemTitle>
+                  <Badge className="rounded-sm">{format(date, "EEE")}</Badge>
+                  <p className="font-semibold">{getDate(date)}</p>
+                </ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <p className="w-16 text-end text-xs text-blue-600">
+                  {formatCurrency(totals.income)}
+                </p>
+                <p className="w-16 text-end text-xs text-red-600">
+                  {formatCurrency(totals.debit)}
+                </p>
+              </ItemActions>
+            </Item>
             <ItemGroup className="flex flex-col gap-0 divide-y divide-border">
-              {groupedTransactions.map((tx) => {
+              {groupedTransactions.map((tx, index) => {
                 const cat = tx.categoryId
                   ? categoryMap.get(tx.categoryId)
                   : undefined;
@@ -126,8 +137,6 @@ export function TransactionsPage() {
                       ? "Transfer out"
                       : "Transfer in"
                     : (cat?.name ?? "Uncategorized");
-                const sign: "credit" | "debit" =
-                  tx.direction === "INFLOW" ? "credit" : "debit";
                 const formattedAmount = formatCurrency(Number(tx.signedAmount));
                 const merchantSub =
                   tx.type === "TRANSFER" && linkedAccountName
@@ -137,21 +146,23 @@ export function TransactionsPage() {
                     : accountName;
 
                 return (
-                  <>
-                    <TransactionItem
-                      key={tx.id}
-                      id={Number(tx.id) || 0}
-                      category={categoryName}
-                      categorySub={cat?.icon ?? undefined}
-                      merchant={tx.description || tx.type.toLowerCase()}
-                      merchantSub={merchantSub}
-                      txDate={date}
-                      amount={formattedAmount}
-                      sign={sign}
-                      onClick={() => setEditTx(tx)}
-                      aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
-                    />
-                  </>
+                  <TransactionItem
+                    key={tx.id}
+                    className={
+                      groupedTransactions.length - 1 === index
+                        ? "rounded-t-none! rounded-b-sm"
+                        : "rounded-none!"
+                    }
+                    id={Number(tx.id) || 0}
+                    category={categoryName}
+                    categorySub={cat?.icon ?? undefined}
+                    merchant={tx.description || tx.type.toLowerCase()}
+                    merchantSub={merchantSub}
+                    amount={formattedAmount}
+                    type={tx.type}
+                    onClick={() => setEditTx(tx)}
+                    aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
+                  />
                 );
               })}
             </ItemGroup>

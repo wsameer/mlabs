@@ -349,11 +349,13 @@ export type CreateIncomeExpense = z.infer<typeof CreateIncomeExpenseSchema>;
 export type CreateTransfer = z.infer<typeof CreateTransferSchema>;
 
 // Update payloads — type cannot be changed
-export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend({
-  accountId: z.uuid().optional(),
-  categoryId: z.uuid().optional(),
-  subcategoryId: z.uuid().nullable().optional(),
-});
+export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
+  {
+    accountId: z.uuid().optional(),
+    categoryId: z.uuid().optional(),
+    subcategoryId: z.uuid().nullable().optional(),
+  }
+);
 
 export const UpdateTransferSchema = TransactionBaseSchema.partial().extend({
   fromAccountId: z.uuid().optional(),

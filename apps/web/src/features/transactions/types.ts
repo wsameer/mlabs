@@ -1,3 +1,5 @@
+import type { TransactionType } from "@workspace/types";
+
 export interface TransactionItemProps {
   id: number;
   /** Transaction category label  (e.g. "Utilities") */
@@ -8,12 +10,9 @@ export interface TransactionItemProps {
   merchant: string;
   /** Account + date line (e.g. "TD Chequing Bank") */
   merchantSub?: string;
-  // Transaction date
-  txDate: string;
   /** Formatted amount string (e.g. "$600.00") */
   amount: string;
-  /** Optional sign for colouring: "debit" | "credit" */
-  sign?: "debit" | "credit";
+  type: TransactionType;
   /** Accessible label for the button */
   "aria-label"?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
