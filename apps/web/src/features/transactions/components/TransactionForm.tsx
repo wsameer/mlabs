@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
@@ -11,11 +12,11 @@ import { useUiActions } from "@/hooks/use-ui-store";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from "@workspace/ui/components/input-group";
 import {
@@ -28,7 +29,13 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@workspace/ui/components/field";
-import { DollarSignIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import { Calendar } from "@workspace/ui/components/calendar";
+import { CalendarIcon, DollarSignIcon } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Schemas
@@ -64,6 +71,125 @@ const TransferFormSchema = z
 
 type IncomeExpenseFormValues = z.infer<typeof IncomeExpenseFormSchema>;
 type TransferFormValues = z.infer<typeof TransferFormSchema>;
+
+// ---------------------------------------------------------------------------
+// Date Picker Field
+// ---------------------------------------------------------------------------
+
+/** Parse YYYY-MM-DD to a local Date (avoids timezone shift from new Date("YYYY-MM-DD")) */
+function parseLocalDate(dateStr: string): Date | undefined {
+  if (!dateStr) return undefined;
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/** Format Date to YYYY-MM-DD */
+function toDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Format Date for display in the input */
+function formatDisplayDate(date: Date | undefined): string {
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function isValidDate(date: Date | undefined): boolean {
+  return !!date && !isNaN(date.getTime());
+}
+
+interface DatePickerFieldProps {
+  id: string;
+  label: string;
+  value: string; // YYYY-MM-DD
+  onChange: (value: string) => void;
+  error?: string;
+}
+
+function DatePickerField({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+}: DatePickerFieldProps) {
+  const [open, setOpen] = useState(false);
+  const selectedDate = parseLocalDate(value);
+  const [month, setMonth] = useState<Date | undefined>(selectedDate);
+  const [displayValue, setDisplayValue] = useState(
+    formatDisplayDate(selectedDate)
+  );
+
+  return (
+    <Field data-invalid={!!error}>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <InputGroup>
+        <InputGroupInput
+          id={id}
+          value={displayValue}
+          placeholder="January 01, 2026"
+          className="text-xs"
+          onChange={(e) => {
+            setDisplayValue(e.target.value);
+            const parsed = new Date(e.target.value);
+            if (isValidDate(parsed)) {
+              onChange(toDateString(parsed));
+              setMonth(parsed);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setOpen(true);
+            }
+          }}
+        />
+        <InputGroupAddon align="inline-end">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger
+              render={
+                <InputGroupButton
+                  variant="ghost"
+                  aria-label="Select date"
+                >
+                  <CalendarIcon />
+                </InputGroupButton>
+              }
+            />
+            <PopoverContent
+              className="w-auto overflow-hidden p-0"
+              align="end"
+              alignOffset={-8}
+              sideOffset={10}
+            >
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                month={month}
+                onMonthChange={setMonth}
+                onSelect={(date) => {
+                  if (date) {
+                    onChange(toDateString(date));
+                    setDisplayValue(formatDisplayDate(date));
+                  }
+                  setOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        </InputGroupAddon>
+      </InputGroup>
+      {error && <FieldError>{error}</FieldError>}
+    </Field>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Props
@@ -218,18 +344,19 @@ function IncomeExpenseForm({
             )}
           />
 
-          <Field data-invalid={!!form.formState.errors.date}>
-            <FieldLabel htmlFor="tx-date">Date</FieldLabel>
-            <Input
-              id="tx-date"
-              type="date"
-              {...form.register("date")}
-              className="text-xs"
-            />
-            {form.formState.errors.date && (
-              <FieldError>{form.formState.errors.date.message}</FieldError>
+          <Controller
+            name="date"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <DatePickerField
+                id="tx-date"
+                label="Date"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+              />
             )}
-          </Field>
+          />
         </div>
 
         {/* Category */}
@@ -481,18 +608,19 @@ function TransferForm({ className }: { className?: string }) {
             )}
           />
 
-          <Field data-invalid={!!form.formState.errors.date}>
-            <FieldLabel htmlFor="tx-transfer-date">Date</FieldLabel>
-            <Input
-              id="tx-transfer-date"
-              type="date"
-              {...form.register("date")}
-              className="text-xs"
-            />
-            {form.formState.errors.date && (
-              <FieldError>{form.formState.errors.date.message}</FieldError>
+          <Controller
+            name="date"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <DatePickerField
+                id="tx-transfer-date"
+                label="Date"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+              />
             )}
-          </Field>
+          />
         </div>
 
         {/* Description */}
