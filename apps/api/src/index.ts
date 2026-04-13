@@ -1,7 +1,8 @@
 import { join } from "path";
 import { existsSync } from "fs";
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { requestId } from "hono/request-id";
@@ -22,7 +23,7 @@ import transactions from "./routes/transactions.js";
 import reports from "./routes/reports.js";
 import { logger } from "./libs/logger.js";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
 function getWebDistPath() {
   const explicitPath = process.env.WEB_DIST_PATH;
@@ -104,6 +105,18 @@ app.get("/api", (c) => {
 app.route("/api/health", health);
 app.route("/api/bootstrap", bootstrap);
 app.route("/api/profiles", profiles);
+
+// OpenAPI Spec & Swagger UI (public — before profile middleware)
+app.doc("/api/spec", {
+  openapi: "3.1.0",
+  info: {
+    title: "mLabs API",
+    version: "1.0.0",
+    description: "Personal finance app API — manage profiles, accounts, categories, and transactions.",
+  },
+});
+
+app.get("/api/docs", swaggerUI({ url: "/api/spec" }));
 
 // Profile middleware - validates X-Profile-Id header for all API routes
 app.use("/api/*", profileMiddleware);

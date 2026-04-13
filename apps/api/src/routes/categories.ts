@@ -1,129 +1,196 @@
-import { Hono } from "hono";
-import { z } from "zod/v4";
-import {
-  CategoryQuerySchema,
-  CreateCategorySchema,
-  UpdateCategorySchema,
-} from "@workspace/types";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import type {
-  ApiResponse,
-  Category,
   CategoryQuery,
-  CategoryWithSubcategories,
   CreateCategory,
   UpdateCategory,
 } from "@workspace/types";
 
-import { validate } from "../middleware/validator.js";
 import type { ProfileEnv } from "../middleware/profile.js";
 import { categoriesService } from "../services/categories.service.js";
+import {
+  apiResponseSchema,
+  ErrorResponseSchema,
+  IdParamSchema,
+  CategorySchema,
+  CategoryWithSubcategoriesSchema,
+} from "../libs/openapi-schemas.js";
 
-const categoriesRoute = new Hono<ProfileEnv>();
-const CategoryParamsSchema = z.object({
-  id: z.uuid(),
+const categoriesRoute = new OpenAPIHono<ProfileEnv>();
+
+// ---------------------------------------------------------------------------
+// Schemas
+// ---------------------------------------------------------------------------
+
+const CategoryQueryRouteSchema = z.object({
+  type: z.enum(["INCOME", "EXPENSE"]).optional(),
+  isActive: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  parentId: z.string().uuid().optional(),
+  search: z.string().optional(),
 });
 
-const CategoryQueryRouteSchema = CategoryQuerySchema.extend({
-  isActive: z
-    .enum(["true", "false"])
-    .transform((value) => value === "true")
-    .optional(),
+const CreateCategoryBodySchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1).max(100),
+  type: z.enum(["INCOME", "EXPENSE"]),
+  icon: z.string().max(50).optional(),
+  color: z.string().optional(),
+  parentId: z.string().uuid().nullable().optional(),
+  isActive: z.boolean().default(true),
+  sortOrder: z.number().int().min(0).default(0),
 });
 
-categoriesRoute.get(
-  "/",
-  validate("query", CategoryQueryRouteSchema),
-  async (c) => {
-    const profileId = c.get("profileId");
-    const filters = c.req.valid("query") as CategoryQuery;
-    const categoryList = await categoriesService.listCategories(
-      profileId,
-      filters
-    );
+const UpdateCategoryBodySchema = CreateCategoryBodySchema.partial();
 
-    const response: ApiResponse<CategoryWithSubcategories[]> = {
-      success: true,
-      data: categoryList,
-    };
+// ---------------------------------------------------------------------------
+// GET / — List categories
+// ---------------------------------------------------------------------------
 
-    return c.json(response);
-  }
-);
+const listCategoriesRoute = createRoute({
+  method: "get",
+  path: "/",
+  tags: ["Categories"],
+  summary: "List categories",
+  description: "Returns categories with nested subcategories for the current profile.",
+  request: { query: CategoryQueryRouteSchema },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(z.array(CategoryWithSubcategoriesSchema)),
+        },
+      },
+      description: "List of categories",
+    },
+  },
+});
 
-categoriesRoute.get(
-  "/:id",
-  validate("param", CategoryParamsSchema),
-  async (c) => {
-    const profileId = c.get("profileId");
-    const { id } = c.req.valid("param");
-    const category = await categoriesService.getCategoryById(profileId, id);
-
-    const response: ApiResponse<Category> = {
-      success: true,
-      data: category,
-    };
-
-    return c.json(response);
-  }
-);
-
-categoriesRoute.post("/", validate("json", CreateCategorySchema), async (c) => {
-  const payload = c.req.valid("json") as CreateCategory;
+categoriesRoute.openapi(listCategoriesRoute, async (c) => {
   const profileId = c.get("profileId");
-  const createdCategory = await categoriesService.createCategory(
-    profileId,
-    payload
-  );
-
-  const response: ApiResponse<Category> = {
-    success: true,
-    data: createdCategory,
-  };
-
-  return c.json(response, 201);
+  const filters = c.req.valid("query") as unknown as CategoryQuery;
+  const categoryList = await categoriesService.listCategories(profileId, filters);
+  return c.json({ success: true as const, data: categoryList });
 });
 
-categoriesRoute.patch(
-  "/:id",
-  validate("param", CategoryParamsSchema),
-  validate("json", UpdateCategorySchema),
-  async (c) => {
-    const profileId = c.get("profileId");
-    const { id } = c.req.valid("param");
-    const payload = c.req.valid("json") as UpdateCategory;
-    const updatedCategory = await categoriesService.updateCategory(
-      profileId,
-      id,
-      payload
-    );
+// ---------------------------------------------------------------------------
+// GET /:id — Get category by ID
+// ---------------------------------------------------------------------------
 
-    const response: ApiResponse<Category> = {
-      success: true,
-      data: updatedCategory,
-    };
+const getCategoryRoute = createRoute({
+  method: "get",
+  path: "/{id}",
+  tags: ["Categories"],
+  summary: "Get category by ID",
+  request: { params: IdParamSchema },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      description: "Category details",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Category not found",
+    },
+  },
+});
 
-    return c.json(response);
-  }
-);
+categoriesRoute.openapi(getCategoryRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const { id } = c.req.valid("param");
+  const category = await categoriesService.getCategoryById(profileId, id);
+  return c.json({ success: true as const, data: category });
+});
 
-categoriesRoute.delete(
-  "/:id",
-  validate("param", CategoryParamsSchema),
-  async (c) => {
-    const profileId = c.get("profileId");
-    const { id } = c.req.valid("param");
-    const deletedCategory = await categoriesService.deleteCategory(
-      profileId,
-      id
-    );
+// ---------------------------------------------------------------------------
+// POST / — Create category
+// ---------------------------------------------------------------------------
 
-    const response: ApiResponse<Category> = {
-      success: true,
-      data: deletedCategory,
-    };
+const createCategoryRoute = createRoute({
+  method: "post",
+  path: "/",
+  tags: ["Categories"],
+  summary: "Create category",
+  request: {
+    body: {
+      content: { "application/json": { schema: CreateCategoryBodySchema } },
+    },
+  },
+  responses: {
+    201: {
+      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      description: "Category created",
+    },
+  },
+});
 
-    return c.json(response);
-  }
-);
+categoriesRoute.openapi(createCategoryRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const payload = c.req.valid("json") as unknown as CreateCategory;
+  const createdCategory = await categoriesService.createCategory(profileId, payload);
+  return c.json({ success: true as const, data: createdCategory }, 201);
+});
+
+// ---------------------------------------------------------------------------
+// PATCH /:id — Update category
+// ---------------------------------------------------------------------------
+
+const updateCategoryRoute = createRoute({
+  method: "patch",
+  path: "/{id}",
+  tags: ["Categories"],
+  summary: "Update category",
+  request: {
+    params: IdParamSchema,
+    body: {
+      content: { "application/json": { schema: UpdateCategoryBodySchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      description: "Category updated",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Category not found",
+    },
+  },
+});
+
+categoriesRoute.openapi(updateCategoryRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const { id } = c.req.valid("param");
+  const payload = c.req.valid("json") as unknown as UpdateCategory;
+  const updatedCategory = await categoriesService.updateCategory(profileId, id, payload);
+  return c.json({ success: true as const, data: updatedCategory });
+});
+
+// ---------------------------------------------------------------------------
+// DELETE /:id — Delete category
+// ---------------------------------------------------------------------------
+
+const deleteCategoryRoute = createRoute({
+  method: "delete",
+  path: "/{id}",
+  tags: ["Categories"],
+  summary: "Delete category",
+  request: { params: IdParamSchema },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      description: "Category deleted",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Category not found",
+    },
+  },
+});
+
+categoriesRoute.openapi(deleteCategoryRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const { id } = c.req.valid("param");
+  const deletedCategory = await categoriesService.deleteCategory(profileId, id);
+  return c.json({ success: true as const, data: deletedCategory });
+});
 
 export default categoriesRoute;
