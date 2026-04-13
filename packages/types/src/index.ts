@@ -44,6 +44,10 @@ export {
   BootstrapSchema,
   OnboardingAccountSchema,
   ProfileParamsSchema,
+  // Reports
+  CategoryTotalsQuerySchema,
+  CategoryTotalSchema,
+  CategoryTotalsResponseSchema,
   // API response
   ApiResponseSchema,
   // Validation
@@ -94,6 +98,10 @@ export type {
   Bootstrap,
   BootstrapStatus,
   ProfileParams,
+  // Reports
+  CategoryTotalsQuery,
+  CategoryTotal,
+  CategoryTotalsResponse,
   // API response
   ApiResponse,
 } from "./schema.js";

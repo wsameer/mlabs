@@ -448,6 +448,40 @@ export const TransactionQuerySchema = z.object({
 export type TransactionQuery = z.input<typeof TransactionQuerySchema>;
 
 // ============================================================================
+// Reports
+// ============================================================================
+
+export const CategoryTotalsQuerySchema = z.object({
+  startDate: z.string(),
+  endDate: z.string(),
+  type: z.enum(["INCOME", "EXPENSE"]),
+  accountId: z.uuid().optional(),
+});
+
+export type CategoryTotalsQuery = z.infer<typeof CategoryTotalsQuerySchema>;
+
+export const CategoryTotalSchema = z.object({
+  categoryId: z.string().nullable(),
+  categoryName: z.string(),
+  categoryIcon: z.string().nullable(),
+  categoryColor: z.string().nullable(),
+  total: z.string(),
+  percentage: z.number(),
+  transactionCount: z.number(),
+});
+
+export type CategoryTotal = z.infer<typeof CategoryTotalSchema>;
+
+export const CategoryTotalsResponseSchema = z.object({
+  items: z.array(CategoryTotalSchema),
+  grandTotal: z.string(),
+});
+
+export type CategoryTotalsResponse = z.infer<
+  typeof CategoryTotalsResponseSchema
+>;
+
+// ============================================================================
 // API Response Wrapper
 // ============================================================================
 

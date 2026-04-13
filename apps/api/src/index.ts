@@ -19,6 +19,7 @@ import profiles from "./routes/profiles.js";
 import accounts from "./routes/accounts.js";
 import categories from "./routes/categories.js";
 import transactions from "./routes/transactions.js";
+import reports from "./routes/reports.js";
 import { logger } from "./libs/logger.js";
 
 const app = new Hono();
@@ -111,6 +112,7 @@ app.use("/api/*", profileMiddleware);
 app.route("/api/categories", categories);
 app.route("/api/accounts", accounts);
 app.route("/api/transactions", transactions);
+app.route("/api/reports", reports);
 
 // Static File Serving (Production Only)
 if (env.NODE_ENV === "production") {
