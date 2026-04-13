@@ -13,6 +13,6 @@ export const MAINTENANCE_ROUTE = "/maintenance" as keyof FileRoutesByPath;
 export const ONBOARDING_ROUTE = "/onboarding" as keyof FileRoutesByPath;
 export const PROFILES_ROUTE = "/profiles" as keyof FileRoutesByPath;
 
-export const ALL_DATA_START = new Date(2022, 3, 1);
+export const ALL_DATA_START = new Date(2020, 3, 1);
 
 export const DEFAULT_GRAIN: TimeGrain = "monthly";

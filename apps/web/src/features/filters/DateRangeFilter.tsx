@@ -1,14 +1,9 @@
-import { useMemo, useState } from "react";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-} from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import {
   endOfDay,
   endOfMonth,
   endOfYear,
-  format,
   getYear,
   startOfDay,
   startOfMonth,
@@ -21,7 +16,11 @@ import {
   useTimeGrain,
 } from "@/hooks/use-filters";
 import { useTimezone } from "@/hooks/use-timezone";
-import { ALL_DATA_START } from "@/constants";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -29,20 +28,9 @@ import {
   getNavigationBoundaries,
 } from "@/lib/date-navigation";
 import { nowInTz } from "@/lib/timezone";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@workspace/ui/components/popover";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@workspace/ui/components/native-select";
 
-const MONTH_OPTIONS = Array.from({ length: 12 }, (_, monthIndex) => ({
-  label: format(new Date(2026, monthIndex, 1), "MMM"),
-  value: monthIndex,
-}));
+import { ALL_DATA_START } from "@/constants";
+import { MonthPicker } from "./components/MonthPicker";
 
 const isPickerEnabled = (timeGrain: ReturnType<typeof useTimeGrain>) =>
   timeGrain === "daily" || timeGrain === "monthly" || timeGrain === "yearly";
@@ -105,6 +93,21 @@ export const DateRangeFilter = () => {
     });
   };
 
+  const getVariant = useCallback(
+    (year: number) => {
+      if (new Date().getFullYear() === year) {
+        return "secondary";
+      }
+
+      if (getYear(to) === year) {
+        return "default";
+      }
+
+      return "ghost";
+    },
+    [to]
+  );
+
   const renderPickerContent = () => {
     if (timeGrain === "daily") {
       return (
@@ -120,70 +123,26 @@ export const DateRangeFilter = () => {
 
     if (timeGrain === "monthly") {
       return (
-        <div className="w-72 space-y-3 p-1">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8"
-              onClick={() => setVisibleMonthYear((year) => year - 1)}
-              disabled={visibleMonthYear <= getYear(ALL_DATA_START)}
-            >
-              <ChevronLeftIcon className="size-4" />
-            </Button>
-            <div className="text-sm font-medium">{visibleMonthYear}</div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8"
-              onClick={() => setVisibleMonthYear((year) => year + 1)}
-              disabled={visibleMonthYear >= getYear(today)}
-            >
-              <ChevronRightIcon className="size-4" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {MONTH_OPTIONS.map((month) => {
-              const monthDate = new Date(visibleMonthYear, month.value, 1);
-              const disabled =
-                monthDate < startOfMonth(ALL_DATA_START) ||
-                monthDate > startOfMonth(today);
-              const isSelected =
-                getYear(from) === visibleMonthYear &&
-                from.getMonth() === month.value;
-
-              return (
-                <Button
-                  key={month.value}
-                  variant={isSelected ? "default" : "ghost"}
-                  className="h-10 rounded-md"
-                  disabled={disabled}
-                  onClick={() => handleMonthSelect(month.value)}
-                >
-                  {month.label}
-                </Button>
-              );
-            })}
-          </div>
-        </div>
+        <MonthPicker
+          visibleMonthYear={visibleMonthYear}
+          setVisibleMonthYear={setVisibleMonthYear}
+          handleMonthSelect={handleMonthSelect}
+        />
       );
     }
 
     if (timeGrain === "yearly") {
       return (
         <div className="w-48 p-1">
-          <NativeSelect
-            value={String(getYear(to))}
-            onChange={(event) => handleYearSelect(event.target.value)}
-            className="w-full"
-          >
-            {yearOptions.map((year) => (
-              <NativeSelectOption key={year} value={String(year)}>
-                {year}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          {yearOptions.map((year) => (
+            <Button
+              variant={getVariant(year)}
+              key={year}
+              onClick={() => handleYearSelect(String(year))}
+            >
+              {year}
+            </Button>
+          ))}
         </div>
       );
     }
@@ -200,7 +159,7 @@ export const DateRangeFilter = () => {
         disabled={prevDisabled}
         onClick={() => navigate("prev")}
       >
-        <ChevronLeftIcon />
+        <ChevronLeftIcon className="size-4" />
       </Button>
 
       <Popover
@@ -220,13 +179,10 @@ export const DateRangeFilter = () => {
               disabled={!pickerEnabled}
             >
               {getDisplayLabel(timeGrain, { from, to })}
-              {pickerEnabled && (
-                <ChevronDownIcon className="size-4 opacity-60" />
-              )}
             </Button>
           }
         />
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0" align="center">
           {renderPickerContent()}
         </PopoverContent>
       </Popover>
@@ -238,7 +194,7 @@ export const DateRangeFilter = () => {
         disabled={nextDisabled}
         onClick={() => navigate("next")}
       >
-        <ChevronRightIcon />
+        <ChevronRightIcon className="size-4" />
       </Button>
     </div>
   );

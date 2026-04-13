@@ -53,9 +53,9 @@ async function seed() {
       })
       .returning();
 
-    console.log(`✅ Created default profile: ${defaultProfile.id}`);
+    console.log(`✅ Created default profile: ${defaultProfile?.id}`);
 
-    const profileId: string = defaultProfile.id;
+    const profileId: string = defaultProfile!.id;
 
     // ============================================================================
     // Seed Default Categories
@@ -78,12 +78,13 @@ async function seed() {
       .insert(accounts)
       .values({
         profileId,
-        name: "TD Chequing",
+        name: "TD Unlimited Chequing",
         group: "chequing",
         balance: "4250.75",
         currency: "CAD",
         icon: "wallet",
         notes: "Primary chequing account",
+        institutionName: "TD",
         includeInNetWorth: true,
         sortOrder: 1,
       })
@@ -99,6 +100,7 @@ async function seed() {
         currency: "CAD",
         icon: "piggy-bank",
         notes: "Emergency fund",
+        institutionName: "Equitable Bank",
         includeInNetWorth: true,
         sortOrder: 2,
       })
@@ -120,7 +122,7 @@ async function seed() {
         notes: "Primary rewards card",
         linkedAccountId: checkingAccount.id,
         includeInNetWorth: false,
-        sortOrder: 3,
+        sortOrder: 7,
       })
       .returning();
 
@@ -131,13 +133,36 @@ async function seed() {
     await db.insert(accounts).values([
       {
         profileId,
-        name: "Wealthsimple",
+        name: "WealthSimple Cash",
+        group: "chequing",
+        balance: "19111.53",
+        currency: "CAD",
+        icon: "wallet",
+        institutionName: "WealthSimple",
+        includeInNetWorth: true,
+        sortOrder: 3,
+      },
+      {
+        profileId,
+        name: "TFSA",
         group: "investment",
         balance: "45000.00",
         currency: "CAD",
         icon: "trending-up",
+        institutionName: "WealthSimple",
         includeInNetWorth: true,
         sortOrder: 4,
+      },
+      {
+        profileId,
+        name: "RRSP",
+        group: "investment",
+        balance: "20000.00",
+        currency: "CAD",
+        icon: "trending-up",
+        institutionName: "WealthSimple",
+        includeInNetWorth: true,
+        sortOrder: 5,
       },
       {
         profileId,
@@ -147,11 +172,11 @@ async function seed() {
         currency: "CAD",
         icon: "banknote",
         includeInNetWorth: true,
-        sortOrder: 5,
+        sortOrder: 6,
       },
     ]);
 
-    console.log("✅ Created 5 accounts");
+    console.log("✅ Created 7 accounts");
 
     // ============================================================================
     // Seed Transactions
