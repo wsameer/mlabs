@@ -21,6 +21,14 @@ import {
 } from "@workspace/ui/components/drawer";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
 import { cn } from "@workspace/ui/lib/utils";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Badge } from "@workspace/ui/components/badge";
 
 export interface TransactionsSummaryProps {
   transactions: Transaction[];
@@ -139,95 +147,105 @@ function SummaryContent({
   return (
     <div className="flex flex-col gap-5">
       {/* Totals */}
-      <section className="flex flex-col gap-2">
-        <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Summary
-        </h3>
-        <SummaryRow label="Income" value={income} variant="income" />
-        <SummaryRow label="Expenses" value={expenses} variant="expense" />
-        <Separator />
-        <SummaryRow label="Net" value={net} variant="net" />
-      </section>
+      <Card size="sm">
+        <CardHeader>
+          <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+            Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-1 flex-col justify-end">
+          <Item variant="muted" className="flex-col items-stretch">
+            <ItemContent className="gap-3">
+              <SummaryRow label="Income" value={income} variant="income" />
+              <SummaryRow label="Expenses" value={expenses} variant="expense" />
+              <Separator />
+              <SummaryRow label="Net" value={net} variant="net" />
+            </ItemContent>
+          </Item>
+        </CardContent>
+      </Card>
 
       {/* Spending by Category */}
       {categories.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <Card size="sm" className="mx-auto w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
               Spending by Category
-            </h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              title="Set budgets"
-              onClick={() => toast.info("Budgeting is coming soon!")}
-            >
-              <SettingsIcon className="size-3" />
-            </Button>
-          </div>
-          <ItemGroup>
-            {categories.map((cat) => (
-              <Item
-                key={cat.id}
-                variant="muted"
-                className="flex-col items-stretch"
+            </CardTitle>
+            <CardAction>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6"
+                title="Set budgets"
+                onClick={() => toast.info("Budgeting is coming soon!")}
               >
-                <ItemContent className="flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <ItemDescription className="flex items-center gap-1.5 text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                      <span
-                        className="inline-block size-2 shrink-0 rounded-full"
-                        style={{
-                          backgroundColor:
-                            cat.color ?? "var(--muted-foreground)",
-                        }}
-                      />
-                      <span className="truncate">
+                <SettingsIcon className="size-3" />
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-72">
+              <ItemGroup>
+                {categories.map((cat) => (
+                  <Item
+                    key={cat.id}
+                    variant="muted"
+                    size={"xs"}
+                    className="flex-col items-stretch"
+                  >
+                    <ItemContent className="gap-3">
+                      <ItemDescription className="cn-font-heading text-[9px] font-medium tracking-wider text-muted-foreground uppercase">
                         {cat.icon ? `${cat.icon} ` : ""}
                         {cat.name}
+                      </ItemDescription>
+                      <span className="text-sm font-medium tabular-nums">
+                        {formatCurrency(cat.total)}
                       </span>
-                    </ItemDescription>
-                    <span className="text-sm font-semibold tabular-nums">
-                      {formatCurrency(cat.total)}
-                    </span>
-                  </div>
-                  <Progress value={100} />
-                </ItemContent>
-                <ItemFooter>
-                  <span className="text-xs text-muted-foreground">
-                    100% of budget
-                  </span>
-                  <span className="text-xs font-medium tabular-nums">
-                    {cat.percentage}% of total
-                  </span>
-                </ItemFooter>
-              </Item>
-            ))}
-          </ItemGroup>
-        </section>
+                      <Progress value={100} />
+                    </ItemContent>
+                    <ItemFooter>
+                      <span className="text-xs text-muted-foreground">
+                        100%
+                      </span>
+                      <span className="text-xs font-medium tabular-nums">
+                        {cat.percentage}% of total
+                      </span>
+                    </ItemFooter>
+                  </Item>
+                ))}
+              </ItemGroup>
+            </ScrollArea>
+          </CardContent>
+        </Card>
       )}
 
       {/* By Account */}
       {accounts.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            By Account
-          </h3>
-          <div className="flex flex-col gap-1.5">
-            {accounts.map((acct) => (
-              <div key={acct.id} className="flex items-center gap-2 text-xs">
-                <span className="truncate">{acct.name}</span>
-                <span className="ml-auto shrink-0 text-muted-foreground tabular-nums">
-                  {acct.percentage}%
-                </span>
-                <span className="w-20 shrink-0 text-right tabular-nums">
-                  {formatCurrency(acct.total)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Card size="sm">
+          <CardHeader>
+            <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+              By Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ItemGroup>
+              {accounts.map((acct) => (
+                <Item key={acct.id} variant="muted" size={"xs"}>
+                  <ItemContent className="truncate">
+                    <p className="truncate">{acct.name}</p>
+                  </ItemContent>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <Badge variant="outline">{acct.percentage}%</Badge>
+                    <span className="font-medium tabular-nums">
+                      {formatCurrency(acct.total)}
+                    </span>
+                  </div>
+                </Item>
+              ))}
+            </ItemGroup>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -249,7 +267,7 @@ export function TransactionsSummaryContent({
   );
 
   return (
-    <div className="p-3">
+    <div className="px-0.5 py-2">
       <SummaryContent
         income={income}
         expenses={expenses}
@@ -326,7 +344,7 @@ function SummaryRow({
       <span className="text-sm text-muted-foreground">{label}</span>
       <span
         className={cn(
-          "text-xs font-medium tabular-nums",
+          "text-sm font-medium tabular-nums",
           variant === "income" && "text-emerald-600 dark:text-emerald-400",
           variant === "expense" && "text-red-600 dark:text-red-400",
           variant === "net" && value >= 0
