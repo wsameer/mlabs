@@ -7,22 +7,20 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@workspace/ui/components/chart";
+import type { CategoryColorMap } from "@/lib/category-colors";
 import { NoData } from "./NoData";
-
-const FALLBACK_COLORS = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-];
 
 type CashflowPieChartProps = {
   data: CategoryTotalsResponse | undefined;
+  colorMap: CategoryColorMap;
   isLoading: boolean;
 };
 
-export function CashflowPieChart({ data, isLoading }: CashflowPieChartProps) {
+export function CashflowPieChart({
+  data,
+  colorMap,
+  isLoading,
+}: CashflowPieChartProps) {
   if (isLoading) {
     return (
       <div className="flex h-[250px] items-center justify-center">
@@ -35,31 +33,36 @@ export function CashflowPieChart({ data, isLoading }: CashflowPieChartProps) {
     return <NoData />;
   }
 
-  return <PieChartContent data={data} />;
+  return <PieChartContent data={data} colorMap={colorMap} />;
 }
 
-function PieChartContent({ data }: { data: CategoryTotalsResponse }) {
+function PieChartContent({
+  data,
+  colorMap,
+}: {
+  data: CategoryTotalsResponse;
+  colorMap: CategoryColorMap;
+}) {
   const chartData = useMemo(
     () =>
-      data.items.map((item, i) => ({
+      data.items.map((item) => ({
         category: item.categoryName,
         total: Number(item.total),
-        fill: item.categoryColor ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+        fill: colorMap[item.categoryId ?? "uncategorized"],
       })),
-    [data.items]
+    [data.items, colorMap]
   );
 
   const chartConfig = useMemo(() => {
     const config: ChartConfig = {};
-    data.items.forEach((item, i) => {
+    data.items.forEach((item) => {
       config[item.categoryName] = {
         label: item.categoryName,
-        color:
-          item.categoryColor ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+        color: colorMap[item.categoryId ?? "uncategorized"],
       };
     });
     return config;
-  }, [data.items]);
+  }, [data.items, colorMap]);
 
   const grandTotal = Number(data.grandTotal);
 

@@ -438,7 +438,11 @@ function IncomeExpenseForm({
         </Button>
       </div>
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="submit" disabled={createTransaction.isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={createTransaction.isPending}
+        >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>
@@ -643,7 +647,11 @@ function TransferForm({ className }: { className?: string }) {
         </Button>
       </div>
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="submit" disabled={createTransaction.isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={createTransaction.isPending}
+        >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>

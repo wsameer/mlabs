@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { toast } from "sonner";
 import type { Account } from "@workspace/types";
@@ -22,6 +23,8 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@workspace/ui/components/drawer";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
 
 interface Props {
   open: boolean;
@@ -32,13 +35,23 @@ interface Props {
 export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const deleteAccount = useDeleteAccount();
+  const [confirmationText, setConfirmationText] = useState("");
+
+  const isConfirmed =
+    confirmationText.trim().toLowerCase() ===
+    (account?.name ?? "").trim().toLowerCase();
+
+  function handleOpenChange(next: boolean) {
+    if (!next) setConfirmationText("");
+    onOpenChange(next);
+  }
 
   function handleClose() {
-    onOpenChange(false);
+    handleOpenChange(false);
   }
 
   function handleDelete() {
-    if (!account) return;
+    if (!account || !isConfirmed) return;
 
     deleteAccount.mutate(account.id, {
       onSuccess: () => {
@@ -52,12 +65,11 @@ export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
   }
 
   const title = "Delete account?";
-  const description =
-    "This will permanently delete this account and all of its transaction history. This action cannot be undone.";
+  const description = "This action cannot be undone.";
 
   if (isDesktop) {
     return (
-      <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialog open={open} onOpenChange={handleOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader className="text-left">
             <AlertDialogTitle className="text-left">{title}</AlertDialogTitle>
@@ -65,6 +77,9 @@ export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
           </AlertDialogHeader>
           <DeleteContent
             accountName={account?.name}
+            confirmationText={confirmationText}
+            onConfirmationChange={setConfirmationText}
+            isConfirmed={isConfirmed}
             isPending={deleteAccount.isPending}
             onCancel={handleClose}
             onDelete={handleDelete}
@@ -75,7 +90,7 @@ export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle className="text-left">{title}</DrawerTitle>
@@ -85,6 +100,9 @@ export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
         </DrawerHeader>
         <DeleteContent
           accountName={account?.name}
+          confirmationText={confirmationText}
+          onConfirmationChange={setConfirmationText}
+          isConfirmed={isConfirmed}
           isPending={deleteAccount.isPending}
           onCancel={handleClose}
           onDelete={handleDelete}
@@ -102,6 +120,9 @@ export function DeleteAccountDialog({ open, onOpenChange, account }: Props) {
 
 interface DeleteContentProps {
   accountName?: string;
+  confirmationText: string;
+  onConfirmationChange: (value: string) => void;
+  isConfirmed: boolean;
   isPending: boolean;
   onCancel: () => void;
   onDelete: () => void;
@@ -110,6 +131,9 @@ interface DeleteContentProps {
 
 function DeleteContent({
   accountName,
+  confirmationText,
+  onConfirmationChange,
+  isConfirmed,
   isPending,
   onCancel,
   onDelete,
@@ -134,12 +158,28 @@ function DeleteContent({
         </div>
       )}
 
+      {accountName && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="confirm-account-name" className="text-sm">
+            To confirm, type<span>{accountName}</span>below
+          </Label>
+          <Input
+            id="confirm-account-name"
+            value={confirmationText}
+            onChange={(e) => onConfirmationChange(e.target.value)}
+            placeholder={accountName}
+            autoComplete="off"
+            autoFocus
+          />
+        </div>
+      )}
+
       <div className="flex justify-end gap-2 md:hidden">
         <Button
           type="button"
           variant="destructive"
           onClick={onDelete}
-          disabled={isPending}
+          disabled={!isConfirmed || isPending}
           className="w-full"
         >
           {isPending ? "Deleting..." : "Delete permanently"}
@@ -154,7 +194,7 @@ function DeleteContent({
           type="button"
           variant="destructive"
           onClick={onDelete}
-          disabled={isPending}
+          disabled={!isConfirmed || isPending}
         >
           {isPending ? "Deleting..." : "Delete permanently"}
         </Button>

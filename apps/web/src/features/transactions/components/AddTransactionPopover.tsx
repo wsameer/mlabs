@@ -27,7 +27,7 @@ export function AddTransactionPopover() {
     <Dialog open={isOpen} onOpenChange={setOpenCreateTransaction}>
       <DialogContent className="sm:max-w-131.25">
         <DialogHeader>
-          <DialogTitle className="text-left text-xl font-light">
+          <DialogTitle className="text-left text-lg">
             Record
             {isTransfer ? " a " : " an "}
             {selectedTransactionType}
@@ -36,7 +36,7 @@ export function AddTransactionPopover() {
             Fill in the details below to record your transaction.
           </DialogDescription>
         </DialogHeader>
-        <div className="-mx-4 no-scrollbar max-h-[50vh] overflow-y-auto px-4">
+        <div className="no-scrollbar max-h-[60svh] overflow-y-auto">
           <TransactionsWrapper />
         </div>
         <DialogFooter>

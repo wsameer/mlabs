@@ -42,6 +42,7 @@ import {
   FieldSeparator,
   FieldTitle,
 } from "@workspace/ui/components/field";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 const ACCOUNT_GROUPS: AccountGroup[] = [
   "chequing",
@@ -93,8 +94,15 @@ const ASSET_TYPES = [
 const AddAccountFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   group: z.enum([
-    "chequing", "savings", "cash", "credit_card",
-    "investment", "loan", "mortgage", "asset", "other",
+    "chequing",
+    "savings",
+    "cash",
+    "credit_card",
+    "investment",
+    "loan",
+    "mortgage",
+    "asset",
+    "other",
   ]),
   balance: z.string().optional(),
   currency: z.string().length(3).default("CAD"),
@@ -225,7 +233,7 @@ export function AddAccountDialog({ open, onOpenChange, defaultGroup }: Props) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
@@ -249,14 +257,12 @@ export function AddAccountDialog({ open, onOpenChange, defaultGroup }: Props) {
             {description}
           </DrawerDescription>
         </DrawerHeader>
-        <div className="max-h-[60vh] overflow-y-auto">
-          <AccountForm
-            form={form}
-            onSubmit={onSubmit}
-            isPending={createAccount.isPending}
-            className="px-4"
-          />
-        </div>
+        <AccountForm
+          form={form}
+          onSubmit={onSubmit}
+          isPending={createAccount.isPending}
+          className="px-4"
+        />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -291,7 +297,8 @@ function buildMetadata(data: AddAccountFormData): Record<string, unknown> {
 
   if (g === "mortgage") {
     if (data.termMonths) meta.termMonths = parseInt(data.termMonths, 10);
-    if (data.amortizationMonths) meta.amortizationMonths = parseInt(data.amortizationMonths, 10);
+    if (data.amortizationMonths)
+      meta.amortizationMonths = parseInt(data.amortizationMonths, 10);
     if (data.startDate) meta.startDate = data.startDate;
     if (data.renewalDate) meta.renewalDate = data.renewalDate;
     if (data.monthlyPayment) meta.monthlyPayment = data.monthlyPayment;
@@ -328,380 +335,394 @@ function AccountForm({
       onSubmit={form.handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-4", className)}
     >
-      <FieldGroup>
-        {/* Core fields */}
-        <Field data-invalid={!!form.formState.errors.name}>
-          <FieldLabel htmlFor="account-name">Name</FieldLabel>
-          <Input
-            id="account-name"
-            {...form.register("name")}
-            placeholder="e.g. Main Chequing"
-            autoComplete="off"
-            autoFocus
-          />
-          {form.formState.errors.name && (
-            <FieldError>{form.formState.errors.name.message}</FieldError>
-          )}
-        </Field>
-
-        <Field data-invalid={!!form.formState.errors.group}>
-          <FieldLabel htmlFor="account-group">Group</FieldLabel>
-          <NativeSelect
-            className="w-full"
-            value={groupValue}
-            onChange={(e) =>
-              form.setValue("group", e.target.value as AccountGroup, {
-                shouldValidate: true,
-              })
-            }
-          >
-            {ACCOUNT_GROUPS.map((g) => (
-              <NativeSelectOption key={g} value={g}>
-                {ACCOUNT_GROUP_METADATA[g].label}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
-        </Field>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel htmlFor="account-balance">Opening balance</FieldLabel>
+      <ScrollArea className="max-h-[60vh]">
+        <FieldGroup>
+          {/* Core fields */}
+          <Field data-invalid={!!form.formState.errors.name}>
+            <FieldLabel htmlFor="account-name">Name</FieldLabel>
             <Input
-              id="account-balance"
-              {...form.register("balance")}
-              placeholder="0.00"
+              id="account-name"
+              {...form.register("name")}
+              placeholder="e.g. Main Chequing"
               autoComplete="off"
-              inputMode="decimal"
+              autoFocus
             />
+            {form.formState.errors.name && (
+              <FieldError>{form.formState.errors.name.message}</FieldError>
+            )}
           </Field>
-          <Field>
-            <FieldLabel htmlFor="account-currency">Currency</FieldLabel>
-            <Input
-              id="account-currency"
-              {...form.register("currency")}
-              placeholder="CAD"
-              autoComplete="off"
-              maxLength={3}
-            />
-          </Field>
-        </div>
 
-        <FieldSeparator>Details</FieldSeparator>
-
-        <Field>
-          <FieldLabel htmlFor="account-institution">Institution</FieldLabel>
-          <Input
-            id="account-institution"
-            {...form.register("institutionName")}
-            placeholder="e.g. TD Bank"
-            autoComplete="off"
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="account-number">Account number (last 4)</FieldLabel>
-          <Input
-            id="account-number"
-            {...form.register("accountNumber")}
-            placeholder="e.g. 1234"
-            autoComplete="off"
-            maxLength={50}
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="account-description">Description</FieldLabel>
-          <Input
-            id="account-description"
-            {...form.register("description")}
-            placeholder="Short description"
-            autoComplete="off"
-          />
-        </Field>
-
-        {/* Credit card fields */}
-        {groupValue === "credit_card" && (
-          <Field>
-            <FieldLabel htmlFor="account-credit-limit">Credit limit</FieldLabel>
-            <Input
-              id="account-credit-limit"
-              {...form.register("creditLimit")}
-              placeholder="e.g. 10000"
-              autoComplete="off"
-              inputMode="decimal"
-            />
-          </Field>
-        )}
-
-        {/* Loan / mortgage shared fields */}
-        {(groupValue === "loan" || groupValue === "mortgage") && (
-          <>
-            <FieldSeparator>
-              {groupValue === "loan" ? "Loan" : "Mortgage"} details
-            </FieldSeparator>
-            <Field>
-              <FieldLabel htmlFor="account-original-amount">
-                Original amount
-              </FieldLabel>
-              <Input
-                id="account-original-amount"
-                {...form.register("originalAmount")}
-                placeholder="e.g. 250000"
-                autoComplete="off"
-                inputMode="decimal"
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="account-interest-rate">
-                  Interest rate (%)
-                </FieldLabel>
-                <Input
-                  id="account-interest-rate"
-                  {...form.register("interestRate")}
-                  placeholder="e.g. 5.25"
-                  autoComplete="off"
-                  inputMode="decimal"
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="account-term-months">
-                  Term (months)
-                </FieldLabel>
-                <Input
-                  id="account-term-months"
-                  {...form.register("termMonths")}
-                  placeholder="e.g. 60"
-                  autoComplete="off"
-                  inputMode="numeric"
-                />
-              </Field>
-            </div>
-            <Field>
-              <FieldLabel htmlFor="account-monthly-payment">
-                Monthly payment
-              </FieldLabel>
-              <Input
-                id="account-monthly-payment"
-                {...form.register("monthlyPayment")}
-                placeholder="e.g. 1500"
-                autoComplete="off"
-                inputMode="decimal"
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="account-start-date">Start date</FieldLabel>
-                <Input
-                  id="account-start-date"
-                  type="date"
-                  {...form.register("startDate")}
-                  autoComplete="off"
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="account-maturity-date">
-                  {groupValue === "mortgage" ? "Renewal date" : "Maturity date"}
-                </FieldLabel>
-                <Input
-                  id="account-maturity-date"
-                  type="date"
-                  {...form.register(
-                    groupValue === "mortgage" ? "renewalDate" : "maturityDate"
-                  )}
-                  autoComplete="off"
-                />
-              </Field>
-            </div>
-          </>
-        )}
-
-        {/* Loan-specific */}
-        {groupValue === "loan" && (
-          <Field>
-            <FieldLabel htmlFor="account-loan-type">Loan type</FieldLabel>
+          <Field data-invalid={!!form.formState.errors.group}>
+            <FieldLabel htmlFor="account-group">Group</FieldLabel>
             <NativeSelect
               className="w-full"
-              value={form.watch("loanType") ?? ""}
-              onChange={(e) => form.setValue("loanType", e.target.value)}
+              value={groupValue}
+              onChange={(e) =>
+                form.setValue("group", e.target.value as AccountGroup, {
+                  shouldValidate: true,
+                })
+              }
             >
-              {LOAN_TYPES.map((t) => (
-                <NativeSelectOption key={t.value} value={t.value}>
-                  {t.label}
+              {ACCOUNT_GROUPS.map((g) => (
+                <NativeSelectOption key={g} value={g}>
+                  {ACCOUNT_GROUP_METADATA[g].label}
                 </NativeSelectOption>
               ))}
             </NativeSelect>
           </Field>
-        )}
 
-        {/* Mortgage-specific */}
-        {groupValue === "mortgage" && (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="account-amortization">
-                  Amortization (months)
-                </FieldLabel>
-                <Input
-                  id="account-amortization"
-                  {...form.register("amortizationMonths")}
-                  placeholder="e.g. 300"
-                  autoComplete="off"
-                  inputMode="numeric"
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="account-pay-frequency">
-                  Pay frequency
-                </FieldLabel>
-                <NativeSelect
-                  className="w-full"
-                  value={form.watch("paymentFrequency") ?? ""}
-                  onChange={(e) =>
-                    form.setValue("paymentFrequency", e.target.value)
-                  }
-                >
-                  {MORTGAGE_FREQUENCIES.map((f) => (
-                    <NativeSelectOption key={f.value} value={f.value}>
-                      {f.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              </Field>
-            </div>
-          </>
-        )}
-
-        {/* Investment-specific */}
-        {groupValue === "investment" && (
-          <>
-            <FieldSeparator>Investment details</FieldSeparator>
+          <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel htmlFor="account-inv-subtype">Account type</FieldLabel>
-              <NativeSelect
-                className="w-full"
-                value={form.watch("investmentSubtype") ?? ""}
-                onChange={(e) =>
-                  form.setValue("investmentSubtype", e.target.value)
-                }
-              >
-                {INVESTMENT_SUBTYPES.map((t) => (
-                  <NativeSelectOption key={t.value} value={t.value}>
-                    {t.label}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="account-contribution-room">
-                Contribution room
-              </FieldLabel>
+              <FieldLabel htmlFor="account-balance">Opening balance</FieldLabel>
               <Input
-                id="account-contribution-room"
-                {...form.register("contributionRoom")}
-                placeholder="e.g. 6500"
+                id="account-balance"
+                {...form.register("balance")}
+                placeholder="0.00"
                 autoComplete="off"
                 inputMode="decimal"
               />
             </Field>
-          </>
-        )}
-
-        {/* Asset-specific */}
-        {groupValue === "asset" && (
-          <>
-            <FieldSeparator>Asset details</FieldSeparator>
             <Field>
-              <FieldLabel htmlFor="account-asset-type">Asset type</FieldLabel>
+              <FieldLabel htmlFor="account-currency">Currency</FieldLabel>
+              <Input
+                id="account-currency"
+                {...form.register("currency")}
+                placeholder="CAD"
+                autoComplete="off"
+                maxLength={3}
+              />
+            </Field>
+          </div>
+
+          <FieldSeparator>Details</FieldSeparator>
+
+          <Field>
+            <FieldLabel htmlFor="account-institution">Institution</FieldLabel>
+            <Input
+              id="account-institution"
+              {...form.register("institutionName")}
+              placeholder="e.g. TD Bank"
+              autoComplete="off"
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="account-number">
+              Account number (last 4)
+            </FieldLabel>
+            <Input
+              id="account-number"
+              {...form.register("accountNumber")}
+              placeholder="e.g. 1234"
+              autoComplete="off"
+              maxLength={50}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="account-description">Description</FieldLabel>
+            <Input
+              id="account-description"
+              {...form.register("description")}
+              placeholder="Short description"
+              autoComplete="off"
+            />
+          </Field>
+
+          {/* Credit card fields */}
+          {groupValue === "credit_card" && (
+            <Field>
+              <FieldLabel htmlFor="account-credit-limit">
+                Credit limit
+              </FieldLabel>
+              <Input
+                id="account-credit-limit"
+                {...form.register("creditLimit")}
+                placeholder="e.g. 10000"
+                autoComplete="off"
+                inputMode="decimal"
+              />
+            </Field>
+          )}
+
+          {/* Loan / mortgage shared fields */}
+          {(groupValue === "loan" || groupValue === "mortgage") && (
+            <>
+              <FieldSeparator>
+                {groupValue === "loan" ? "Loan" : "Mortgage"} details
+              </FieldSeparator>
+              <Field>
+                <FieldLabel htmlFor="account-original-amount">
+                  Original amount
+                </FieldLabel>
+                <Input
+                  id="account-original-amount"
+                  {...form.register("originalAmount")}
+                  placeholder="e.g. 250000"
+                  autoComplete="off"
+                  inputMode="decimal"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="account-interest-rate">
+                    Interest rate (%)
+                  </FieldLabel>
+                  <Input
+                    id="account-interest-rate"
+                    {...form.register("interestRate")}
+                    placeholder="e.g. 5.25"
+                    autoComplete="off"
+                    inputMode="decimal"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="account-term-months">
+                    Term (months)
+                  </FieldLabel>
+                  <Input
+                    id="account-term-months"
+                    {...form.register("termMonths")}
+                    placeholder="e.g. 60"
+                    autoComplete="off"
+                    inputMode="numeric"
+                  />
+                </Field>
+              </div>
+              <Field>
+                <FieldLabel htmlFor="account-monthly-payment">
+                  Monthly payment
+                </FieldLabel>
+                <Input
+                  id="account-monthly-payment"
+                  {...form.register("monthlyPayment")}
+                  placeholder="e.g. 1500"
+                  autoComplete="off"
+                  inputMode="decimal"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="account-start-date">
+                    Start date
+                  </FieldLabel>
+                  <Input
+                    id="account-start-date"
+                    type="date"
+                    {...form.register("startDate")}
+                    autoComplete="off"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="account-maturity-date">
+                    {groupValue === "mortgage"
+                      ? "Renewal date"
+                      : "Maturity date"}
+                  </FieldLabel>
+                  <Input
+                    id="account-maturity-date"
+                    type="date"
+                    {...form.register(
+                      groupValue === "mortgage" ? "renewalDate" : "maturityDate"
+                    )}
+                    autoComplete="off"
+                  />
+                </Field>
+              </div>
+            </>
+          )}
+
+          {/* Loan-specific */}
+          {groupValue === "loan" && (
+            <Field>
+              <FieldLabel htmlFor="account-loan-type">Loan type</FieldLabel>
               <NativeSelect
                 className="w-full"
-                value={form.watch("assetType") ?? ""}
-                onChange={(e) => form.setValue("assetType", e.target.value)}
+                value={form.watch("loanType") ?? ""}
+                onChange={(e) => form.setValue("loanType", e.target.value)}
               >
-                {ASSET_TYPES.map((t) => (
+                {LOAN_TYPES.map((t) => (
                   <NativeSelectOption key={t.value} value={t.value}>
                     {t.label}
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+          )}
+
+          {/* Mortgage-specific */}
+          {groupValue === "mortgage" && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="account-amortization">
+                    Amortization (months)
+                  </FieldLabel>
+                  <Input
+                    id="account-amortization"
+                    {...form.register("amortizationMonths")}
+                    placeholder="e.g. 300"
+                    autoComplete="off"
+                    inputMode="numeric"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="account-pay-frequency">
+                    Pay frequency
+                  </FieldLabel>
+                  <NativeSelect
+                    className="w-full"
+                    value={form.watch("paymentFrequency") ?? ""}
+                    onChange={(e) =>
+                      form.setValue("paymentFrequency", e.target.value)
+                    }
+                  >
+                    {MORTGAGE_FREQUENCIES.map((f) => (
+                      <NativeSelectOption key={f.value} value={f.value}>
+                        {f.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
+                </Field>
+              </div>
+            </>
+          )}
+
+          {/* Investment-specific */}
+          {groupValue === "investment" && (
+            <>
+              <FieldSeparator>Investment details</FieldSeparator>
               <Field>
-                <FieldLabel htmlFor="account-purchase-date">
-                  Purchase date
+                <FieldLabel htmlFor="account-inv-subtype">
+                  Account type
                 </FieldLabel>
-                <Input
-                  id="account-purchase-date"
-                  type="date"
-                  {...form.register("purchaseDate")}
-                  autoComplete="off"
-                />
+                <NativeSelect
+                  className="w-full"
+                  value={form.watch("investmentSubtype") ?? ""}
+                  onChange={(e) =>
+                    form.setValue("investmentSubtype", e.target.value)
+                  }
+                >
+                  {INVESTMENT_SUBTYPES.map((t) => (
+                    <NativeSelectOption key={t.value} value={t.value}>
+                      {t.label}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
               </Field>
               <Field>
-                <FieldLabel htmlFor="account-purchase-price">
-                  Purchase price
+                <FieldLabel htmlFor="account-contribution-room">
+                  Contribution room
                 </FieldLabel>
                 <Input
-                  id="account-purchase-price"
-                  {...form.register("purchasePrice")}
-                  placeholder="e.g. 450000"
+                  id="account-contribution-room"
+                  {...form.register("contributionRoom")}
+                  placeholder="e.g. 6500"
                   autoComplete="off"
                   inputMode="decimal"
                 />
               </Field>
-            </div>
+            </>
+          )}
+
+          {/* Asset-specific */}
+          {groupValue === "asset" && (
+            <>
+              <FieldSeparator>Asset details</FieldSeparator>
+              <Field>
+                <FieldLabel htmlFor="account-asset-type">Asset type</FieldLabel>
+                <NativeSelect
+                  className="w-full"
+                  value={form.watch("assetType") ?? ""}
+                  onChange={(e) => form.setValue("assetType", e.target.value)}
+                >
+                  {ASSET_TYPES.map((t) => (
+                    <NativeSelectOption key={t.value} value={t.value}>
+                      {t.label}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="account-purchase-date">
+                    Purchase date
+                  </FieldLabel>
+                  <Input
+                    id="account-purchase-date"
+                    type="date"
+                    {...form.register("purchaseDate")}
+                    autoComplete="off"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="account-purchase-price">
+                    Purchase price
+                  </FieldLabel>
+                  <Input
+                    id="account-purchase-price"
+                    {...form.register("purchasePrice")}
+                    placeholder="e.g. 450000"
+                    autoComplete="off"
+                    inputMode="decimal"
+                  />
+                </Field>
+              </div>
+              <Field>
+                <FieldLabel htmlFor="account-asset-location">
+                  Location
+                </FieldLabel>
+                <Input
+                  id="account-asset-location"
+                  {...form.register("location")}
+                  placeholder="e.g. 123 Main St, Toronto"
+                  autoComplete="off"
+                />
+              </Field>
+            </>
+          )}
+
+          {/* Cash location */}
+          {groupValue === "cash" && (
             <Field>
-              <FieldLabel htmlFor="account-asset-location">Location</FieldLabel>
+              <FieldLabel htmlFor="account-cash-location">Location</FieldLabel>
               <Input
-                id="account-asset-location"
+                id="account-cash-location"
                 {...form.register("location")}
-                placeholder="e.g. 123 Main St, Toronto"
+                placeholder="e.g. Home safe"
                 autoComplete="off"
               />
             </Field>
-          </>
-        )}
+          )}
 
-        {/* Cash location */}
-        {groupValue === "cash" && (
+          <FieldSeparator>Options</FieldSeparator>
+
+          <Field orientation="horizontal">
+            <Checkbox
+              checked={form.watch("includeInNetWorth")}
+              onCheckedChange={(checked) =>
+                form.setValue("includeInNetWorth", checked as boolean)
+              }
+            />
+            <FieldContent>
+              <FieldTitle>Include in net worth</FieldTitle>
+              <FieldDescription>
+                Count this account in net worth calculations
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+
           <Field>
-            <FieldLabel htmlFor="account-cash-location">Location</FieldLabel>
+            <FieldLabel htmlFor="account-notes">Notes</FieldLabel>
             <Input
-              id="account-cash-location"
-              {...form.register("location")}
-              placeholder="e.g. Home safe"
+              id="account-notes"
+              {...form.register("notes")}
+              placeholder="Any additional notes"
               autoComplete="off"
             />
           </Field>
-        )}
-
-        <FieldSeparator>Options</FieldSeparator>
-
-        <Field orientation="horizontal">
-          <Checkbox
-            checked={form.watch("includeInNetWorth")}
-            onCheckedChange={(checked) =>
-              form.setValue("includeInNetWorth", checked as boolean)
-            }
-          />
-          <FieldContent>
-            <FieldTitle>Include in net worth</FieldTitle>
-            <FieldDescription>
-              Count this account in net worth calculations
-            </FieldDescription>
-          </FieldContent>
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="account-notes">Notes</FieldLabel>
-          <Input
-            id="account-notes"
-            {...form.register("notes")}
-            placeholder="Any additional notes"
-            autoComplete="off"
-          />
-        </Field>
-      </FieldGroup>
+        </FieldGroup>
+      </ScrollArea>
 
       <div className="flex justify-end gap-2 md:hidden">
         <Button type="submit" disabled={isPending} className="w-full">
@@ -710,7 +731,7 @@ function AccountForm({
       </div>
 
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" className={"w-full"} disabled={isPending}>
           {isPending ? "Creating..." : "Create"}
         </Button>
       </div>

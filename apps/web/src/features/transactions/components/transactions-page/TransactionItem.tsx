@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { TransactionType } from "@workspace/types";
-import type { TransactionItemProps } from "../types";
+import type { TransactionItemProps } from "../../types";
 
 interface CellProps {
   primary: string;
@@ -85,40 +85,5 @@ export const TransactionItem = React.forwardRef<
         </button>
       </li>
     );
-
-    // return (
-    //   <Item
-    //     ref={ref}
-    //     render={
-    //       <button
-    //         type="button"
-    //         tabIndex={0}
-    //         aria-label={ariaLabel ?? `${merchant} - ${amount}`}
-    //         onClick={onClick}
-    //         className={[
-    //           "group w-full cursor-pointer border-none text-left outline-none hover:bg-accent",
-    //           "grid grid-cols-[1fr_3fr_1fr] items-center gap-x-1 gap-y-0 px-2! py-1!",
-    //           "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
-    //           className,
-    //         ].join(" ")}
-    //       >
-    //         <Cell
-    //           primary={category}
-    //           secondary={categorySub ? [categorySub] : undefined}
-    //         />
-
-    //         <Cell primary={merchant} secondary={[merchantSub ?? ""]} />
-
-    //         <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
-    //           <small
-    //             className={`block truncate text-xs tabular-nums ${getAmountColor(type)}`}
-    //           >
-    //             {amount}
-    //           </small>
-    //         </div>
-    //       </button>
-    //     }
-    //   />
-    // );
   }
 );

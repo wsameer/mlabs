@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { CashflowPieChart } from "@/components/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
@@ -14,6 +14,8 @@ import { CategoryStatList } from "@/components/CategoryStatList";
 import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { useDateRange } from "@/hooks/use-filters";
 import { useCategoryTotals } from "../api/use-category-totals";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
+import { buildCategoryColorMap } from "@/lib/category-colors";
 
 type TabType = "INCOME" | "EXPENSE";
 
@@ -32,14 +34,25 @@ export function DashboardPage() {
     type: activeTab,
   });
 
+  const colorMap = useMemo(
+    () => buildCategoryColorMap(data?.items ?? []),
+    [data?.items]
+  );
+
   const renderTransactionsSummary = () => (
     <>
       <Card className="w-full border-none">
         <CardContent>
-          <CashflowPieChart data={data} isLoading={isLoading} />
+          <CashflowPieChart
+            data={data}
+            colorMap={colorMap}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
-      <CategoryStatList data={data?.items ?? []} />
+      <ScrollArea className="mt-2 h-7/12">
+        <CategoryStatList data={data?.items ?? []} colorMap={colorMap} />
+      </ScrollArea>
     </>
   );
 

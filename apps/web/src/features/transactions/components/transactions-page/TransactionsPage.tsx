@@ -8,13 +8,16 @@ import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
 
-import { useTransactions } from "../api/use-transactions";
+import { useTransactions } from "../../api/use-transactions";
 import { TransactionItem } from "./TransactionItem";
 import { TListLoader } from "./TListLoader";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { EmptyTransactions } from "./EmptyTransactions";
-import { TransactionSummaryCard } from "./TransactionSummaryCard";
+import {
+  TransactionsSummaryContent,
+  TransactionsSummaryMobile,
+} from "./TransactionsSidebar";
 import {
   Item,
   ItemActions,
@@ -23,7 +26,7 @@ import {
 } from "@workspace/ui/components/item";
 import { format } from "date-fns";
 import { Badge } from "@workspace/ui/components/badge";
-import { calculateTransactionGroupTotals, groupByDate } from "../utils";
+import { calculateTransactionGroupTotals, groupByDate } from "../../utils";
 import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
@@ -32,11 +35,6 @@ import { useDateRange } from "@/hooks/use-filters";
 import { parseDateString, toDateString } from "@/lib/timezone";
 
 export function TransactionsPage() {
-  useLayoutConfig({
-    pageTitle: "Transactions",
-    actions: <TimeGrainSelect />,
-  });
-
   const { to, from } = useDateRange();
 
   const { setOpenCreateTransaction } = useUiActions();
@@ -66,15 +64,38 @@ export function TransactionsPage() {
   const categoryMap = useMemo(() => {
     const map = new Map<
       string,
-      { name: string; icon?: string; parentId?: string | null }
+      { name: string; icon?: string; color?: string; parentId?: string | null }
     >();
     categories?.forEach((c) =>
-      map.set(c.id, { name: c.name, icon: c.icon, parentId: c.parentId })
+      map.set(c.id, {
+        name: c.name,
+        icon: c.icon,
+        color: c.color,
+        parentId: c.parentId,
+      })
     );
     return map;
   }, [categories]);
 
   const transactions = useMemo(() => data?.transactions ?? [], [data]);
+
+  const sidebarContent = useMemo(
+    () =>
+      transactions.length > 0 ? (
+        <TransactionsSummaryContent
+          transactions={transactions}
+          categoryMap={categoryMap}
+          accountMap={accountMap}
+        />
+      ) : null,
+    [transactions, categoryMap, accountMap]
+  );
+
+  useLayoutConfig({
+    pageTitle: "Transactions",
+    actions: <TimeGrainSelect />,
+    leftSidebarContent: sidebarContent,
+  });
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
   const totalsByDate = useMemo(() => {
     const totals: Record<string, { income: number; debit: number }> = {};
@@ -99,20 +120,27 @@ export function TransactionsPage() {
   }
 
   return (
-    <div className="max-full flex flex-col gap-3">
-      <DateRangeFilter />
-
+    <div className="mx-auto flex w-full flex-col gap-4 pb-8">
       {transactions.length === 0 ? (
         <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
           <EmptyTransactions openCreateTransaction={setOpenCreateTransaction} />
         </div>
       ) : (
         <>
-          <TransactionSummaryCard transactions={transactions} />
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <DateRangeFilter />
+            </div>
+            <TransactionsSummaryMobile
+              transactions={transactions}
+              categoryMap={categoryMap}
+              accountMap={accountMap}
+            />
+          </div>
 
           <Card className="p-0">
             <CardContent className="p-0">
-              <ScrollArea className="h-[70svh]">
+              <ScrollArea className="h-[75svh]">
                 <div>
                   {sortedDates.map((date) => {
                     const groupedTransactions = grouped[date];
