@@ -84,8 +84,8 @@ export function CategoriesSection() {
       {/* Tab selector + Add button */}
       <div className="flex items-center justify-between">
         <Tabs
-          defaultValue={activeTab}
-          onValueChange={(v) => v && setActiveTab(v as CategoryType)}
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as CategoryType)}
         >
           <TabsList>
             <TabsTrigger value="EXPENSE">Expense</TabsTrigger>

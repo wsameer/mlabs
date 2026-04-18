@@ -69,8 +69,15 @@ async function seed() {
 
     console.log(`✅ Created ${seededCategories.length} categories`);
 
+    const incomeCategories = seededCategories.filter(
+      (c) => c.type === "INCOME"
+    );
+    const expenseCategories = seededCategories.filter(
+      (c) => c.type === "EXPENSE"
+    );
+
     // ============================================================================
-    // Seed Accounts
+    // Seed Accounts (all group types)
     // ============================================================================
     console.log("🏦 Seeding accounts...");
 
@@ -85,6 +92,7 @@ async function seed() {
         icon: "wallet",
         notes: "Primary chequing account",
         institutionName: "TD",
+        accountNumber: "4821",
         includeInNetWorth: true,
         sortOrder: 1,
       })
@@ -101,6 +109,8 @@ async function seed() {
         icon: "piggy-bank",
         notes: "Emergency fund",
         institutionName: "Equitable Bank",
+        accountNumber: "7734",
+        description: "High interest savings",
         includeInNetWorth: true,
         sortOrder: 2,
       })
@@ -116,13 +126,16 @@ async function seed() {
         profileId,
         name: "TD Visa Infinite",
         group: "credit_card",
-        balance: "-1250.00", // Negative for liability
+        balance: "-1250.00",
         currency: "CAD",
         icon: "credit-card",
         notes: "Primary rewards card",
+        institutionName: "TD",
+        accountNumber: "9032",
+        creditLimit: "10000",
         linkedAccountId: checkingAccount.id,
-        includeInNetWorth: false,
-        sortOrder: 7,
+        includeInNetWorth: true,
+        sortOrder: 3,
       })
       .returning();
 
@@ -130,8 +143,9 @@ async function seed() {
       throw new Error("Failed to create savings or credit card account");
     }
 
-    await db.insert(accounts).values([
-      {
+    const [wealthSimpleCash] = await db
+      .insert(accounts)
+      .values({
         profileId,
         name: "WealthSimple Cash",
         group: "chequing",
@@ -139,10 +153,15 @@ async function seed() {
         currency: "CAD",
         icon: "wallet",
         institutionName: "WealthSimple",
+        accountNumber: "6110",
         includeInNetWorth: true,
-        sortOrder: 3,
-      },
-      {
+        sortOrder: 4,
+      })
+      .returning();
+
+    const [tfsaAccount] = await db
+      .insert(accounts)
+      .values({
         profileId,
         name: "TFSA",
         group: "investment",
@@ -150,10 +169,20 @@ async function seed() {
         currency: "CAD",
         icon: "trending-up",
         institutionName: "WealthSimple",
+        accountNumber: "3301",
+        description: "Tax-free savings account",
         includeInNetWorth: true,
-        sortOrder: 4,
-      },
-      {
+        sortOrder: 5,
+        metadata: JSON.stringify({
+          subtype: "TFSA",
+          contributionRoom: "6500",
+        }),
+      })
+      .returning();
+
+    const [rrspAccount] = await db
+      .insert(accounts)
+      .values({
         profileId,
         name: "RRSP",
         group: "investment",
@@ -161,10 +190,20 @@ async function seed() {
         currency: "CAD",
         icon: "trending-up",
         institutionName: "WealthSimple",
+        accountNumber: "3302",
+        description: "Registered retirement savings",
         includeInNetWorth: true,
-        sortOrder: 5,
-      },
-      {
+        sortOrder: 6,
+        metadata: JSON.stringify({
+          subtype: "RRSP",
+          contributionRoom: "12500",
+        }),
+      })
+      .returning();
+
+    const [cashWallet] = await db
+      .insert(accounts)
+      .values({
         profileId,
         name: "Cash Wallet",
         group: "cash",
@@ -172,11 +211,117 @@ async function seed() {
         currency: "CAD",
         icon: "banknote",
         includeInNetWorth: true,
-        sortOrder: 6,
-      },
-    ]);
+        sortOrder: 7,
+        metadata: JSON.stringify({ location: "Home safe" }),
+      })
+      .returning();
 
-    console.log("✅ Created 7 accounts");
+    const [loanAccount] = await db
+      .insert(accounts)
+      .values({
+        profileId,
+        name: "Toyota Auto Loan",
+        group: "loan",
+        balance: "-18500.00",
+        currency: "CAD",
+        institutionName: "Toyota Financial",
+        accountNumber: "5590",
+        description: "2023 RAV4 financing",
+        originalAmount: "32000",
+        interestRate: "4.99",
+        includeInNetWorth: true,
+        sortOrder: 8,
+        metadata: JSON.stringify({
+          loanType: "auto",
+          termMonths: 72,
+          startDate: "2023-06-01",
+          maturityDate: "2029-06-01",
+          monthlyPayment: "520.00",
+        }),
+      })
+      .returning();
+
+    const [mortgageAccount] = await db
+      .insert(accounts)
+      .values({
+        profileId,
+        name: "Home Mortgage",
+        group: "mortgage",
+        balance: "-385000.00",
+        currency: "CAD",
+        institutionName: "RBC",
+        accountNumber: "8812",
+        description: "Primary residence mortgage",
+        originalAmount: "450000",
+        interestRate: "5.14",
+        includeInNetWorth: true,
+        sortOrder: 9,
+        metadata: JSON.stringify({
+          termMonths: 60,
+          amortizationMonths: 300,
+          startDate: "2022-09-01",
+          renewalDate: "2027-09-01",
+          monthlyPayment: "2650.00",
+          paymentFrequency: "biweekly",
+        }),
+      })
+      .returning();
+
+    const [homeAsset] = await db
+      .insert(accounts)
+      .values({
+        profileId,
+        name: "Primary Residence",
+        group: "asset",
+        balance: "620000.00",
+        currency: "CAD",
+        description: "Condo in Toronto",
+        includeInNetWorth: true,
+        sortOrder: 10,
+        metadata: JSON.stringify({
+          assetType: "property",
+          purchaseDate: "2022-09-01",
+          purchasePrice: "550000",
+          location: "Toronto, ON",
+        }),
+      })
+      .returning();
+
+    const [carAsset] = await db
+      .insert(accounts)
+      .values({
+        profileId,
+        name: "2023 Toyota RAV4",
+        group: "asset",
+        balance: "28000.00",
+        currency: "CAD",
+        description: "Vehicle",
+        includeInNetWorth: true,
+        sortOrder: 11,
+        metadata: JSON.stringify({
+          assetType: "vehicle",
+          purchaseDate: "2023-06-01",
+          purchasePrice: "38000",
+        }),
+      })
+      .returning();
+
+    const [otherAccount] = await db
+      .insert(accounts)
+      .values({
+        profileId,
+        name: "Employer HSA",
+        group: "other",
+        balance: "1200.00",
+        currency: "CAD",
+        institutionName: "Sun Life",
+        description: "Health spending account",
+        includeInNetWorth: false,
+        sortOrder: 12,
+      })
+      .returning();
+
+    console.log("✅ Created 13 accounts (all group types)");
 
     // ============================================================================
     // Seed Transactions
@@ -191,6 +336,10 @@ async function seed() {
     };
 
     const salary = incomeCategories.find((c) => c.name === "Salary");
+    const freelance = incomeCategories.find((c) => c.name === "Freelance");
+    const investmentIncome = incomeCategories.find(
+      (c) => c.name === "Investment"
+    );
     const food = expenseCategories.find((c) => c.name === "Food & Dining");
     const transport = expenseCategories.find(
       (c) => c.name === "Transportation"
@@ -203,6 +352,8 @@ async function seed() {
     const subscriptions = expenseCategories.find(
       (c) => c.name === "Subscriptions"
     );
+    const housing = expenseCategories.find((c) => c.name === "Housing");
+    const healthcare = expenseCategories.find((c) => c.name === "Healthcare");
 
     if (
       !salary ||
@@ -211,16 +362,20 @@ async function seed() {
       !utilities ||
       !entertainment ||
       !shopping ||
-      !subscriptions
+      !subscriptions ||
+      !housing ||
+      !healthcare
     ) {
       throw new Error("Failed to find required categories");
     }
 
-    // Generate a transfer ID for the transfer transaction
-    const transferUuid = crypto.randomUUID();
+    // Transfer IDs for double-entry transfers
+    const transferUuid1 = crypto.randomUUID();
+    const transferUuid2 = crypto.randomUUID();
+    const transferUuid3 = crypto.randomUUID();
 
     await db.insert(transactions).values([
-      // Income (positive amount, checking account)
+      // ── Income ──
       {
         profileId,
         accountId: checkingAccount.id,
@@ -231,7 +386,56 @@ async function seed() {
         date: daysAgo(15),
         isCleared: true,
       },
-      // Food & Dining (expense, credit card)
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: salary.id,
+        type: "INCOME",
+        amount: "5500.00",
+        description: "Salary deposit",
+        date: daysAgo(45),
+        isCleared: true,
+      },
+      ...(freelance
+        ? [
+            {
+              profileId,
+              accountId: wealthSimpleCash!.id,
+              categoryId: freelance.id,
+              type: "INCOME" as const,
+              amount: "1200.00",
+              description: "Logo design project",
+              date: daysAgo(10),
+              isCleared: true,
+            },
+          ]
+        : []),
+      ...(investmentIncome
+        ? [
+            {
+              profileId,
+              accountId: tfsaAccount!.id,
+              categoryId: investmentIncome.id,
+              type: "INCOME" as const,
+              amount: "320.50",
+              description: "TFSA dividend payout",
+              date: daysAgo(22),
+              isCleared: true,
+            },
+            {
+              profileId,
+              accountId: rrspAccount!.id,
+              categoryId: investmentIncome.id,
+              type: "INCOME" as const,
+              amount: "185.75",
+              description: "RRSP dividend payout",
+              date: daysAgo(22),
+              isCleared: true,
+            },
+          ]
+        : []),
+
+      // ── Food & Dining ──
       {
         profileId,
         accountId: creditCard.id,
@@ -262,7 +466,18 @@ async function seed() {
         date: daysAgo(5),
         isCleared: true,
       },
-      // Transportation
+      {
+        profileId,
+        accountId: cashWallet!.id,
+        categoryId: food.id,
+        type: "EXPENSE",
+        amount: "12.00",
+        description: "Farmers market",
+        date: daysAgo(6),
+        isCleared: true,
+      },
+
+      // ── Transportation ──
       {
         profileId,
         accountId: creditCard.id,
@@ -283,7 +498,8 @@ async function seed() {
         date: daysAgo(28),
         isCleared: true,
       },
-      // Utilities
+
+      // ── Utilities ──
       {
         profileId,
         accountId: checkingAccount.id,
@@ -304,7 +520,52 @@ async function seed() {
         date: daysAgo(12),
         isCleared: true,
       },
-      // Entertainment
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: utilities.id,
+        type: "EXPENSE",
+        amount: "45.00",
+        description: "Enbridge Gas",
+        date: daysAgo(14),
+        isCleared: true,
+      },
+
+      // ── Housing (mortgage payment from chequing) ──
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: housing.id,
+        type: "EXPENSE",
+        amount: "2650.00",
+        description: "Mortgage payment - RBC",
+        date: daysAgo(1),
+        isCleared: true,
+      },
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: housing.id,
+        type: "EXPENSE",
+        amount: "2650.00",
+        description: "Mortgage payment - RBC",
+        date: daysAgo(31),
+        isCleared: true,
+      },
+
+      // ── Healthcare ──
+      {
+        profileId,
+        accountId: otherAccount!.id,
+        categoryId: healthcare.id,
+        type: "EXPENSE",
+        amount: "150.00",
+        description: "Dental cleaning",
+        date: daysAgo(20),
+        isCleared: true,
+      },
+
+      // ── Entertainment ──
       {
         profileId,
         accountId: creditCard.id,
@@ -315,7 +576,8 @@ async function seed() {
         date: daysAgo(8),
         isCleared: true,
       },
-      // Shopping
+
+      // ── Shopping ──
       {
         profileId,
         accountId: creditCard.id,
@@ -326,7 +588,8 @@ async function seed() {
         date: daysAgo(4),
         isCleared: true,
       },
-      // Subscriptions
+
+      // ── Subscriptions ──
       {
         profileId,
         accountId: creditCard.id,
@@ -347,7 +610,21 @@ async function seed() {
         date: daysAgo(18),
         isCleared: true,
       },
-      // Transfer: checking → savings (both sides of the transfer)
+
+      // ── Loan payment ──
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: transport.id,
+        type: "EXPENSE",
+        amount: "520.00",
+        description: "Auto loan payment - Toyota Financial",
+        date: daysAgo(5),
+        isCleared: true,
+      },
+
+      // ── Transfers ──
+      // Chequing → Savings
       {
         profileId,
         accountId: checkingAccount.id,
@@ -356,7 +633,7 @@ async function seed() {
         amount: "500.00",
         description: "Transfer to savings",
         date: daysAgo(2),
-        transferId: transferUuid,
+        transferId: transferUuid1,
         isCleared: true,
       },
       {
@@ -365,14 +642,62 @@ async function seed() {
         categoryId: null,
         type: "TRANSFER",
         amount: "500.00",
-        description: "Transfer from checking",
+        description: "Transfer from chequing",
         date: daysAgo(2),
-        transferId: transferUuid,
+        transferId: transferUuid1,
+        isCleared: true,
+      },
+      // Chequing → TFSA contribution
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: null,
+        type: "TRANSFER",
+        amount: "500.00",
+        description: "TFSA contribution",
+        date: daysAgo(16),
+        transferId: transferUuid2,
+        isCleared: true,
+      },
+      {
+        profileId,
+        accountId: tfsaAccount!.id,
+        categoryId: null,
+        type: "TRANSFER",
+        amount: "500.00",
+        description: "TFSA contribution from chequing",
+        date: daysAgo(16),
+        transferId: transferUuid2,
+        isCleared: true,
+      },
+      // Chequing → Credit card payment
+      {
+        profileId,
+        accountId: checkingAccount.id,
+        categoryId: null,
+        type: "TRANSFER",
+        amount: "800.00",
+        description: "Visa payment",
+        date: daysAgo(9),
+        transferId: transferUuid3,
+        isCleared: true,
+      },
+      {
+        profileId,
+        accountId: creditCard.id,
+        categoryId: null,
+        type: "TRANSFER",
+        amount: "800.00",
+        description: "Payment from chequing",
+        date: daysAgo(9),
+        transferId: transferUuid3,
         isCleared: true,
       },
     ]);
 
-    console.log("✅ Created 14 transactions (including 2 for transfer)");
+    console.log(
+      "✅ Created 30 transactions (income, expenses, loan payments, transfers)"
+    );
 
     // ============================================================================
     // Summary
@@ -382,8 +707,8 @@ async function seed() {
   - Profiles: 1 (Default)
   - Income categories: ${incomeCategories.length}
   - Expense categories: ${expenseCategories.length}
-  - Accounts: 5
-  - Transactions: 14
+  - Accounts: 13 (chequing x2, savings, credit card, investment x2, cash, loan, mortgage, asset x2, other)
+  - Transactions: 30
     `);
 
     process.exit(0);

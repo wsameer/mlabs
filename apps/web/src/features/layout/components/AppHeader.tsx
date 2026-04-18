@@ -58,7 +58,6 @@ export const AppHeader = () => {
             variant="ghost"
             size="icon"
             onClick={handleBack}
-            className="justify-start"
             aria-label="Go back"
           >
             <ArrowLeftIcon className="size-5" />

@@ -132,7 +132,7 @@ export function TransactionsPage() {
                               {format(parseDateString(date), "EEE")}
                             </Badge>
                             <p className="text-xs">
-                              {format(parseDateString(date), "dd MMM, Y")}
+                              {format(parseDateString(date), "dd MMM, y")}
                             </p>
                           </ItemContent>
                           <ItemActions>

@@ -13,11 +13,15 @@ import {
 } from "@workspace/ui/components/input-group";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
   Field,
+  FieldContent,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldTitle,
 } from "@workspace/ui/components/field";
 import {
   Collapsible,
@@ -106,6 +110,12 @@ const accountFormSchema = z.object({
 
   // Cash / Asset
   location: z.string().max(200).optional(),
+
+  // Shared optional
+  currency: z.string().length(3).default("CAD"),
+  description: z.string().max(200).optional(),
+  notes: z.string().optional(),
+  includeInNetWorth: z.boolean().default(true),
 });
 
 type AccountFormValues = z.output<typeof accountFormSchema>;
@@ -174,6 +184,10 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
       name: "",
       balance: "0",
       type,
+      currency: "CAD",
+      description: "",
+      notes: "",
+      includeInNetWorth: true,
     },
   });
 
@@ -185,12 +199,14 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
         name: data.name,
         group: data.type,
         balance: data.balance,
-        currency: "CAD",
+        currency: data.currency || "CAD",
         isActive: true,
-        includeInNetWorth: true,
+        includeInNetWorth: data.includeInNetWorth,
         sortOrder: 0,
         ...(data.institutionName && { institutionName: data.institutionName }),
         ...(data.accountNumber && { accountNumber: data.accountNumber }),
+        ...(data.description?.trim() && { description: data.description.trim() }),
+        ...(data.notes?.trim() && { notes: data.notes.trim() }),
         ...(data.creditLimit && { creditLimit: data.creditLimit }),
         ...(data.originalAmount && { originalAmount: data.originalAmount }),
         ...(data.interestRate && { interestRate: data.interestRate }),
@@ -208,13 +224,8 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
     );
   }
 
-  const hasAdvancedFields =
-    isBankHeld ||
-    type === "cash" ||
-    type === "investment" ||
-    type === "loan" ||
-    type === "mortgage" ||
-    type === "asset";
+  // All types have at least currency/description/notes/includeInNetWorth
+  const hasAdvancedFields = true;
 
   return (
     <form
@@ -528,6 +539,98 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
                   )}
                 />
               )}
+
+              {/* Currency */}
+              <Controller
+                name="currency"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="account-creation-form-currency">
+                      Currency
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="account-creation-form-currency"
+                      className="text-xs"
+                      placeholder="CAD"
+                      maxLength={3}
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              {/* Description */}
+              <Controller
+                name="description"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="account-creation-form-description">
+                      Description
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="account-creation-form-description"
+                      className="text-xs"
+                      placeholder="Short description"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              {/* Notes */}
+              <Controller
+                name="notes"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="account-creation-form-notes">
+                      Notes
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="account-creation-form-notes"
+                      className="text-xs"
+                      placeholder="Any additional notes"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              {/* Include in net worth */}
+              <Controller
+                name="includeInNetWorth"
+                control={form.control}
+                render={({ field }) => (
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked as boolean)
+                      }
+                    />
+                    <FieldContent>
+                      <FieldTitle>Include in net worth</FieldTitle>
+                      <FieldDescription>
+                        Count this account in net worth calculations
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                )}
+              />
 
               {/* Cash: Location */}
               {type === "cash" && (
