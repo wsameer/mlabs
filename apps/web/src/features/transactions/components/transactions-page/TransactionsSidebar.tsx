@@ -18,6 +18,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@workspace/ui/components/drawer";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
 import { cn } from "@workspace/ui/lib/utils";
@@ -145,7 +146,7 @@ function SummaryContent({
   accounts: AccountBreakdown[];
 }) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 pb-5">
       {/* Totals */}
       <Card size="sm">
         <CardHeader>
@@ -288,7 +289,6 @@ export function TransactionsSummaryMobile({
   categoryMap,
   accountMap,
 }: TransactionsSummaryProps) {
-  const [open, setOpen] = useState(false);
   const { income, expenses, net, categories, accounts } = useSummaryData(
     transactions,
     categoryMap,
@@ -297,21 +297,21 @@ export function TransactionsSummaryMobile({
 
   return (
     <>
-      <Button
-        variant="secondary"
-        className="lg:hidden"
-        title="View summary"
-        onClick={() => setOpen(true)}
-      >
-        <ChartNoAxesCombinedIcon className="size-3" />
-      </Button>
-
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button
+            variant="secondary"
+            className="lg:hidden"
+            title="View summary"
+          >
+            <ChartNoAxesCombinedIcon className="size-3" />
+          </Button>
+        </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Summary</DrawerTitle>
           </DrawerHeader>
-          <ScrollArea className="max-h-[70svh] px-4 pb-6">
+          <div className="no-scrollbar overflow-y-auto px-4">
             <SummaryContent
               income={income}
               expenses={expenses}
@@ -319,7 +319,7 @@ export function TransactionsSummaryMobile({
               categories={categories}
               accounts={accounts}
             />
-          </ScrollArea>
+          </div>
         </DrawerContent>
       </Drawer>
     </>

@@ -96,6 +96,7 @@ export function TransactionsPage() {
     actions: <TimeGrainSelect />,
     leftSidebarContent: sidebarContent,
   });
+
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
   const totalsByDate = useMemo(() => {
     const totals: Record<string, { income: number; debit: number }> = {};
@@ -120,7 +121,7 @@ export function TransactionsPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-4 pb-8">
+    <div className="mx-auto flex w-full flex-col gap-4">
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
           <DateRangeFilter />
