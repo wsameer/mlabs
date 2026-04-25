@@ -29,5 +29,6 @@ npm-debug.log*
 # Misc
 .DS_Store
 *.pem
+.worktrees/
 
 apps/web/src/routeTree.gen.ts
