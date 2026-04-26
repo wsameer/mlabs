@@ -431,7 +431,8 @@ export type CategoryQuery = z.infer<typeof CategoryQuerySchema>;
 
 export const TransactionQuerySchema = z.object({
   accountId: z.uuid().optional(),
-  categoryId: z.uuid().optional(),
+  categoryIds: z.array(z.uuid()).optional(),
+  uncategorizedOnly: z.boolean().optional(),
   type: TransactionTypeSchema.optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
