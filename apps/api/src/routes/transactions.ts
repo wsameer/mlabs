@@ -26,7 +26,15 @@ const transactionsRoute = new OpenAPIHono<ProfileEnv>();
 
 const TransactionQueryRouteSchema = z.object({
   accountId: z.string().uuid().optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryIds: z
+    .union([z.string(), z.array(z.string())])
+    .transform((v) => (Array.isArray(v) ? v : v.split(",")))
+    .pipe(z.array(z.string().uuid()))
+    .optional(),
+  uncategorizedOnly: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
   type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]).optional(),
   startDate: z.string().optional().openapi({ example: "2026-01-01" }),
   endDate: z.string().optional().openapi({ example: "2026-12-31" }),
@@ -34,8 +42,16 @@ const TransactionQueryRouteSchema = z.object({
   maxAmount: z.string().optional(),
   isCleared: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
   search: z.string().optional(),
-  limit: z.string().transform((v) => Number(v)).pipe(z.number().int().min(1).max(100)).optional(),
-  offset: z.string().transform((v) => Number(v)).pipe(z.number().int().min(0)).optional(),
+  limit: z
+    .string()
+    .transform((v) => Number(v))
+    .pipe(z.number().int().min(1).max(100))
+    .optional(),
+  offset: z
+    .string()
+    .transform((v) => Number(v))
+    .pipe(z.number().int().min(0))
+    .optional(),
   sortBy: z.enum(["date", "amount", "description"]).default("date"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
