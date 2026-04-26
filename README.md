@@ -90,6 +90,20 @@ Spawns the staged Node sidecar on port 39099 with a temp `DATABASE_URL`, waits f
 
 The app stores its SQLite database at `~/Library/Application Support/app.mlabs.desktop/mlabs.db`. This path follows Tauri's identifier-based convention; the folder name matches the app identifier, not the `productName`. A future milestone may override the location to `~/Library/Application Support/mLabs/`.
 
+### Schema changes
+
+The desktop app applies **real migrations** from `packages/db/migrations/` on first launch, whereas the dev workflow uses `pnpm db:push` which writes the schema directly without producing a migration file. This means schema drift between `packages/db/src/schema.ts` and the committed migrations will only surface once the desktop installer runs — as a `SQLITE_ERROR` at runtime.
+
+Safe workflow when changing `schema.ts`:
+
+1. Edit `packages/db/src/schema.ts`.
+2. Run `pnpm db:generate` — produces a new migration file under `packages/db/migrations/`.
+3. Review the generated SQL. Drizzle occasionally emits SQL that SQLite rejects (e.g., parameter placeholders inside `CHECK` constraints) — fix by hand if needed.
+4. Commit `schema.ts` and the new migration file together.
+5. Re-run `pnpm desktop:sidecar` so the next DMG build picks up the new migration.
+
+Don't share a single SQLite file between `pnpm dev` and the installed desktop app. Dev mode's `db:push` can silently diverge the file from what any migration history describes, which will confuse the desktop app's migrator on next launch. Treat them as separate databases (the desktop app lives in `~/Library/Application Support/app.mlabs.desktop/`; dev lives at `./data/mlabs.db`).
+
 ### Troubleshooting
 
 - **"Port 3001 is already in use."** Quit whatever is bound to 3001 (`lsof -i tcp:3001`) and relaunch.
