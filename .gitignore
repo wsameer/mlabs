@@ -41,3 +41,4 @@ apps/desktop/src-tauri/bin/
 apps/desktop/src-tauri/resources/
 apps/desktop/src-tauri/icons/*
 !apps/desktop/src-tauri/icons/.gitkeep
+.superpowers/
