@@ -37,6 +37,7 @@ export class TransactionsService {
     if (filters?.accountId) {
       conditions.push(eq(transactions.accountId, filters.accountId));
     }
+    // uncategorizedOnly overrides categoryIds: a row cannot be both null and in a set.
     if (filters?.uncategorizedOnly) {
       conditions.push(isNull(transactions.categoryId));
       conditions.push(ne(transactions.type, "TRANSFER"));

@@ -100,10 +100,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  try {
-    if (fs.existsSync(TEST_DB)) fs.unlinkSync(TEST_DB);
-  } catch {
-    // best-effort cleanup
+  for (const suffix of ["", "-shm", "-wal"]) {
+    const file = `${TEST_DB}${suffix}`;
+    try {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    } catch {
+      // best-effort cleanup
+    }
   }
 });
 
