@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@workspace/ui/components/input";
 
 export interface AmountRangeInputsProps {
@@ -15,21 +15,29 @@ function parseOptionalNumber(raw: string): number | undefined {
   return n;
 }
 
+function toDisplay(value: number | undefined): string {
+  return value !== undefined ? String(value) : "";
+}
+
 export function AmountRangeInputs({
   min,
   max,
   onCommit,
   className,
 }: AmountRangeInputsProps) {
-  const [minLocal, setMinLocal] = useState(min !== undefined ? String(min) : "");
-  const [maxLocal, setMaxLocal] = useState(max !== undefined ? String(max) : "");
+  const [minLocal, setMinLocal] = useState(toDisplay(min));
+  const [maxLocal, setMaxLocal] = useState(toDisplay(max));
+  const [prevMin, setPrevMin] = useState(min);
+  const [prevMax, setPrevMax] = useState(max);
 
-  useEffect(() => {
-    setMinLocal(min !== undefined ? String(min) : "");
-  }, [min]);
-  useEffect(() => {
-    setMaxLocal(max !== undefined ? String(max) : "");
-  }, [max]);
+  if (min !== prevMin) {
+    setPrevMin(min);
+    setMinLocal(toDisplay(min));
+  }
+  if (max !== prevMax) {
+    setPrevMax(max);
+    setMaxLocal(toDisplay(max));
+  }
 
   const commit = () => {
     onCommit({
