@@ -5,10 +5,14 @@ CREATE TABLE `accounts` (
 	`group` text NOT NULL,
 	`balance` text DEFAULT '0' NOT NULL,
 	`currency` text DEFAULT 'CAD' NOT NULL,
+	`institution_name` text,
+	`account_number` text,
+	`description` text,
 	`original_amount` text,
 	`interest_rate` text,
-	`next_payment_date` text,
+	`credit_limit` text,
 	`linked_account_id` text,
+	`metadata` text,
 	`color` text,
 	`icon` text,
 	`is_active` integer DEFAULT true NOT NULL,
@@ -52,8 +56,7 @@ CREATE TABLE `profiles` (
 	`is_setup_complete` integer DEFAULT false NOT NULL,
 	`notes` text,
 	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL,
-	CONSTRAINT "profiles_notes_length_chk" CHECK(("profiles"."notes" is null or length("profiles"."notes") <= 160))
+	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE INDEX `profiles_default_idx` ON `profiles` (`is_default`);--> statement-breakpoint
