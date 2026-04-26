@@ -37,7 +37,7 @@
     "macOS": {
       "minimumSystemVersion": "11.0"
     },
-    "resources": [],
-    "externalBin": []
+    "resources": ["resources/**/*"],
+    "externalBin": ["bin/mlabs-api"]
   }
 }
