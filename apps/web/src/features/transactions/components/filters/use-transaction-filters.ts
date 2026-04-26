@@ -50,7 +50,7 @@ export function useTransactionFilters() {
       merged.maxAmount = max;
 
       void navigate({
-        search: () => stripDefaults(merged),
+        search: stripDefaults(merged) as never,
         replace: true,
       });
     },
@@ -59,7 +59,7 @@ export function useTransactionFilters() {
 
   const resetFilters = useCallback(() => {
     void navigate({
-      search: () => ({}),
+      search: {} as never,
       replace: true,
     });
   }, [navigate]);
