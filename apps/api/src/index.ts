@@ -13,6 +13,7 @@ import { requestLogger } from "./middleware/request-logger.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { profileMiddleware } from "./middleware/profile.js";
 import { env } from "./libs/env.js";
+import { applyMigrationsIfEnabled } from "./libs/migrations.js";
 
 import health from "./routes/health.js";
 import bootstrap from "./routes/bootstrap.js";
@@ -162,6 +163,9 @@ app.notFound((c) => {
 
 // Global error handler
 app.onError(errorHandler);
+
+// Apply migrations when desktop sidecar provides MIGRATIONS_FOLDER
+await applyMigrationsIfEnabled();
 
 // Server Startup
 const port = env.PORT;
