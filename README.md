@@ -1,6 +1,6 @@
-# shadcn/ui monorepo template
+# mLabs
 
-This is a Vite monorepo template with shadcn/ui.
+This is your own offline first finance OS where you can track your expenses, income, investments, budgets and use AI to make every penny useful.
 
 ## Local development (app + embedded SQLite)
 

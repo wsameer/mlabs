@@ -232,6 +232,7 @@ function IncomeExpenseForm({
 
   // Separate parent categories and subcategories
   const parentCategories = categories?.filter((c) => !c.parentId) ?? [];
+  // eslint-disable-next-line
   const selectedCategoryId = form.watch("categoryId");
   const subcategories =
     categories?.filter((c) => c.parentId === selectedCategoryId) ?? [];

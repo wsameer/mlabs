@@ -37,7 +37,6 @@ export function navigateDateRange({
   grain,
   direction,
   tz = DEFAULT_TIMEZONE,
-  weekStartsOn = 1,
 }: NavigateOptions): DateRange {
   const today = nowInTz(tz);
   const isPrev = direction === "prev";

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ChartNoAxesCombinedIcon, SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { Transaction } from "@workspace/types";

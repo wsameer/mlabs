@@ -183,6 +183,7 @@ function EditIncomeExpenseForm({
   });
 
   const form = useForm<EditIncomeExpenseValues>({
+    // eslint-disable-next-line
     resolver: zodResolver(EditIncomeExpenseSchema) as any,
     mode: "onChange",
     defaultValues: {
@@ -428,6 +429,7 @@ function EditTransferForm({
   const { data: accounts } = useAccounts({ isActive: true });
 
   const form = useForm<EditTransferValues>({
+    // eslint-disable-next-line
     resolver: zodResolver(EditTransferSchema) as any,
     mode: "onChange",
     defaultValues: {

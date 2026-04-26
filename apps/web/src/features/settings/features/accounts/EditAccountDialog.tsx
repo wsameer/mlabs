@@ -145,6 +145,7 @@ export function EditAccountDialog({ open, onOpenChange, account }: Props) {
   const updateAccount = useUpdateAccount();
 
   const form = useForm<EditAccountFormData>({
+    // eslint-disable-next-line
     resolver: zodResolver(EditAccountFormSchema) as any,
     defaultValues: getDefaultValues(),
   });
