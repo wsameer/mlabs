@@ -1,10 +1,14 @@
 import type { TransactionQuery } from "@workspace/types";
 import type { TransactionFilterState } from "./filter-types";
 
+function hasSearch(q: string | undefined): boolean {
+  return !!q && q.trim().length > 0;
+}
+
 export function getActiveFilterCount(state: TransactionFilterState): number {
   let count = 0;
   if (state.preset !== "all") count += 1;
-  if (state.q && state.q.length > 0) count += 1;
+  if (hasSearch(state.q)) count += 1;
   if (state.categoryIds && state.categoryIds.length > 0) count += 1;
   if (state.minAmount !== undefined) count += 1;
   if (state.maxAmount !== undefined) count += 1;
@@ -32,8 +36,8 @@ export function toApiQuery(
     base.categoryIds = state.categoryIds;
   }
 
-  if (state.q && state.q.trim().length > 0) {
-    base.search = state.q;
+  if (hasSearch(state.q)) {
+    base.search = state.q!.trim();
   }
 
   if (state.minAmount !== undefined) {

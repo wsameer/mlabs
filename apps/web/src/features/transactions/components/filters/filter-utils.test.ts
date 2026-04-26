@@ -33,6 +33,10 @@ describe("getActiveFilterCount", () => {
   it("does not count empty categoryIds array", () => {
     expect(getActiveFilterCount({ preset: "all", categoryIds: [] })).toBe(0);
   });
+
+  it("does not count whitespace-only search", () => {
+    expect(getActiveFilterCount({ preset: "all", q: "   " })).toBe(0);
+  });
 });
 
 describe("toApiQuery", () => {
@@ -79,6 +83,16 @@ describe("toApiQuery", () => {
       range
     );
     expect(q.categoryIds).toEqual(["a", "b"]);
+  });
+
+  it("omits search when q is only whitespace", () => {
+    const q = toApiQuery({ preset: "all", q: "   " }, range);
+    expect(q.search).toBeUndefined();
+  });
+
+  it("trims surrounding whitespace from search", () => {
+    const q = toApiQuery({ preset: "all", q: "  chipotle  " }, range);
+    expect(q.search).toBe("chipotle");
   });
 });
 
