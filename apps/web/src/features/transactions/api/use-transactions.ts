@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
 import { accountKeys } from "@/features/accounts/api/use-accounts";
 import type {
@@ -28,6 +33,7 @@ export function useTransactions(filters?: TransactionQuery) {
           signal,
         }
       ),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -14,6 +14,7 @@ import { TListLoader } from "./TListLoader";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { EmptyTransactions } from "./EmptyTransactions";
+import { FilteredEmpty } from "./FilteredEmpty";
 import {
   TransactionsSummaryContent,
   TransactionsSummaryMobile,
@@ -33,28 +34,40 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 import { useDateRange } from "@/hooks/use-filters";
 import { parseDateString, toDateString } from "@/lib/timezone";
+import {
+  SearchInput,
+  TransactionFilters,
+  TransactionFiltersSheet,
+  toApiQuery,
+  useTransactionFilters,
+} from "../filters";
 
 export function TransactionsPage() {
   const { to, from } = useDateRange();
-
   const { setOpenCreateTransaction } = useUiActions();
+  const {
+    filters: filterState,
+    setFilters,
+    resetFilters,
+    activeFilterCount,
+  } = useTransactionFilters();
 
-  const filters = useMemo(
-    () => ({
-      startDate: toDateString(from),
-      endDate: toDateString(to),
-    }),
-    [from, to]
+  const queryFilters = useMemo(
+    () =>
+      toApiQuery(filterState, {
+        startDate: toDateString(from),
+        endDate: toDateString(to),
+      }),
+    [filterState, from, to]
   );
 
-  const { data, isLoading } = useTransactions(filters);
+  const { data, isLoading } = useTransactions(queryFilters);
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
 
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTx, setDeleteTx] = useState<Transaction | null>(null);
 
-  // Build lookup maps
   const accountMap = useMemo(() => {
     const map = new Map<string, string>();
     accounts?.forEach((a) => map.set(a.id, a.name));
@@ -100,11 +113,9 @@ export function TransactionsPage() {
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
   const totalsByDate = useMemo(() => {
     const totals: Record<string, { income: number; debit: number }> = {};
-
     for (const dateKey of Object.keys(grouped)) {
       totals[dateKey] = calculateTransactionGroupTotals(grouped[dateKey]);
     }
-
     return totals;
   }, [grouped]);
   const sortedDates = useMemo(
@@ -120,12 +131,28 @@ export function TransactionsPage() {
     );
   }
 
+  const hasActiveFilters = activeFilterCount > 0;
+
   return (
-    <div className="mx-auto flex w-full flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1">
-          <DateRangeFilter />
-        </div>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      {/* Row 1: global date range */}
+      <DateRangeFilter />
+
+      {/* Row 2: desktop filters */}
+      <div className="hidden lg:block">
+        <TransactionFilters />
+      </div>
+
+      {/* Row 2 (mobile): search + Filters sheet + summary */}
+      <div className="flex items-center gap-2 lg:hidden">
+        <SearchInput
+          value={filterState.q ?? ""}
+          onDebouncedChange={(next) =>
+            setFilters({ q: next.length > 0 ? next : undefined })
+          }
+          className="min-w-0 flex-1"
+        />
+        <TransactionFiltersSheet />
         <TransactionsSummaryMobile
           transactions={transactions}
           categoryMap={categoryMap}
@@ -135,7 +162,13 @@ export function TransactionsPage() {
 
       {transactions.length === 0 ? (
         <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
-          <EmptyTransactions openCreateTransaction={setOpenCreateTransaction} />
+          {hasActiveFilters ? (
+            <FilteredEmpty onReset={resetFilters} />
+          ) : (
+            <EmptyTransactions
+              openCreateTransaction={setOpenCreateTransaction}
+            />
+          )}
         </div>
       ) : (
         <Card className="p-0">
