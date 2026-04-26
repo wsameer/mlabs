@@ -165,14 +165,16 @@ app.onError(errorHandler);
 
 // Server Startup
 const port = env.PORT;
+const host = env.HOST;
 
 const server = serve(
   {
     fetch: app.fetch,
     port,
+    hostname: host,
   },
   (info) => {
-    logger.info(`Server is running on http://localhost:${info.port}/api`);
+    logger.info(`Server is running on http://${host}:${info.port}/api`);
     logger.info(`Environment: ${env.NODE_ENV}`);
     logger.info(`Rate limiting: 100 requests per 15 minutes`);
   }
