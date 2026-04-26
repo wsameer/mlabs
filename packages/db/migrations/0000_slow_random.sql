@@ -53,7 +53,7 @@ CREATE TABLE `profiles` (
 	`notes` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	CONSTRAINT "profiles_notes_length_chk" CHECK(("profiles"."notes" is null or length("profiles"."notes") <= ?))
+	CONSTRAINT "profiles_notes_length_chk" CHECK(("profiles"."notes" is null or length("profiles"."notes") <= 160))
 );
 --> statement-breakpoint
 CREATE INDEX `profiles_default_idx` ON `profiles` (`is_default`);--> statement-breakpoint
