@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { execSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,5 +29,19 @@ describe("sidecar bundle layout", () => {
     const libsql = path.join(resources, "node_modules", "@libsql");
     expect(existsSync(libsql)).toBe(true);
     expect(readdirSync(libsql).length).toBeGreaterThan(0);
+  });
+
+  it("produces syntactically valid JavaScript in api/index.js", () => {
+    const entry = path.join(resources, "api", "index.js");
+    // node --check exits non-zero on syntax errors
+    expect(() =>
+      execSync(`node --check "${entry}"`, { stdio: "pipe" })
+    ).not.toThrow();
+  });
+
+  it("stages the drizzle migrations journal", () => {
+    expect(
+      existsSync(path.join(resources, "migrations", "meta", "_journal.json"))
+    ).toBe(true);
   });
 });

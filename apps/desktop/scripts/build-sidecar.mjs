@@ -253,4 +253,9 @@ function main() {
   console.log("Done.");
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  console.error("Sidecar staging failed:", err);
+  process.exit(1);
+}
