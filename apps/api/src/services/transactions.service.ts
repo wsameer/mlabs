@@ -10,6 +10,8 @@ import type {
   UpdateTransfer,
 } from "@workspace/types";
 
+import { inArray, isNull, ne } from "drizzle-orm";
+
 import { and, asc, db, desc, eq, gte, lte, or, sql } from "../libs/db.js";
 import {
   BadRequestError,
@@ -35,8 +37,11 @@ export class TransactionsService {
     if (filters?.accountId) {
       conditions.push(eq(transactions.accountId, filters.accountId));
     }
-    if (filters?.categoryId) {
-      conditions.push(eq(transactions.categoryId, filters.categoryId));
+    if (filters?.uncategorizedOnly) {
+      conditions.push(isNull(transactions.categoryId));
+      conditions.push(ne(transactions.type, "TRANSFER"));
+    } else if (filters?.categoryIds && filters.categoryIds.length > 0) {
+      conditions.push(inArray(transactions.categoryId, filters.categoryIds));
     }
     if (filters?.type) {
       conditions.push(eq(transactions.type, filters.type));
