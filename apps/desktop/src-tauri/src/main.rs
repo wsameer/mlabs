@@ -3,7 +3,7 @@
 mod errors;
 mod sidecar;
 
-use tauri::{Manager, RunEvent, WindowEvent};
+use tauri::{RunEvent, WindowEvent};
 
 fn main() {
     // TODO(security): Tighten CSP before shipping a signed DMG. Tauri v2 rejects

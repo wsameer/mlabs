@@ -77,7 +77,7 @@ pub fn start(app: &AppHandle) -> Result<(), SidecarError> {
         .spawn()
         .map_err(|e| SidecarError::Spawn(e.to_string()))?;
 
-    *child_slot().lock().unwrap() = Some(child);
+    *child_slot().lock().unwrap_or_else(|e| e.into_inner()) = Some(child);
 
     tauri::async_runtime::spawn(async move {
         while let Some(event) = rx.recv().await {
@@ -101,7 +101,39 @@ pub fn start(app: &AppHandle) -> Result<(), SidecarError> {
 }
 
 pub fn stop() {
-    if let Some(child) = child_slot().lock().unwrap().take() {
-        let _ = child.kill();
+    let child = {
+        let mut slot = child_slot().lock().unwrap_or_else(|e| e.into_inner());
+        slot.take()
+    };
+    let Some(child) = child else { return };
+
+    let pid = child.pid();
+
+    // Send SIGTERM so the API's graceful-shutdown handler runs (server.close,
+    // SQLite WAL checkpoint). If it doesn't exit within the grace window, fall
+    // back to kill() (SIGKILL in tauri-plugin-shell).
+    #[cfg(unix)]
+    unsafe {
+        libc::kill(pid as libc::pid_t, libc::SIGTERM);
     }
+
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(3);
+    loop {
+        // tauri-plugin-shell doesn't expose a try_wait; poll by sending
+        // signal 0 (existence check). When the process is gone, kill(0) fails.
+        #[cfg(unix)]
+        let alive = unsafe { libc::kill(pid as libc::pid_t, 0) == 0 };
+        #[cfg(not(unix))]
+        let alive = true;
+
+        if !alive {
+            return;
+        }
+        if std::time::Instant::now() >= deadline {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+
+    let _ = child.kill();
 }
