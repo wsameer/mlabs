@@ -14,8 +14,8 @@ export const TransactionsSearchSchema = z.object({
   preset: z.enum(TRANSACTION_FILTER_PRESETS).catch("all").default("all"),
   q: z.string().optional().catch(undefined),
   categoryIds: z.array(z.uuid()).optional().catch(undefined),
-  minAmount: z.number().nonnegative().optional().catch(undefined),
-  maxAmount: z.number().nonnegative().optional().catch(undefined),
+  minAmount: z.coerce.number().nonnegative().optional().catch(undefined),
+  maxAmount: z.coerce.number().nonnegative().optional().catch(undefined),
 });
 
 export type TransactionFilterState = z.infer<typeof TransactionsSearchSchema>;
