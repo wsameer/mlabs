@@ -1,5 +1,5 @@
 export { TransactionFilters } from "./TransactionFilters";
-export { TransactionFiltersSheet } from "./TransactionFiltersSheet";
+export { TransactionFiltersDrawer } from "./TransactionFiltersDrawer";
 export { SearchInput } from "./components/SearchInput";
 export { useTransactionFilters } from "./use-transaction-filters";
 export { toApiQuery } from "./filter-utils";

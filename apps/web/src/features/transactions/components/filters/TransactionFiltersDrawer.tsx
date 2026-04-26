@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontalIcon } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@workspace/ui/components/drawer";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { useCategories } from "@/features/categories/api/use-categories";
@@ -19,7 +19,7 @@ import { FilterResetButton } from "./components/FilterResetButton";
 import { useTransactionFilters } from "./use-transaction-filters";
 import { sanitizeCategoryIds } from "./filter-utils";
 
-export function TransactionFiltersSheet() {
+export function TransactionFiltersDrawer() {
   const [open, setOpen] = useState(false);
   const { data: categories } = useCategories();
   const { filters, setFilters, resetFilters, activeFilterCount } =
@@ -46,27 +46,25 @@ export function TransactionFiltersSheet() {
   }, [categories, filters.categoryIds, setFilters]);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        render={
-          <Button type="button" variant="secondary" className="gap-1">
-            <SlidersHorizontalIcon className="size-3" />
-            Filters
-            {activeFilterCount > 0 && (
-              <Badge variant="default" className="ml-1 h-4 px-1 text-[10px]">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        }
-      />
-      <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Filters</SheetTitle>
-          <SheetDescription>
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button type="button" variant="secondary" className="gap-1">
+          <SlidersHorizontalIcon className="size-3" />
+          Filters
+          {activeFilterCount > 0 && (
+            <Badge variant="default" className="ml-1 h-4 px-1 text-[10px]">
+              {activeFilterCount}
+            </Badge>
+          )}
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Filters</DrawerTitle>
+          <DrawerDescription>
             Narrow the transactions list by preset, category, and amount.
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
         <div className="flex flex-col gap-4 px-4 pb-6">
           <section className="flex flex-col gap-2">
@@ -115,7 +113,7 @@ export function TransactionFiltersSheet() {
             className="self-start"
           />
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }

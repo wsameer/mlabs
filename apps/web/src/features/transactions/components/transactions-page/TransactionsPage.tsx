@@ -37,7 +37,7 @@ import { parseDateString, toDateString } from "@/lib/timezone";
 import {
   SearchInput,
   TransactionFilters,
-  TransactionFiltersSheet,
+  TransactionFiltersDrawer,
   toApiQuery,
   useTransactionFilters,
 } from "../filters";
@@ -152,7 +152,7 @@ export function TransactionsPage() {
           }
           className="min-w-0 flex-1"
         />
-        <TransactionFiltersSheet />
+        <TransactionFiltersDrawer />
         <TransactionsSummaryMobile
           transactions={transactions}
           categoryMap={categoryMap}
