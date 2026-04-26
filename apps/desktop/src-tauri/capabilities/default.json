@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "default capability for the main window",
+  "description": "default capability for the main window (TODO: narrow permissions in Task 5 once sidecar scope is known)",
   "windows": ["main"],
   "permissions": [
     "core:default",

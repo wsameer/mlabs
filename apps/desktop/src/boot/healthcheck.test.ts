@@ -4,6 +4,7 @@ import { waitForHealth } from "./healthcheck.js";
 describe("waitForHealth", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("resolves when fetch returns ok", async () => {
