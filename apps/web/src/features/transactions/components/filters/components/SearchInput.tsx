@@ -38,7 +38,7 @@ export function SearchInput({
     <div className={`relative flex items-center ${className ?? ""}`}>
       <SearchIcon className="pointer-events-none absolute left-2 size-3.5 text-muted-foreground" />
       <Input
-        type="search"
+        type="text"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         placeholder={placeholder}
