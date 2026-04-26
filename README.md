@@ -4,14 +4,30 @@ This is a Vite monorepo template with shadcn/ui.
 
 ## Local development (app + embedded SQLite)
 
+Two separate workflows, depending on what you're working on:
+
+### Web + API (most of the time)
+
 ```bash
 cp .env.example .env
-pnpm db:bootstrap
-pnpm dev
-
-# Seed data
-Use `pnpm db:bootstrap:seed` instead of `pnpm db:bootstrap` if you want sample data.
+pnpm db:bootstrap        # or pnpm db:bootstrap:seed for sample data
+pnpm dev                 # runs api (port 3001) + web (vite, port 5173)
 ```
+
+Vite serves the frontend at `http://localhost:5173` and proxies `/api` to the Hono server on 3001. Edit files in `apps/web` or `apps/api` and both hot-reload.
+
+### Desktop app (Tauri shell)
+
+Running the desktop app is a separate command because it spawns a native window and a Rust toolchain:
+
+```bash
+pnpm desktop:sidecar     # stage API + web + node_modules into the Tauri resources dir
+pnpm desktop:dev         # launch the Tauri dev window
+```
+
+See the [macOS Desktop](#macos-desktop-local-first-offline) section for prerequisites (Rust, Xcode CLT).
+
+**Note:** `pnpm dev` intentionally excludes `apps/desktop` — use `pnpm desktop:dev` when you want the native window.
 
 ## PROD
 ```bash
