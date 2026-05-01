@@ -14,7 +14,7 @@ import {
 } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
 
-import { TransactionsWrapper } from "./TransactionsWrapper";
+import { TransactionsWrapper } from "./components/TransactionsWrapper";
 
 export function AddTransactionPopover() {
   const isOpen = useOpenCreateTransaction();

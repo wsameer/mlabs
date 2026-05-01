@@ -9,7 +9,7 @@ import { FilterResetButton } from "./components/FilterResetButton";
 import { useTransactionFilters } from "./use-transaction-filters";
 import { sanitizeCategoryIds } from "./filter-utils";
 
-export function TransactionFilters() {
+export function TransactionFilters({ disabled }: { disabled?: boolean }) {
   const { data: categories } = useCategories();
   const { filters, setFilters, resetFilters, activeFilterCount } =
     useTransactionFilters();
@@ -42,6 +42,7 @@ export function TransactionFilters() {
       <PresetChips
         value={filters.preset}
         onChange={(preset) => setFilters({ preset })}
+        disabled={disabled}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -50,6 +51,7 @@ export function TransactionFilters() {
           onDebouncedChange={(next) =>
             setFilters({ q: next.length > 0 ? next : undefined })
           }
+          disabled={disabled}
           className="min-w-[220px] flex-1"
         />
 
@@ -59,6 +61,7 @@ export function TransactionFilters() {
           onChange={(next) =>
             setFilters({ categoryIds: next.length > 0 ? next : undefined })
           }
+          disabled={disabled}
         />
 
         <AmountRangeInputs
@@ -67,6 +70,7 @@ export function TransactionFilters() {
           onCommit={({ min, max }) =>
             setFilters({ minAmount: min, maxAmount: max })
           }
+          disabled={disabled}
         />
 
         <FilterResetButton

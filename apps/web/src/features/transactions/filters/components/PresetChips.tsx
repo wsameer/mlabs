@@ -14,9 +14,10 @@ const PRESETS: Array<{ value: TransactionFilterPreset; label: string }> = [
 export interface PresetChipsProps {
   value: TransactionFilterPreset;
   onChange: (next: TransactionFilterPreset) => void;
+  disabled?: boolean;
 }
 
-export function PresetChips({ value, onChange }: PresetChipsProps) {
+export function PresetChips({ value, onChange, disabled }: PresetChipsProps) {
   return (
     <ToggleGroup
       value={[value]}
@@ -24,6 +25,7 @@ export function PresetChips({ value, onChange }: PresetChipsProps) {
         if (!next.length) return;
         onChange(next[0] as TransactionFilterPreset);
       }}
+      disabled={disabled}
       className="flex flex-wrap gap-1"
     >
       {PRESETS.map((p) => (

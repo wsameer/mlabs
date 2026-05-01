@@ -9,6 +9,7 @@ export interface SearchInputProps {
   placeholder?: string;
   debounceMs?: number;
   className?: string;
+  disabled?: boolean;
 }
 
 export function SearchInput({
@@ -17,6 +18,7 @@ export function SearchInput({
   placeholder = "Search description…",
   debounceMs = 250,
   className,
+  disabled,
 }: SearchInputProps) {
   const [local, setLocal] = useState(value);
   const [prevValue, setPrevValue] = useState(value);
@@ -44,9 +46,10 @@ export function SearchInput({
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         placeholder={placeholder}
+        disabled={disabled}
         className="h-8 pl-7 pr-7 text-xs"
       />
-      {local.length > 0 && (
+      {!disabled && local.length > 0 && (
         <Button
           type="button"
           variant="ghost"

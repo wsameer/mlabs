@@ -29,6 +29,7 @@ export interface CategoryMultiSelectProps {
   onChange: (next: string[]) => void;
   /** Render selected categories as inline removable pills next to the trigger (desktop) */
   showInlinePills?: boolean;
+  disabled?: boolean;
 }
 
 export function CategoryMultiSelect({
@@ -36,6 +37,7 @@ export function CategoryMultiSelect({
   value,
   onChange,
   showInlinePills = true,
+  disabled,
 }: CategoryMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const selected = options.filter((o) => value.includes(o.id));
@@ -57,7 +59,7 @@ export function CategoryMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
-            <Button variant="outline" size="sm" className="h-8 gap-1 text-xs">
+            <Button variant="outline" size="sm" disabled={disabled} className="h-8 gap-1 text-xs">
               {triggerLabel}
               <ChevronDownIcon className="size-3 text-muted-foreground" />
             </Button>

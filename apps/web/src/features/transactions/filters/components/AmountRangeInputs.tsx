@@ -6,6 +6,7 @@ export interface AmountRangeInputsProps {
   max: number | undefined;
   onCommit: (next: { min: number | undefined; max: number | undefined }) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 function parseOptionalNumber(raw: string): number | undefined {
@@ -24,6 +25,7 @@ export function AmountRangeInputs({
   max,
   onCommit,
   className,
+  disabled,
 }: AmountRangeInputsProps) {
   const [minLocal, setMinLocal] = useState(toDisplay(min));
   const [maxLocal, setMaxLocal] = useState(toDisplay(max));
@@ -57,6 +59,7 @@ export function AmountRangeInputs({
         onBlur={commit}
         placeholder="Min $"
         aria-label="Minimum amount"
+        disabled={disabled}
         className="h-8 w-20 text-xs"
       />
       <span className="text-xs text-muted-foreground">–</span>
@@ -69,6 +72,7 @@ export function AmountRangeInputs({
         onBlur={commit}
         placeholder="Max $"
         aria-label="Maximum amount"
+        disabled={disabled}
         className="h-8 w-20 text-xs"
       />
     </div>

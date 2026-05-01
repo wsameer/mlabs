@@ -1,3 +1,2 @@
-export { TransactionsPage } from "./components/transactions-page";
-export { AddTransactionPopover } from "./components/AddTransactionPopover";
-export type { TransactionItemProps } from "./types";
+export { TransactionsPage } from "./TransactionsPage";
+export { AddTransactionPopover } from "./create-transaction";

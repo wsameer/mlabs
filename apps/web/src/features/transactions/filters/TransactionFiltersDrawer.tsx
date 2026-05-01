@@ -19,7 +19,7 @@ import { FilterResetButton } from "./components/FilterResetButton";
 import { useTransactionFilters } from "./use-transaction-filters";
 import { sanitizeCategoryIds } from "./filter-utils";
 
-export function TransactionFiltersDrawer() {
+export function TransactionFiltersDrawer({ disabled }: { disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const { data: categories } = useCategories();
   const { filters, setFilters, resetFilters, activeFilterCount } =
@@ -48,7 +48,7 @@ export function TransactionFiltersDrawer() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button type="button" variant="secondary" className="gap-1">
+        <Button type="button" variant="secondary" disabled={disabled} className="gap-1">
           <SlidersHorizontalIcon className="size-3" />
           Filters
           {activeFilterCount > 0 && (

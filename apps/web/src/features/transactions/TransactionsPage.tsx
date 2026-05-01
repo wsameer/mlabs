@@ -8,17 +8,17 @@ import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
 
-import { useTransactions } from "../../api/use-transactions";
-import { TransactionItem } from "./TransactionItem";
-import { TListLoader } from "./TListLoader";
-import { EditTransactionDialog } from "./EditTransactionDialog";
-import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
-import { EmptyTransactions } from "./EmptyTransactions";
-import { FilteredEmpty } from "./FilteredEmpty";
+import { useTransactions } from "./api/use-transactions";
+import { TransactionItem } from "./components/TransactionItem";
+import { TListLoader } from "./components/TListLoader";
+import { EmptyTransactions } from "./components/EmptyTransactions";
+import { FilteredEmpty } from "./components/FilteredEmpty";
+import { EditTransactionDialog } from "./edit-transaction";
+import { DeleteTransactionDialog } from "./delete-transaction";
 import {
   TransactionsSummaryContent,
   TransactionsSummaryMobile,
-} from "./TransactionsSidebar";
+} from "./summary";
 import {
   Item,
   ItemActions,
@@ -27,7 +27,8 @@ import {
 } from "@workspace/ui/components/item";
 import { format } from "date-fns";
 import { Badge } from "@workspace/ui/components/badge";
-import { calculateTransactionGroupTotals, groupByDate } from "../../utils";
+import { groupByDate } from "./lib/group-by-date";
+import { calculateTransactionGroupTotals } from "./lib/calculate-transaction-group-totals";
 import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
@@ -40,7 +41,7 @@ import {
   TransactionFiltersDrawer,
   toApiQuery,
   useTransactionFilters,
-} from "../filters";
+} from "./filters";
 
 export function TransactionsPage() {
   const { to, from } = useDateRange();
@@ -132,6 +133,7 @@ export function TransactionsPage() {
   }
 
   const hasActiveFilters = activeFilterCount > 0;
+  const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
@@ -140,7 +142,7 @@ export function TransactionsPage() {
 
       {/* Row 2: desktop filters */}
       <div className="hidden lg:block">
-        <TransactionFilters />
+        <TransactionFilters disabled={filtersDisabled} />
       </div>
 
       {/* Row 2 (mobile): search + Filters sheet + summary */}
@@ -150,9 +152,10 @@ export function TransactionsPage() {
           onDebouncedChange={(next) =>
             setFilters({ q: next.length > 0 ? next : undefined })
           }
+          disabled={filtersDisabled}
           className="min-w-0 flex-1"
         />
-        <TransactionFiltersDrawer />
+        <TransactionFiltersDrawer disabled={filtersDisabled} />
         <TransactionsSummaryMobile
           transactions={transactions}
           categoryMap={categoryMap}
