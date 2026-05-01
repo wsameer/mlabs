@@ -29,7 +29,7 @@ export function PresetChips({ value, onChange, disabled }: PresetChipsProps) {
       className="flex flex-wrap gap-1"
     >
       {PRESETS.map((p) => (
-        <ToggleGroupItem key={p.value} value={p.value} className="text-xs">
+        <ToggleGroupItem key={p.value} value={p.value} className="text-xs" data-testid={`tx-filters-preset-${p.value}`}>
           {p.label}
         </ToggleGroupItem>
       ))}

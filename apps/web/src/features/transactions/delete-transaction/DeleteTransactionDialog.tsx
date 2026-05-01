@@ -64,7 +64,7 @@ export function DeleteTransactionDialog({
   if (isDesktop) {
     return (
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent>
+        <AlertDialogContent data-testid="tx-delete-dialog">
           <AlertDialogHeader className="text-left">
             <AlertDialogTitle className="text-left">{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -82,7 +82,7 @@ export function DeleteTransactionDialog({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent data-testid="tx-delete-dialog">
         <DrawerHeader>
           <DrawerTitle className="text-left">{title}</DrawerTitle>
           <DrawerDescription className="text-left">
@@ -98,7 +98,7 @@ export function DeleteTransactionDialog({
         />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" data-testid="tx-delete-cancel">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -145,13 +145,14 @@ function DeleteContent({
           onClick={onDelete}
           disabled={isPending}
           className="w-full"
+          data-testid="tx-delete-confirm"
         >
           {isPending ? "Deleting..." : "Delete"}
         </Button>
       </div>
 
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} data-testid="tx-delete-cancel">
           Cancel
         </Button>
         <Button
@@ -159,6 +160,7 @@ function DeleteContent({
           variant="destructive"
           onClick={onDelete}
           disabled={isPending}
+          data-testid="tx-delete-confirm"
         >
           {isPending ? "Deleting..." : "Delete"}
         </Button>

@@ -25,6 +25,7 @@ export const TransactionsWrapper = () => {
             key={type}
             value={type}
             className="w-full text-center capitalize"
+            data-testid={`tx-create-tab-${type.toLowerCase()}`}
           >
             {type}
           </TabsTrigger>

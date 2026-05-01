@@ -61,6 +61,7 @@ export function AmountRangeInputs({
         aria-label="Minimum amount"
         disabled={disabled}
         className="h-8 w-20 text-xs"
+        data-testid="tx-filters-amount-min"
       />
       <span className="text-xs text-muted-foreground">–</span>
       <Input
@@ -74,6 +75,7 @@ export function AmountRangeInputs({
         aria-label="Maximum amount"
         disabled={disabled}
         className="h-8 w-20 text-xs"
+        data-testid="tx-filters-amount-max"
       />
     </div>
   );

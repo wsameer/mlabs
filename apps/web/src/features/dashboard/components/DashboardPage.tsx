@@ -40,8 +40,8 @@ export function DashboardPage() {
   );
 
   const renderTransactionsSummary = () => (
-    <>
-      <Card className="w-full border-none">
+    <ScrollArea className="h-[70svh]">
+      <Card className="m-0.5">
         <CardContent>
           <CashflowPieChart
             data={data}
@@ -50,10 +50,10 @@ export function DashboardPage() {
           />
         </CardContent>
       </Card>
-      <ScrollArea className="mt-2 h-7/12">
+      <div className="mt-2">
         <CategoryStatList data={data?.items ?? []} colorMap={colorMap} />
-      </ScrollArea>
-    </>
+      </div>
+    </ScrollArea>
   );
 
   return (

@@ -26,7 +26,7 @@ export function FilteredEmpty({ onReset }: FilteredEmptyProps) {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={onReset}>
+        <Button type="button" variant="outline" size="sm" onClick={onReset} data-testid="tx-empty-filtered-reset">
           Reset filters
         </Button>
       </EmptyContent>

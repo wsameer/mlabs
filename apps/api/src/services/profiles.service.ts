@@ -1,8 +1,7 @@
 import {
   accounts,
-  categories,
   profiles,
-  DEFAULT_CATEGORIES,
+  seedCategoriesForProfile,
 } from "@workspace/db";
 import type {
   CreateOnboardingProfile,
@@ -103,11 +102,7 @@ export class ProfilesService {
       }
 
       // Seed default categories
-      await tx
-        .insert(categories)
-        .values(
-          DEFAULT_CATEGORIES.map((cat) => ({ ...cat, profileId: profile.id }))
-        );
+      await seedCategoriesForProfile(tx, profile.id);
 
       if (payload.firstAccount) {
         await tx.insert(accounts).values({

@@ -136,7 +136,7 @@ export function TransactionsPage() {
   const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
       {/* Row 1: global date range */}
       <DateRangeFilter />
 

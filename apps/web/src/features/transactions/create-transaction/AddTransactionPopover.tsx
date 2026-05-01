@@ -25,7 +25,7 @@ export function AddTransactionPopover() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpenCreateTransaction}>
-      <DialogContent className="sm:max-w-131.25">
+      <DialogContent className="sm:max-w-131.25" data-testid="tx-create-dialog">
         <DialogHeader>
           <DialogTitle className="text-left text-lg">
             Record
@@ -42,7 +42,7 @@ export function AddTransactionPopover() {
         <DialogFooter>
           <DialogClose
             className="w-full"
-            render={<Button variant="secondary">Cancel</Button>}
+            render={<Button variant="secondary" data-testid="tx-create-cancel">Cancel</Button>}
           />
         </DialogFooter>
       </DialogContent>

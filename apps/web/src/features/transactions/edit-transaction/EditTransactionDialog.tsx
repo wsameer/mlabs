@@ -129,7 +129,7 @@ export function EditTransactionDialog({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-131.25">
+        <DialogContent className="sm:max-w-131.25" data-testid="tx-edit-dialog">
           <DialogHeader>
             <DialogTitle className="text-left">{title}</DialogTitle>
             <DialogDescription className="text-left">
@@ -144,7 +144,7 @@ export function EditTransactionDialog({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent data-testid="tx-edit-dialog">
         <DrawerHeader>
           <DrawerTitle className="text-left">{title}</DrawerTitle>
           <DrawerDescription className="text-left">
@@ -154,7 +154,7 @@ export function EditTransactionDialog({
         <div className="px-4">{content}</div>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" data-testid="tx-edit-cancel">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -265,6 +265,7 @@ function EditIncomeExpenseForm({
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-edit-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -299,6 +300,7 @@ function EditIncomeExpenseForm({
                     min="0"
                     placeholder="0.00"
                     className="text-xs"
+                    data-testid="tx-edit-amount"
                   />
                   <InputGroupAddon>
                     <DollarSignIcon />
@@ -318,6 +320,7 @@ function EditIncomeExpenseForm({
               type="date"
               {...form.register("date")}
               className="text-xs"
+              data-testid="tx-edit-date"
             />
             {form.formState.errors.date && (
               <FieldError>{form.formState.errors.date.message}</FieldError>
@@ -337,6 +340,7 @@ function EditIncomeExpenseForm({
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-edit-category"
               >
                 <NativeSelectOption value="">
                   Select category...
@@ -363,6 +367,7 @@ function EditIncomeExpenseForm({
             {...form.register("description")}
             autoComplete="off"
             className="text-xs"
+            data-testid="tx-edit-description"
           />
         </Field>
 
@@ -374,6 +379,7 @@ function EditIncomeExpenseForm({
             {...form.register("notes")}
             rows={2}
             className="text-xs"
+            data-testid="tx-edit-notes"
           />
         </Field>
       </FieldGroup>
@@ -381,7 +387,7 @@ function EditIncomeExpenseForm({
       {/* Actions */}
       <div className="flex justify-between gap-2 md:hidden">
         {onDelete && (
-          <Button type="button" variant="destructive" onClick={onDelete}>
+          <Button type="button" variant="destructive" onClick={onDelete} data-testid="tx-edit-delete">
             Delete
           </Button>
         )}
@@ -389,6 +395,7 @@ function EditIncomeExpenseForm({
           type="submit"
           disabled={updateTransaction.isPending}
           className="flex-1"
+          data-testid="tx-edit-save"
         >
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
@@ -400,11 +407,12 @@ function EditIncomeExpenseForm({
             variant="destructive"
             onClick={onDelete}
             className="mr-auto"
+            data-testid="tx-edit-delete"
           >
             Delete
           </Button>
         )}
-        <Button type="submit" disabled={updateTransaction.isPending}>
+        <Button type="submit" disabled={updateTransaction.isPending} data-testid="tx-edit-save">
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>
@@ -520,6 +528,7 @@ function EditTransferForm({
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-edit-from-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -549,6 +558,7 @@ function EditTransferForm({
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-edit-to-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -585,6 +595,7 @@ function EditTransferForm({
                     min="0"
                     placeholder="0.00"
                     className="text-xs"
+                    data-testid="tx-edit-amount"
                   />
                   <InputGroupAddon>
                     <DollarSignIcon />
@@ -604,6 +615,7 @@ function EditTransferForm({
               type="date"
               {...form.register("date")}
               className="text-xs"
+              data-testid="tx-edit-date"
             />
             {form.formState.errors.date && (
               <FieldError>{form.formState.errors.date.message}</FieldError>
@@ -621,6 +633,7 @@ function EditTransferForm({
             {...form.register("description")}
             autoComplete="off"
             className="text-xs"
+            data-testid="tx-edit-description"
           />
         </Field>
 
@@ -632,6 +645,7 @@ function EditTransferForm({
             {...form.register("notes")}
             rows={2}
             className="text-xs"
+            data-testid="tx-edit-notes"
           />
         </Field>
       </FieldGroup>
@@ -639,7 +653,7 @@ function EditTransferForm({
       {/* Actions */}
       <div className="flex justify-between gap-2 md:hidden">
         {onDelete && (
-          <Button type="button" variant="destructive" onClick={onDelete}>
+          <Button type="button" variant="destructive" onClick={onDelete} data-testid="tx-edit-delete">
             Delete
           </Button>
         )}
@@ -647,6 +661,7 @@ function EditTransferForm({
           type="submit"
           disabled={updateTransaction.isPending}
           className="flex-1"
+          data-testid="tx-edit-save"
         >
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
@@ -658,11 +673,12 @@ function EditTransferForm({
             variant="destructive"
             onClick={onDelete}
             className="mr-auto"
+            data-testid="tx-edit-delete"
           >
             Delete
           </Button>
         )}
-        <Button type="submit" disabled={updateTransaction.isPending}>
+        <Button type="submit" disabled={updateTransaction.isPending} data-testid="tx-edit-save">
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>

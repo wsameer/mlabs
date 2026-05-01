@@ -31,10 +31,10 @@ export const CategoryStatList = ({
               <button type="button" className="w-full">
                 <ItemMedia>
                   <Badge
-                    className="w-12 text-white"
+                    className="w-10 text-foreground"
                     style={{ backgroundColor: color }}
                   >
-                    {item.percentage}%
+                    {Math.round(item.percentage)}%
                   </Badge>
                 </ItemMedia>
                 <ItemContent>
@@ -45,7 +45,7 @@ export const CategoryStatList = ({
                 </ItemContent>
                 <ItemActions>
                   <p className="not-first:mt- leading-7">
-                    ${Number(item.total).toLocaleString()}
+                    ${Math.round(Number(item.total)).toLocaleString()}
                   </p>
                 </ItemActions>
               </button>

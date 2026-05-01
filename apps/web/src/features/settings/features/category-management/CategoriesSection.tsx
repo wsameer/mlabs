@@ -115,12 +115,12 @@ export function CategoriesSection() {
             return (
               <div key={cat.id} className="flex flex-col gap-2">
                 {/* Parent row */}
-                <Item variant="outline" size="sm">
+                <Item variant="muted" size="sm">
                   {/* Expand toggle */}
                   {hasSubs && (
                     <button
                       type="button"
-                      className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground"
+                      className="flex size-4 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground"
                       onClick={() => toggleExpand(cat.id)}
                     >
                       <ChevronDownIcon
@@ -130,9 +130,7 @@ export function CategoriesSection() {
                   )}
 
                   {/* Name */}
-                  <ItemContent>
-                    <span className="text-sm">{cat.name}</span>
-                  </ItemContent>
+                  <ItemContent>{cat.name}</ItemContent>
 
                   {/* Actions */}
                   <ItemActions>
@@ -147,7 +145,7 @@ export function CategoriesSection() {
                           title="Add subcategory"
                           onClick={() => handleAddSubcategory(cat)}
                         >
-                          <PlusIcon className="size-3.5" />
+                          <PlusIcon className="size-3" />
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
@@ -157,17 +155,17 @@ export function CategoriesSection() {
                           title="Edit"
                           onClick={() => handleEdit(cat)}
                         >
-                          <PencilIcon className="size-3.5" />
+                          <PencilIcon className="size-3" />
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
                         <Button
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
                           title="Delete"
                           onClick={() => handleDeleteRequest(cat)}
                         >
-                          <Trash2Icon className="size-3.5" />
+                          <Trash2Icon className="size-3" />
                         </Button>
                       </ButtonGroup>
                     </ButtonGroup>
@@ -176,14 +174,10 @@ export function CategoriesSection() {
 
                 {/* Subcategories */}
                 {hasSubs && isExpanded && (
-                  <div className="flex flex-col gap-2 pl-8">
+                  <ItemGroup className="flex flex-col gap-2 pl-4">
                     {cat.subcategories!.map((sub) => (
-                      <Item key={sub.id} variant="outline" size="xs">
-                        <ItemContent>
-                          <span className="text-sm text-muted-foreground">
-                            {sub.name}
-                          </span>
-                        </ItemContent>
+                      <Item key={sub.id} variant="muted" size="xs">
+                        <ItemContent>{sub.name}</ItemContent>
                         <ItemActions>
                           <Button
                             variant="ghost"
@@ -204,7 +198,7 @@ export function CategoriesSection() {
                         </ItemActions>
                       </Item>
                     ))}
-                  </div>
+                  </ItemGroup>
                 )}
               </div>
             );

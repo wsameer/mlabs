@@ -48,6 +48,7 @@ export function SearchInput({
         placeholder={placeholder}
         disabled={disabled}
         className="h-8 pl-7 pr-7 text-xs"
+        data-testid="tx-filters-search"
       />
       {!disabled && local.length > 0 && (
         <Button
@@ -56,6 +57,7 @@ export function SearchInput({
           size="icon"
           className="absolute right-1 size-6"
           aria-label="Clear search"
+          data-testid="tx-filters-search-clear"
           onClick={() => {
             setLocal("");
             onDebouncedChange("");

@@ -98,6 +98,7 @@ interface DatePickerFieldProps {
   value: string; // YYYY-MM-DD
   onChange: (value: string) => void;
   error?: string;
+  testId?: string;
 }
 
 function DatePickerField({
@@ -106,6 +107,7 @@ function DatePickerField({
   value,
   onChange,
   error,
+  testId,
 }: DatePickerFieldProps) {
   const [open, setOpen] = useState(false);
   const selectedDate = value ? parseDateString(value) : undefined;
@@ -120,6 +122,7 @@ function DatePickerField({
           value={formatDisplayDate(selectedDate)}
           placeholder="January 01, 2026"
           className="text-xs"
+          data-testid={testId}
           onChange={(e) => {
             const parsed = new Date(e.target.value);
             if (isValidDate(parsed)) {
@@ -138,7 +141,7 @@ function DatePickerField({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger
               render={
-                <InputGroupButton variant="ghost" aria-label="Select date">
+                <InputGroupButton variant="ghost" aria-label="Select date" data-testid={testId ? `${testId}-trigger` : undefined}>
                   <CalendarIcon />
                 </InputGroupButton>
               }
@@ -281,6 +284,7 @@ function IncomeExpenseForm({
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-create-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -315,6 +319,7 @@ function IncomeExpenseForm({
                     min="0"
                     placeholder="0.00"
                     className="text-xs"
+                    data-testid="tx-create-amount"
                   />
                   <InputGroupAddon>
                     <DollarSignIcon />
@@ -337,6 +342,7 @@ function IncomeExpenseForm({
                 value={field.value}
                 onChange={field.onChange}
                 error={fieldState.error?.message}
+                testId="tx-create-date"
               />
             )}
           />
@@ -358,6 +364,7 @@ function IncomeExpenseForm({
                   // Reset subcategory when category changes
                   form.setValue("subcategoryId", undefined);
                 }}
+                data-testid="tx-create-category"
               >
                 <NativeSelectOption value="">
                   Select category...
@@ -389,6 +396,7 @@ function IncomeExpenseForm({
                   className="w-full"
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(e.target.value || undefined)}
+                  data-testid="tx-create-subcategory"
                 >
                   <NativeSelectOption value="">None</NativeSelectOption>
                   {subcategories.map((sub) => (
@@ -412,6 +420,7 @@ function IncomeExpenseForm({
             placeholder="e.g. Grocery shopping"
             autoComplete="off"
             className="text-xs"
+            data-testid="tx-create-description"
           />
         </Field>
 
@@ -424,6 +433,7 @@ function IncomeExpenseForm({
             placeholder="Optional notes..."
             rows={2}
             className="text-xs"
+            data-testid="tx-create-notes"
           />
         </Field>
       </FieldGroup>
@@ -434,6 +444,7 @@ function IncomeExpenseForm({
           type="submit"
           disabled={createTransaction.isPending}
           className="w-full"
+          data-testid="tx-create-submit"
         >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>
@@ -443,6 +454,7 @@ function IncomeExpenseForm({
           type="submit"
           className="w-full"
           disabled={createTransaction.isPending}
+          data-testid="tx-create-submit"
         >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>
@@ -522,6 +534,7 @@ function TransferForm({ className }: { className?: string }) {
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-create-from-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -551,6 +564,7 @@ function TransferForm({ className }: { className?: string }) {
                 className="w-full"
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
+                data-testid="tx-create-to-account"
               >
                 <NativeSelectOption value="">
                   Select account...
@@ -585,6 +599,7 @@ function TransferForm({ className }: { className?: string }) {
                     min="0"
                     placeholder="0.00"
                     className="text-xs"
+                    data-testid="tx-create-amount"
                   />
                   <InputGroupAddon>
                     <DollarSignIcon />
@@ -607,6 +622,7 @@ function TransferForm({ className }: { className?: string }) {
                 value={field.value}
                 onChange={field.onChange}
                 error={fieldState.error?.message}
+                testId="tx-create-date"
               />
             )}
           />
@@ -621,6 +637,7 @@ function TransferForm({ className }: { className?: string }) {
             placeholder="e.g. Move savings"
             autoComplete="off"
             className="text-xs"
+            data-testid="tx-create-description"
           />
         </Field>
 
@@ -633,6 +650,7 @@ function TransferForm({ className }: { className?: string }) {
             placeholder="Optional notes..."
             rows={2}
             className="text-xs"
+            data-testid="tx-create-notes"
           />
         </Field>
       </FieldGroup>
@@ -643,6 +661,7 @@ function TransferForm({ className }: { className?: string }) {
           type="submit"
           disabled={createTransaction.isPending}
           className="w-full"
+          data-testid="tx-create-submit"
         >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>
@@ -652,6 +671,7 @@ function TransferForm({ className }: { className?: string }) {
           type="submit"
           className="w-full"
           disabled={createTransaction.isPending}
+          data-testid="tx-create-submit"
         >
           {createTransaction.isPending ? "Saving..." : "Save"}
         </Button>

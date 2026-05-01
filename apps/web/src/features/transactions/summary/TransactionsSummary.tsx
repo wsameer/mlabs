@@ -148,7 +148,7 @@ function SummaryContent({
   return (
     <div className="flex flex-col gap-5 pb-5">
       {/* Totals */}
-      <Card size="sm">
+      <Card size="sm" className="mt-1">
         <CardHeader>
           <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
             Summary
@@ -180,6 +180,7 @@ function SummaryContent({
                 className="size-6"
                 title="Set budgets"
                 onClick={() => toast.info("Budgeting is coming soon!")}
+                data-testid="tx-summary-budget-settings"
               >
                 <SettingsIcon className="size-3" />
               </Button>
@@ -187,7 +188,7 @@ function SummaryContent({
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-72">
-              <ItemGroup>
+              <ItemGroup className="mt-1">
                 {categories.map((cat) => (
                   <Item
                     key={cat.id}
@@ -303,6 +304,7 @@ export function TransactionsSummaryMobile({
             variant="secondary"
             className="lg:hidden"
             title="View summary"
+            data-testid="tx-summary-mobile-trigger"
           >
             <ChartNoAxesCombinedIcon className="size-3" />
           </Button>

@@ -49,6 +49,7 @@ export const TransactionItem = React.forwardRef<
 >(
   (
     {
+      id,
       category,
       categorySub,
       merchant,
@@ -80,9 +81,10 @@ export const TransactionItem = React.forwardRef<
           tabIndex={0}
           aria-label={ariaLabel ?? `${merchant} - ${amount}`}
           onClick={onClick}
+          data-testid={`tx-list-item-${id}`}
           className={[
-            "group w-full cursor-pointer border-none text-left outline-none hover:bg-accent",
-            "grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_8rem] items-center gap-x-4 gap-y-0 px-4 py-2.5",
+            "group w-full cursor-pointer border-none text-left outline-none hover:rounded-none hover:bg-accent",
+            "grid grid-cols-[1fr_2fr_1fr] items-center gap-x-1 gap-y-0 px-3 py-2",
             "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
             className,
           ].join(" ")}

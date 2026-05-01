@@ -32,12 +32,12 @@ export function EmptyTransactions({
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <Button onClick={() => openCreateTransaction(true)}>
+        <Button onClick={() => openCreateTransaction(true)} data-testid="tx-empty-add">
           Add a transaction
         </Button>
         <Tooltip>
           <TooltipTrigger
-            render={<Button variant="outline">Import Transactions</Button>}
+            render={<Button variant="outline" data-testid="tx-empty-import">Import Transactions</Button>}
           />
           <TooltipContent>
             <p>Coming soon</p>

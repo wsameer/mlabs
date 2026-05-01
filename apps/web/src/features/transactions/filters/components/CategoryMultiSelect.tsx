@@ -59,7 +59,7 @@ export function CategoryMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
-            <Button variant="outline" size="sm" disabled={disabled} className="h-8 gap-1 text-xs">
+            <Button variant="outline" size="sm" disabled={disabled} className="h-8 gap-1 text-xs" data-testid="tx-filters-category-trigger">
               {triggerLabel}
               <ChevronDownIcon className="size-3 text-muted-foreground" />
             </Button>
@@ -70,6 +70,7 @@ export function CategoryMultiSelect({
             <CommandInput
               placeholder="Search categories…"
               className="h-8 text-xs"
+              data-testid="tx-filters-category-search"
             />
             <CommandList>
               <CommandEmpty>No categories.</CommandEmpty>
@@ -82,6 +83,7 @@ export function CategoryMultiSelect({
                       value={opt.name}
                       onSelect={() => toggle(opt.id)}
                       className="text-xs"
+                      data-testid={`tx-filters-category-option-${opt.id}`}
                     >
                       <CheckIcon
                         className={`mr-2 size-3 ${
@@ -112,6 +114,7 @@ export function CategoryMultiSelect({
               onClick={() => toggle(cat.id)}
               aria-label={`Remove ${cat.name}`}
               className="-mr-1 rounded hover:bg-muted"
+              data-testid={`tx-filters-category-pill-remove-${cat.id}`}
             >
               <XIcon className="size-3" />
             </button>
