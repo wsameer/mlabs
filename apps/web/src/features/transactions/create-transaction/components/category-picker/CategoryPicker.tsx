@@ -156,7 +156,7 @@ export function CategoryPicker({
         <PopoverContent
           align="start"
           sideOffset={6}
-          className="w-[var(--anchor-width)] max-w-[var(--anchor-width)] gap-2 p-2"
+          className="`w-(--anchor-width) `max-w-(--anchor-width) gap-2 p-2"
         >
           <div className="flex items-center gap-1 px-1 pb-1">
             {stage === "subcategory" && (

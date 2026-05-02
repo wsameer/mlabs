@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, SearchIcon } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "@workspace/ui/components/button";
@@ -6,6 +6,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import { useHeaderConfig } from "@/hooks/use-layout";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
@@ -15,8 +16,15 @@ export const AppHeader = () => {
     mobileBackPath,
     onMobileBack,
   } = useHeaderConfig();
-  const { setGlobalSearch } = useUiActions();
+  const { setGlobalSearch, setOpenCreateTransaction } = useUiActions();
   const showBackButton = Boolean(mobileBackPath || onMobileBack);
+  const backendStatus = useAppStore((s) => s.backendStatus);
+  const isBackendConnected = backendStatus === "connected";
+
+  const handleAddTransaction = () => {
+    if (!isBackendConnected) return;
+    setOpenCreateTransaction(true);
+  };
 
   const handleBack = () => {
     if (onMobileBack) {
@@ -37,6 +45,9 @@ export const AppHeader = () => {
         <p className="text-base text-muted-foreground">{pageTitle}</p>
       </div>
       <div className="flex items-center gap-2">
+        <Button variant="default" size="sm" onClick={handleAddTransaction}>
+          <PlusIcon /> Add Transaction
+        </Button>
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
