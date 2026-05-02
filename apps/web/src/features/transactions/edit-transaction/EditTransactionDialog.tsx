@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
 import { toast } from "sonner";
-import type { Transaction } from "@workspace/types";
+import type { Transaction, CategoryWithSubcategories } from "@workspace/types";
 
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
@@ -37,15 +37,17 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@workspace/ui/components/drawer";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@workspace/ui/components/sheet";
 import { DollarSignIcon } from "lucide-react";
+
+import { CategoryPicker } from "../create-transaction/components/category-picker";
 
 // ---------------------------------------------------------------------------
 // Schemas (edit-only — no type field, type cannot change)
@@ -54,6 +56,7 @@ import { DollarSignIcon } from "lucide-react";
 const EditIncomeExpenseSchema = z.object({
   accountId: z.string().min(1, "Account is required"),
   categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().optional(),
   amount: z.string().min(1, "Amount is required"),
   description: z.string().max(200).optional(),
   notes: z.string().optional(),
@@ -143,22 +146,39 @@ export function EditTransactionDialog({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent data-testid="tx-edit-dialog">
-        <DrawerHeader>
-          <DrawerTitle className="text-left">{title}</DrawerTitle>
-          <DrawerDescription className="text-left">
+    <Sheet
+      open={open}
+      onOpenChange={(nextOpen, eventDetails) => {
+        // Clicks inside nested popovers (category picker, calendar) portal
+        // outside the sheet's DOM tree, which Base UI treats as an outside
+        // press and would otherwise close the sheet. Ignore those.
+        if (!nextOpen && eventDetails?.reason === "outside-press") return;
+        onOpenChange(nextOpen);
+      }}
+    >
+      <SheetContent
+        side="bottom"
+        className="max-h-[90svh] overflow-y-auto rounded-t-xl"
+        data-testid="tx-edit-dialog"
+      >
+        <SheetHeader>
+          <SheetTitle className="text-left">{title}</SheetTitle>
+          <SheetDescription className="text-left">
             {description}
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="px-4">{content}</div>
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline" data-testid="tx-edit-cancel">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          </SheetDescription>
+        </SheetHeader>
+        <div className="px-4 pb-2">{content}</div>
+        <SheetFooter className="pt-2">
+          <SheetClose
+            render={
+              <Button variant="outline" data-testid="tx-edit-cancel">
+                Cancel
+              </Button>
+            }
+          />
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -189,6 +209,7 @@ function EditIncomeExpenseForm({
     defaultValues: {
       accountId: "",
       categoryId: "",
+      subcategoryId: undefined,
       amount: "",
       description: "",
       notes: "",
@@ -197,21 +218,40 @@ function EditIncomeExpenseForm({
     },
   });
 
+  // Transactions store only a single categoryId. If that id points to a
+  // subcategory, seed the picker with parentId=<parent> + subcategoryId=<id>
+  // so the trigger renders the full context.
   useEffect(() => {
-    if (transaction) {
-      form.reset({
-        accountId: transaction.accountId,
-        categoryId: transaction.categoryId ?? "",
-        amount: transaction.amount,
-        description: transaction.description ?? "",
-        notes: transaction.notes ?? "",
-        date: transaction.date,
-        isCleared: transaction.isCleared,
-      });
+    if (!transaction) return;
+    const id = transaction.categoryId ?? "";
+    let seededCategoryId = id;
+    let seededSubcategoryId: string | undefined = undefined;
+    if (id && categories) {
+      for (const parent of categories as CategoryWithSubcategories[]) {
+        const sub = parent.subcategories?.find((s) => s.id === id);
+        if (sub) {
+          seededCategoryId = parent.id;
+          seededSubcategoryId = sub.id;
+          break;
+        }
+      }
     }
-  }, [transaction, form]);
+    form.reset({
+      accountId: transaction.accountId,
+      categoryId: seededCategoryId,
+      subcategoryId: seededSubcategoryId,
+      amount: transaction.amount,
+      description: transaction.description ?? "",
+      notes: transaction.notes ?? "",
+      date: transaction.date,
+      isCleared: transaction.isCleared,
+    });
+  }, [transaction, form, categories]);
 
-  const parentCategories = categories?.filter((c) => !c.parentId) ?? [];
+  const subcategoryId = useWatch({
+    control: form.control,
+    name: "subcategoryId",
+  });
 
   function onSubmit(data: EditIncomeExpenseValues) {
     updateTransaction.mutate(
@@ -219,7 +259,7 @@ function EditIncomeExpenseForm({
         id: transaction.id,
         data: {
           accountId: data.accountId,
-          categoryId: data.categoryId,
+          categoryId: data.subcategoryId || data.categoryId,
           amount: data.amount,
           description: data.description || undefined,
           notes: data.notes || undefined,
@@ -332,31 +372,30 @@ function EditIncomeExpenseForm({
         <Controller
           name="categoryId"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="edit-tx-category">Category</FieldLabel>
-              <NativeSelect
+          render={({ field, fieldState }) => {
+            const value = field.value
+              ? { categoryId: field.value, subcategoryId }
+              : null;
+            return (
+              <CategoryPicker
                 id="edit-tx-category"
-                className="w-full"
-                value={field.value}
-                onChange={(e) => field.onChange(e.target.value)}
-                data-testid="tx-edit-category"
-              >
-                <NativeSelectOption value="">
-                  Select category...
-                </NativeSelectOption>
-                {parentCategories.map((cat) => (
-                  <NativeSelectOption key={cat.id} value={cat.id}>
-                    {cat.icon ? `${cat.icon} ` : ""}
-                    {cat.name}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-              {fieldState.error && (
-                <FieldError>{fieldState.error.message}</FieldError>
-              )}
-            </Field>
-          )}
+                label="Category"
+                categories={categories}
+                value={value}
+                onChange={(next) => {
+                  form.setValue("categoryId", next.categoryId, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                  form.setValue("subcategoryId", next.subcategoryId, {
+                    shouldDirty: true,
+                  });
+                }}
+                error={fieldState.error?.message}
+                testId="tx-edit-category"
+              />
+            );
+          }}
         />
 
         {/* Description */}
