@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { and, eq, inArray } from "drizzle-orm";
 
 const TEST_DB = path.join(
   os.tmpdir(),
@@ -142,5 +143,69 @@ describe("listTransactions — filters", () => {
     });
     const descs = rows.map((r) => r.description);
     expect(descs).toEqual(["uncategorized expense"]);
+  });
+});
+
+describe("mergeAsTransfer — pair case", () => {
+  const ACCT_A = "00000000-0000-0000-0000-0000000000c1";
+  const ACCT_B = "00000000-0000-0000-0000-0000000000c2";
+  const PENDING_OUT = "20000000-0000-0000-0000-000000000001";
+  const PENDING_IN = "20000000-0000-0000-0000-000000000002";
+  const PAIR_XID = "XFER-PAIR-TEST";
+
+  beforeAll(async () => {
+    await dbMod.db.insert(schemaMod.accounts).values([
+      { id: ACCT_A, profileId: PROFILE_ID, name: "A", group: "chequing", currency: "CAD", balance: "500" },
+      { id: ACCT_B, profileId: PROFILE_ID, name: "B", group: "chequing", currency: "CAD", balance: "1000" },
+    ]);
+    await dbMod.db.insert(schemaMod.transactions).values([
+      {
+        id: PENDING_OUT,
+        profileId: PROFILE_ID,
+        accountId: ACCT_A,
+        categoryId: CAT_A,
+        type: "EXPENSE",
+        amount: "200",
+        description: "A to B",
+        date: "2026-05-10",
+        transferId: PAIR_XID,
+      },
+      {
+        id: PENDING_IN,
+        profileId: PROFILE_ID,
+        accountId: ACCT_B,
+        categoryId: CAT_B,
+        type: "INCOME",
+        amount: "200",
+        description: "A to B",
+        date: "2026-05-10",
+        transferId: PAIR_XID,
+      },
+    ]);
+  });
+
+  it("upgrades both legs to TRANSFER and leaves balances unchanged", async () => {
+    const before = await dbMod.db.select().from(schemaMod.accounts);
+    const balancesBefore = Object.fromEntries(before.map((a) => [a.id, a.balance]));
+
+    const merged = await service.mergeAsTransfer(PROFILE_ID, PENDING_OUT);
+
+    expect(merged).toHaveLength(2);
+    for (const row of merged) expect(row.type).toBe("TRANSFER");
+    const ids = merged.map((r) => r.id).sort();
+    expect(ids).toEqual([PENDING_IN, PENDING_OUT].sort());
+    for (const row of merged) expect(row.transferId).toBe(PAIR_XID);
+
+    const after = await dbMod.db.select().from(schemaMod.accounts);
+    const balancesAfter = Object.fromEntries(after.map((a) => [a.id, a.balance]));
+    expect(balancesAfter[ACCT_A]).toBe(balancesBefore[ACCT_A]);
+    expect(balancesAfter[ACCT_B]).toBe(balancesBefore[ACCT_B]);
+
+    const rows = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(inArray(schemaMod.transactions.id, [PENDING_OUT, PENDING_IN]));
+    expect(rows).toHaveLength(2);
+    for (const row of rows) expect(row.categoryId).toBeNull();
   });
 });

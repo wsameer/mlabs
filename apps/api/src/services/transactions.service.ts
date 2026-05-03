@@ -912,6 +912,109 @@ export class TransactionsService {
       return deleted;
     });
   }
+
+  // ---------------------------------------------------------------------------
+  // MERGE AS TRANSFER
+  // ---------------------------------------------------------------------------
+  async mergeAsTransfer(
+    profileId: string,
+    pendingId: string,
+    opts?: { counterAccountId?: string }
+  ): Promise<Transaction[]> {
+    return db.transaction(async (tx) => {
+      const [pending] = await tx
+        .select()
+        .from(transactions)
+        .where(
+          and(
+            eq(transactions.id, pendingId),
+            eq(transactions.profileId, profileId)
+          )
+        )
+        .limit(1);
+
+      if (!pending) {
+        throw new NotFoundError(
+          "Transaction not found",
+          "TRANSACTION_NOT_FOUND"
+        );
+      }
+
+      if (pending.type === "TRANSFER") {
+        throw new BadRequestError(
+          "Transaction is already a transfer",
+          "ALREADY_TRANSFER"
+        );
+      }
+
+      if (!pending.transferId) {
+        throw new BadRequestError(
+          "Transaction has no transferId — delete and recreate as a transfer",
+          "NO_TRANSFER_ID"
+        );
+      }
+
+      const groupRows = await tx
+        .select()
+        .from(transactions)
+        .where(
+          and(
+            eq(transactions.transferId, pending.transferId),
+            eq(transactions.profileId, profileId)
+          )
+        );
+
+      if (groupRows.length > 2) {
+        throw new BadRequestError(
+          `Found ${groupRows.length} transactions sharing this transferId. Remove duplicates before merging.`,
+          "AMBIGUOUS_TRANSFER_GROUP"
+        );
+      }
+
+      const counter = groupRows.find((r) => r.id !== pending.id);
+
+      if (counter) {
+        if (counter.accountId === pending.accountId) {
+          throw new BadRequestError(
+            "Both transfer legs are on the same account",
+            "SAME_ACCOUNT_TRANSFER"
+          );
+        }
+
+        await tx
+          .update(transactions)
+          .set({
+            type: "TRANSFER",
+            categoryId: null,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              inArray(transactions.id, [pending.id, counter.id]),
+              eq(transactions.profileId, profileId)
+            )
+          );
+
+        const refreshed = await tx
+          .select()
+          .from(transactions)
+          .where(
+            and(
+              inArray(transactions.id, [pending.id, counter.id]),
+              eq(transactions.profileId, profileId)
+            )
+          );
+
+        const categoryParentMap = await loadCategoryParentMap(profileId);
+        return serializeTransactions(refreshed, categoryParentMap);
+      }
+
+      throw new BadRequestError(
+        "Counter account is required when no paired leg exists",
+        "COUNTER_ACCOUNT_REQUIRED"
+      );
+    });
+  }
 }
 
 export const transactionsService = new TransactionsService();
