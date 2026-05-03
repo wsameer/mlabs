@@ -88,3 +88,49 @@ export function useDeleteTransaction() {
     },
   });
 }
+
+export function useTransferCounterLeg(
+  transferId: string | null | undefined,
+  selfId: string | null | undefined
+) {
+  return useQuery({
+    queryKey: [...transactionKeys.all, "counter", transferId, selfId] as const,
+    enabled: !!transferId && !!selfId,
+    queryFn: async ({ signal }) => {
+      const result = await apiClient<{
+        transactions: Transaction[];
+        total: number;
+      }>("/transactions", {
+        params: toQueryParams({ transferId: transferId! } as Record<string, unknown>),
+        signal,
+      });
+      return result;
+    },
+    select: (result) => {
+      const others = result.transactions.filter((t) => t.id !== selfId);
+      if (result.transactions.length > 2) return "ambiguous" as const;
+      return others[0] ?? null;
+    },
+  });
+}
+
+export function useMergeAsTransfer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      counterAccountId,
+    }: {
+      id: string;
+      counterAccountId?: string;
+    }) =>
+      apiClient<Transaction[]>(`/transactions/${id}/merge-as-transfer`, {
+        method: "POST",
+        body: { counterAccountId },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: accountKeys.lists() });
+    },
+  });
+}
