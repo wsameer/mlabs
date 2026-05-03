@@ -41,11 +41,7 @@ export function MapColumnsStep({
     if (amountMode === "signed" && (f.field === "debit" || f.field === "credit"))
       return false;
     if (amountMode === "split" && f.field === "amount") return false;
-    if (
-      !typeMapped &&
-      (f.field === "transferId" || f.field === "counterAccount")
-    )
-      return false;
+    if (!typeMapped && f.field === "transferId") return false;
     return true;
   });
 

@@ -231,14 +231,21 @@ export function TransactionsPage() {
                           const linkedAccountName = tx.linkedAccountId
                             ? (accountMap.get(tx.linkedAccountId) ?? "Unknown")
                             : undefined;
-                          const categoryName =
-                            tx.type === "TRANSFER"
+                          const isPendingTransfer =
+                            tx.type !== "TRANSFER" && !!tx.transferId;
+                          const categoryName = isPendingTransfer
+                            ? tx.type === "INCOME"
+                              ? "Transfer in"
+                              : "Transfer out"
+                            : tx.type === "TRANSFER"
                               ? tx.direction === "OUTFLOW"
                                 ? "Transfer out"
                                 : "Transfer in"
                               : (cat?.name ?? "Uncategorized");
                           const subcategoryName =
-                            tx.type === "TRANSFER" ? undefined : sub?.name;
+                            tx.type === "TRANSFER" || isPendingTransfer
+                              ? undefined
+                              : sub?.name;
                           const formattedAmount = formatCurrency(
                             Number(tx.signedAmount)
                           );

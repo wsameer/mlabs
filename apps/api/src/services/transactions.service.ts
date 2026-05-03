@@ -325,6 +325,7 @@ export class TransactionsService {
             notes: item.notes,
             date: item.date,
             isCleared: item.isCleared,
+            transferId: item.transferId ?? null,
           });
 
           const balanceDelta =

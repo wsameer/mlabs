@@ -86,19 +86,6 @@ function resolveType(
   return { type: mapped, isTransferLeg, transferLeg };
 }
 
-function buildTransferMarker(
-  leg: TransferLeg,
-  transferId: string,
-  counterAccount: string
-): string {
-  const xid = transferId.trim();
-  const counter = counterAccount.trim();
-  const parts = [`leg=${leg}`];
-  if (xid) parts.push(`xid=${xid}`);
-  if (counter) parts.push(`counter=${encodeURIComponent(counter)}`);
-  return `[MLABS_TRANSFER v1 ${parts.join(" ")}]`;
-}
-
 function buildSubcategoryIndex(
   categories: CategoryWithSubcategories[]
 ): Map<string, { parentId: string; subcategoryId: string }> {
@@ -165,7 +152,6 @@ export function transformRows(
     const subcategoryRaw = getCell(row, mapping.subcategory);
     const typeRaw = getCell(row, mapping.type);
     const transferIdRaw = getCell(row, mapping.transferId);
-    const counterAccountRaw = getCell(row, mapping.counterAccount);
     const notesRaw = getCell(row, mapping.notes);
 
     const resolvedAmount = resolveAmount(row, mapping, amountMode);
@@ -183,23 +169,14 @@ export function transformRows(
     const typeRes = resolveType(typeRaw, resolvedAmount);
     if (typeRes.warning) validation.warnings.push(typeRes.warning);
 
-    const catRes = resolveCategory(
-      categoryRaw,
-      subcategoryRaw,
-      parentByName,
-      subIndex
-    );
+    // Transfer rows don't get categorized — the counter-leg account carries
+    // the meaning, and the TRANSFER type is self-describing.
+    const catRes = typeRes.isTransferLeg
+      ? {}
+      : resolveCategory(categoryRaw, subcategoryRaw, parentByName, subIndex);
     if (catRes.warning) validation.warnings.push(catRes.warning);
 
-    let notes = notesRaw.trim();
-    if (typeRes.isTransferLeg && typeRes.transferLeg) {
-      const marker = buildTransferMarker(
-        typeRes.transferLeg,
-        transferIdRaw,
-        counterAccountRaw
-      );
-      notes = notes ? `${marker}\n${notes}` : marker;
-    }
+    const transferId = transferIdRaw.trim() || undefined;
 
     return {
       index,
@@ -210,11 +187,12 @@ export function transformRows(
       isTransferLeg: typeRes.isTransferLeg,
       transferLeg: typeRes.transferLeg,
       description: descriptionRaw.trim(),
-      category: categoryRaw.trim(),
+      category: typeRes.isTransferLeg ? "" : categoryRaw.trim(),
       categoryId: catRes.categoryId,
-      subcategory: subcategoryRaw.trim(),
+      subcategory: typeRes.isTransferLeg ? "" : subcategoryRaw.trim(),
       subcategoryId: catRes.subcategoryId,
-      notes,
+      notes: notesRaw.trim(),
+      transferId,
       validation,
     } satisfies ValidatedRow;
   });
@@ -236,5 +214,6 @@ export function toApiPayload(
       notes: r.notes || undefined,
       date: r.date,
       isCleared: false,
+      transferId: r.transferId,
     }));
 }

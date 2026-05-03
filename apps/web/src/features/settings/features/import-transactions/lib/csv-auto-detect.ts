@@ -26,12 +26,6 @@ const FIELD_PATTERNS: Record<TransactionField, string[]> = {
   subcategory: ["sub-category", "subcategory", "sub category"],
   type: ["type", "transaction type", "txn type"],
   transferId: ["transferid", "transfer id", "transfer_id", "xferid"],
-  counterAccount: [
-    "counteraccount",
-    "counter account",
-    "counter_account",
-    "counter-account",
-  ],
   notes: ["notes", "note", "reference", "ref", "comment"],
 };
 
@@ -80,6 +74,5 @@ export const MAPPABLE_FIELDS: {
   { field: "category", label: "Category", required: false },
   { field: "subcategory", label: "Subcategory", required: false },
   { field: "transferId", label: "Transfer ID", required: false },
-  { field: "counterAccount", label: "Counter Account", required: false },
   { field: "notes", label: "Notes", required: false },
 ];

@@ -10,7 +10,6 @@ export type TransactionField =
   | "subcategory"
   | "type"
   | "transferId"
-  | "counterAccount"
   | "notes";
 
 export type AmountMode = "signed" | "split";
@@ -39,6 +38,7 @@ export type ValidatedRow = {
   subcategory: string;
   subcategoryId?: string;
   notes: string;
+  transferId?: string;
   validation: RowValidation;
 };
 

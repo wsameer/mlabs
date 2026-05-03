@@ -360,6 +360,9 @@ export const BulkCreateIncomeExpenseSchema = z.object({
   notes: z.string().optional(),
   date: z.string(),
   isCleared: z.boolean().default(false),
+  // When importing a transfer leg as INCOME/EXPENSE, the CSV's TransferId lets
+  // a future reconciler pair both legs and promote them to a real TRANSFER.
+  transferId: z.string().optional(),
 });
 
 export const BulkCreateTransactionsSchema = z.object({
