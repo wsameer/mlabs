@@ -77,6 +77,9 @@ export class TransactionsService {
     if (filters?.isCleared !== undefined) {
       conditions.push(eq(transactions.isCleared, filters.isCleared));
     }
+    if (filters?.transferId) {
+      conditions.push(eq(transactions.transferId, filters.transferId));
+    }
     if (filters?.search?.trim()) {
       const search = `%${filters.search.trim().toLowerCase()}%`;
       conditions.push(sql`lower(${transactions.description}) like ${search}`);

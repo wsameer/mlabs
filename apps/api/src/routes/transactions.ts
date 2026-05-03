@@ -41,6 +41,7 @@ const TransactionQueryRouteSchema = z.object({
   minAmount: z.string().optional(),
   maxAmount: z.string().optional(),
   isCleared: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  transferId: z.string().optional(),
   search: z.string().optional(),
   limit: z
     .string()
