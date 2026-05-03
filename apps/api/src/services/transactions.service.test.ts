@@ -362,3 +362,58 @@ describe("mergeAsTransfer — orphan case", () => {
     expect(counterRowMerged?.direction).toBe("OUTFLOW");
   });
 });
+
+describe("mergeAsTransfer — errors", () => {
+  const ACCT = "00000000-0000-0000-0000-0000000000e1";
+  const NO_XID = "40000000-0000-0000-0000-000000000001";
+  const ALREADY_T = "40000000-0000-0000-0000-000000000002";
+  const AMBIG_1 = "40000000-0000-0000-0000-000000000003";
+  const AMBIG_2 = "40000000-0000-0000-0000-000000000004";
+  const AMBIG_3 = "40000000-0000-0000-0000-000000000005";
+  const ORPHAN = "40000000-0000-0000-0000-000000000006";
+  const AMBIG_XID = "XFER-AMBIG";
+
+  beforeAll(async () => {
+    await dbMod.db.insert(schemaMod.accounts).values([
+      { id: ACCT, profileId: PROFILE_ID, name: "Err", group: "chequing", currency: "CAD", balance: "0" },
+    ]);
+    await dbMod.db.insert(schemaMod.transactions).values([
+      { id: NO_XID, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13" },
+      { id: ALREADY_T, profileId: PROFILE_ID, accountId: ACCT, type: "TRANSFER", amount: "10", date: "2026-05-13", transferId: "XFER-T" },
+      { id: AMBIG_1, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
+      { id: AMBIG_2, profileId: PROFILE_ID, accountId: ACCT, type: "INCOME", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
+      { id: AMBIG_3, profileId: PROFILE_ID, accountId: ACCT, type: "INCOME", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
+      { id: ORPHAN, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13", transferId: "XFER-LONELY" },
+    ]);
+  });
+
+  it("throws NO_TRANSFER_ID when transferId is null", async () => {
+    await expect(service.mergeAsTransfer(PROFILE_ID, NO_XID)).rejects.toMatchObject({
+      code: "NO_TRANSFER_ID",
+    });
+  });
+
+  it("throws ALREADY_TRANSFER when row is already TRANSFER", async () => {
+    await expect(service.mergeAsTransfer(PROFILE_ID, ALREADY_T)).rejects.toMatchObject({
+      code: "ALREADY_TRANSFER",
+    });
+  });
+
+  it("throws AMBIGUOUS_TRANSFER_GROUP when >2 rows share transferId", async () => {
+    await expect(service.mergeAsTransfer(PROFILE_ID, AMBIG_1)).rejects.toMatchObject({
+      code: "AMBIGUOUS_TRANSFER_GROUP",
+    });
+  });
+
+  it("throws COUNTER_ACCOUNT_REQUIRED for orphan without counterAccountId", async () => {
+    await expect(service.mergeAsTransfer(PROFILE_ID, ORPHAN)).rejects.toMatchObject({
+      code: "COUNTER_ACCOUNT_REQUIRED",
+    });
+  });
+
+  it("throws SAME_ACCOUNT_TRANSFER when counterAccountId equals source account", async () => {
+    await expect(
+      service.mergeAsTransfer(PROFILE_ID, ORPHAN, { counterAccountId: ACCT })
+    ).rejects.toMatchObject({ code: "SAME_ACCOUNT_TRANSFER" });
+  });
+});
