@@ -48,6 +48,7 @@ import {
 import { DollarSignIcon } from "lucide-react";
 
 import { CategoryPicker } from "../create-transaction/components/category-picker";
+import { MergeTransferPanel } from "./MergeTransferPanel";
 
 // ---------------------------------------------------------------------------
 // Schemas (edit-only — no type field, type cannot change)
@@ -278,6 +279,14 @@ function EditIncomeExpenseForm({
       </div>
 
       <FieldGroup>
+        {transaction.type !== "TRANSFER" && transaction.transferId && (
+          <MergeTransferPanel
+            transaction={transaction}
+            accounts={accounts}
+            onMerged={onClose}
+          />
+        )}
+
         {/* Account */}
         <Controller
           name="accountId"
