@@ -345,4 +345,55 @@ transactionsRoute.openapi(deleteRoute, async (c) => {
   return c.json({ success: true as const, data: deleted });
 });
 
+// ---------------------------------------------------------------------------
+// POST /:id/merge-as-transfer — Promote pending transfer to real transfer
+// ---------------------------------------------------------------------------
+
+const MergeAsTransferBodySchema = z.object({
+  counterAccountId: z.string().uuid().optional(),
+});
+
+const mergeAsTransferRoute = createRoute({
+  method: "post",
+  path: "/{id}/merge-as-transfer",
+  tags: ["Transactions"],
+  summary: "Merge pending transfer leg",
+  description:
+    "Promotes an imported pending transfer row (INCOME/EXPENSE with a transferId) into a real TRANSFER. If a counter leg with the same transferId exists, both are upgraded in place. Otherwise a counter leg is created in the counterAccountId provided.",
+  request: {
+    params: IdParamSchema,
+    body: {
+      content: { "application/json": { schema: MergeAsTransferBodySchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(z.array(TransactionSchema)),
+        },
+      },
+      description: "Merged transfer (both legs)",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Merge not possible (see error code)",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Transaction or account not found",
+    },
+  },
+});
+
+transactionsRoute.openapi(mergeAsTransferRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
+  const merged = await transactionsService.mergeAsTransfer(profileId, id, {
+    counterAccountId: body.counterAccountId,
+  });
+  return c.json({ success: true as const, data: merged });
+});
+
 export default transactionsRoute;
