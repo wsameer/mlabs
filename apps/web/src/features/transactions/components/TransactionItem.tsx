@@ -4,9 +4,9 @@ import type { TransactionType } from "@workspace/types";
 
 export interface TransactionItemProps {
   id: number;
-  /** Transaction category label  (e.g. "Utilities") */
+  /** Parent category name (e.g. "Utilities") */
   category: string;
-  /** Category sub-label (e.g. "Heat & Hydro") */
+  /** Subcategory name, rendered below parent (e.g. "Heat & Hydro") */
   categorySub?: string;
   /** Merchant / payee name */
   merchant: string;

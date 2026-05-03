@@ -92,14 +92,24 @@ export function PreviewStep({ rows, onBack, onImport }: PreviewStepProps) {
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={row.type === "INCOME" ? "default" : "secondary"}
+                    variant={
+                      row.isTransferLeg
+                        ? "outline"
+                        : row.type === "INCOME"
+                          ? "default"
+                          : "secondary"
+                    }
                     className="text-[0.65rem]"
                   >
-                    {row.type}
+                    {row.isTransferLeg
+                      ? `Transfer-${row.transferLeg}`
+                      : row.type}
                   </Badge>
                 </TableCell>
                 <TableCell className="max-w-24 truncate text-xs">
-                  {row.category || "—"}
+                  {row.subcategory
+                    ? `${row.category || "—"} / ${row.subcategory}`
+                    : row.category || "—"}
                 </TableCell>
                 <TableCell>
                   <StatusBadge validation={row.validation} />

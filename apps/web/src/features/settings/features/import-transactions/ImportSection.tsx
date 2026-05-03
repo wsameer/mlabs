@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
+import type { CategoryWithSubcategories } from "@workspace/types";
 
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
@@ -36,7 +37,7 @@ export function ImportSection() {
       csvParser.rows,
       columnMapping.mapping,
       columnMapping.amountMode,
-      categories ?? []
+      (categories ?? []) as CategoryWithSubcategories[]
     );
   }, [
     csvParser.rows,

@@ -1,5 +1,13 @@
-import type { Category, BulkCreateIncomeExpense } from "@workspace/types";
-import type { AmountMode, ColumnMapping, ValidatedRow } from "../types";
+import type {
+  CategoryWithSubcategories,
+  BulkCreateIncomeExpense,
+} from "@workspace/types";
+import type {
+  AmountMode,
+  ColumnMapping,
+  TransferLeg,
+  ValidatedRow,
+} from "../types";
 import { parseDate, parseAmount, validateRow } from "./csv-validators";
 
 function getCell(row: string[], index: number | null | undefined): string {
@@ -7,10 +15,6 @@ function getCell(row: string[], index: number | null | undefined): string {
   return row[index] ?? "";
 }
 
-/**
- * Resolve the amount from a row based on the amount mode.
- * Returns the raw signed amount as a number.
- */
 function resolveAmount(
   row: string[],
   mapping: ColumnMapping,
@@ -24,7 +28,6 @@ function resolveAmount(
 
     if (debit != null && debit !== 0) return -Math.abs(debit);
     if (credit != null && credit !== 0) return Math.abs(credit);
-    // Both present — try the non-zero one
     if (debit === 0 && credit != null) return Math.abs(credit);
     if (credit === 0 && debit != null) return -Math.abs(debit);
     return null;
@@ -34,23 +37,135 @@ function resolveAmount(
   return parseAmount(amountStr);
 }
 
-/**
- * Transform raw CSV rows into validated rows using the column mapping.
- */
+const TYPE_ALIASES: Record<string, "INCOME" | "EXPENSE"> = {
+  income: "INCOME",
+  credit: "INCOME",
+  deposit: "INCOME",
+  "transfer-in": "INCOME",
+  "transfer in": "INCOME",
+  "xfer-in": "INCOME",
+  expense: "EXPENSE",
+  debit: "EXPENSE",
+  withdrawal: "EXPENSE",
+  "transfer-out": "EXPENSE",
+  "transfer out": "EXPENSE",
+  "xfer-out": "EXPENSE",
+};
+
+type TypeResolution = {
+  type: "INCOME" | "EXPENSE";
+  isTransferLeg: boolean;
+  transferLeg?: TransferLeg;
+  warning?: string;
+};
+
+function resolveType(
+  rawType: string,
+  resolvedAmount: number | null
+): TypeResolution {
+  const fallback: TypeResolution = {
+    type: resolvedAmount != null && resolvedAmount >= 0 ? "INCOME" : "EXPENSE",
+    isTransferLeg: false,
+  };
+
+  const normalized = rawType.trim().toLowerCase();
+  if (!normalized) return fallback;
+
+  const mapped = TYPE_ALIASES[normalized];
+  if (!mapped) {
+    return { ...fallback, warning: `Unknown type "${rawType}"` };
+  }
+
+  const isTransferLeg = normalized.startsWith("transfer");
+  const transferLeg: TransferLeg | undefined = isTransferLeg
+    ? mapped === "INCOME"
+      ? "IN"
+      : "OUT"
+    : undefined;
+
+  return { type: mapped, isTransferLeg, transferLeg };
+}
+
+function buildTransferMarker(
+  leg: TransferLeg,
+  transferId: string,
+  counterAccount: string
+): string {
+  const xid = transferId.trim();
+  const counter = counterAccount.trim();
+  const parts = [`leg=${leg}`];
+  if (xid) parts.push(`xid=${xid}`);
+  if (counter) parts.push(`counter=${encodeURIComponent(counter)}`);
+  return `[MLABS_TRANSFER v1 ${parts.join(" ")}]`;
+}
+
+function buildSubcategoryIndex(
+  categories: CategoryWithSubcategories[]
+): Map<string, { parentId: string; subcategoryId: string }> {
+  const index = new Map<string, { parentId: string; subcategoryId: string }>();
+  for (const parent of categories) {
+    const parentName = parent.name.trim().toLowerCase();
+    for (const sub of parent.subcategories ?? []) {
+      const key = `${parentName}|||${sub.name.trim().toLowerCase()}`;
+      index.set(key, { parentId: parent.id, subcategoryId: sub.id });
+    }
+  }
+  return index;
+}
+
+type ResolvedCategory = {
+  categoryId?: string;
+  subcategoryId?: string;
+  warning?: string;
+};
+
+function resolveCategory(
+  categoryRaw: string,
+  subcategoryRaw: string,
+  parentByName: Map<string, string>,
+  subIndex: Map<string, { parentId: string; subcategoryId: string }>
+): ResolvedCategory {
+  const categoryName = categoryRaw.trim().toLowerCase();
+  const subName = subcategoryRaw.trim().toLowerCase();
+
+  if (!categoryName) return {};
+
+  const parentId = parentByName.get(categoryName);
+
+  if (!subName) {
+    return { categoryId: parentId };
+  }
+
+  const subHit = subIndex.get(`${categoryName}|||${subName}`);
+  if (subHit) {
+    return { categoryId: subHit.parentId, subcategoryId: subHit.subcategoryId };
+  }
+
+  return {
+    categoryId: parentId,
+    warning: `Subcategory "${subcategoryRaw.trim()}" not found under "${categoryRaw.trim()}"`,
+  };
+}
+
 export function transformRows(
   rows: string[][],
   mapping: ColumnMapping,
   amountMode: AmountMode,
-  categories: Category[]
+  categories: CategoryWithSubcategories[]
 ): ValidatedRow[] {
-  const categoryMap = new Map(
-    categories.map((c) => [c.name.toLowerCase().trim(), c.id])
+  const parentByName = new Map(
+    categories.map((c) => [c.name.trim().toLowerCase(), c.id])
   );
+  const subIndex = buildSubcategoryIndex(categories);
 
   return rows.map((row, index) => {
     const dateRaw = getCell(row, mapping.date);
     const descriptionRaw = getCell(row, mapping.description);
     const categoryRaw = getCell(row, mapping.category);
+    const subcategoryRaw = getCell(row, mapping.subcategory);
+    const typeRaw = getCell(row, mapping.type);
+    const transferIdRaw = getCell(row, mapping.transferId);
+    const counterAccountRaw = getCell(row, mapping.counterAccount);
     const notesRaw = getCell(row, mapping.notes);
 
     const resolvedAmount = resolveAmount(row, mapping, amountMode);
@@ -65,31 +180,46 @@ export function transformRows(
       descriptionRaw
     );
 
-    const type =
-      resolvedAmount != null && resolvedAmount >= 0 ? "INCOME" : "EXPENSE";
+    const typeRes = resolveType(typeRaw, resolvedAmount);
+    if (typeRes.warning) validation.warnings.push(typeRes.warning);
 
-    const categoryId = categoryRaw
-      ? categoryMap.get(categoryRaw.toLowerCase().trim())
-      : undefined;
+    const catRes = resolveCategory(
+      categoryRaw,
+      subcategoryRaw,
+      parentByName,
+      subIndex
+    );
+    if (catRes.warning) validation.warnings.push(catRes.warning);
+
+    let notes = notesRaw.trim();
+    if (typeRes.isTransferLeg && typeRes.transferLeg) {
+      const marker = buildTransferMarker(
+        typeRes.transferLeg,
+        transferIdRaw,
+        counterAccountRaw
+      );
+      notes = notes ? `${marker}\n${notes}` : marker;
+    }
 
     return {
       index,
       raw: row,
       date: parsedDate ?? dateRaw,
       amount: amountStr,
-      type,
+      type: typeRes.type,
+      isTransferLeg: typeRes.isTransferLeg,
+      transferLeg: typeRes.transferLeg,
       description: descriptionRaw.trim(),
       category: categoryRaw.trim(),
-      categoryId,
-      notes: notesRaw.trim(),
+      categoryId: catRes.categoryId,
+      subcategory: subcategoryRaw.trim(),
+      subcategoryId: catRes.subcategoryId,
+      notes,
       validation,
     } satisfies ValidatedRow;
   });
 }
 
-/**
- * Convert validated rows into the API payload for bulk create.
- */
 export function toApiPayload(
   rows: ValidatedRow[],
   accountId: string
@@ -100,6 +230,7 @@ export function toApiPayload(
       type: r.type,
       accountId,
       categoryId: r.categoryId,
+      subcategoryId: r.subcategoryId,
       amount: r.amount,
       description: r.description || undefined,
       notes: r.notes || undefined,

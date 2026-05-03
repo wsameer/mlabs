@@ -97,6 +97,7 @@ export const TransactionSchema = z.object({
   accountId: z.string().uuid(),
   linkedAccountId: z.string().uuid().nullable().optional(),
   categoryId: z.string().uuid().nullable().optional(),
+  subcategoryId: z.string().uuid().nullable().optional(),
   type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]),
   direction: z.enum(["INFLOW", "OUTFLOW"]),
   amount: z.string(),

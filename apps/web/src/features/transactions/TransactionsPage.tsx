@@ -80,14 +80,22 @@ export function TransactionsPage() {
       string,
       { name: string; icon?: string; color?: string; parentId?: string | null }
     >();
-    categories?.forEach((c) =>
+    categories?.forEach((c) => {
       map.set(c.id, {
         name: c.name,
         icon: c.icon,
         color: c.color,
         parentId: c.parentId,
-      })
-    );
+      });
+      c.subcategories?.forEach((sub) =>
+        map.set(sub.id, {
+          name: sub.name,
+          icon: sub.icon,
+          color: sub.color,
+          parentId: sub.parentId,
+        })
+      );
+    });
     return map;
   }, [categories]);
 
@@ -214,6 +222,10 @@ export function TransactionsPage() {
                           const cat = tx.categoryId
                             ? categoryMap.get(tx.categoryId)
                             : undefined;
+                          const sub = tx.subcategoryId
+                            ? categoryMap.get(tx.subcategoryId)
+                            : undefined;
+
                           const accountName =
                             accountMap.get(tx.accountId) ?? "Unknown";
                           const linkedAccountName = tx.linkedAccountId
@@ -225,6 +237,8 @@ export function TransactionsPage() {
                                 ? "Transfer out"
                                 : "Transfer in"
                               : (cat?.name ?? "Uncategorized");
+                          const subcategoryName =
+                            tx.type === "TRANSFER" ? undefined : sub?.name;
                           const formattedAmount = formatCurrency(
                             Number(tx.signedAmount)
                           );
@@ -245,7 +259,7 @@ export function TransactionsPage() {
                                 }
                                 id={Number(tx.id) || 0}
                                 category={categoryName}
-                                categorySub={cat?.icon ?? undefined}
+                                categorySub={subcategoryName}
                                 merchant={
                                   tx.description || tx.type.toLowerCase()
                                 }

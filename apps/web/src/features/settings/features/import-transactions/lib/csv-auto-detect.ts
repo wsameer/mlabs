@@ -10,8 +10,8 @@ const FIELD_PATTERNS: Record<TransactionField, string[]> = {
     "value date",
   ],
   amount: ["amount", "sum", "total", "value"],
-  debit: ["debit", "withdrawal", "outflow", "expense", "debit amount"],
-  credit: ["credit", "deposit", "inflow", "income", "credit amount"],
+  debit: ["debit", "withdrawal", "outflow", "debit amount"],
+  credit: ["credit", "deposit", "inflow", "credit amount"],
   description: [
     "description",
     "payee",
@@ -23,6 +23,15 @@ const FIELD_PATTERNS: Record<TransactionField, string[]> = {
     "particulars",
   ],
   category: ["category", "group", "tag", "label"],
+  subcategory: ["sub-category", "subcategory", "sub category"],
+  type: ["type", "transaction type", "txn type"],
+  transferId: ["transferid", "transfer id", "transfer_id", "xferid"],
+  counterAccount: [
+    "counteraccount",
+    "counter account",
+    "counter_account",
+    "counter-account",
+  ],
   notes: ["notes", "note", "reference", "ref", "comment"],
 };
 
@@ -66,7 +75,11 @@ export const MAPPABLE_FIELDS: {
   { field: "amount", label: "Amount", required: false },
   { field: "debit", label: "Debit", required: false },
   { field: "credit", label: "Credit", required: false },
+  { field: "type", label: "Type", required: false },
   { field: "description", label: "Description", required: false },
   { field: "category", label: "Category", required: false },
+  { field: "subcategory", label: "Subcategory", required: false },
+  { field: "transferId", label: "Transfer ID", required: false },
+  { field: "counterAccount", label: "Counter Account", required: false },
   { field: "notes", label: "Notes", required: false },
 ];

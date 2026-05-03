@@ -1,4 +1,4 @@
-import { accounts, transactions } from "@workspace/db";
+import { accounts, categories, transactions } from "@workspace/db";
 import type {
   Transaction,
   TransactionQuery,
@@ -22,7 +22,18 @@ import {
   serializeTransaction,
   serializeTransactions,
   serializeTransactionsWithContext,
+  type CategoryParentMap,
 } from "./transaction-serializer.js";
+
+async function loadCategoryParentMap(
+  profileId: string
+): Promise<CategoryParentMap> {
+  const rows = await db
+    .select({ id: categories.id, parentId: categories.parentId })
+    .from(categories)
+    .where(eq(categories.profileId, profileId));
+  return new Map(rows.map((r) => [r.id, r.parentId]));
+}
 
 export class TransactionsService {
   // ---------------------------------------------------------------------------
@@ -130,8 +141,14 @@ export class TransactionsService {
               )
             );
 
+    const categoryParentMap = await loadCategoryParentMap(profileId);
+
     return {
-      transactions: serializeTransactionsWithContext(rows, transferContextRows),
+      transactions: serializeTransactionsWithContext(
+        rows,
+        transferContextRows,
+        categoryParentMap
+      ),
       total,
     };
   }
@@ -156,8 +173,10 @@ export class TransactionsService {
       throw new NotFoundError("Transaction not found", "TRANSACTION_NOT_FOUND");
     }
 
+    const categoryParentMap = await loadCategoryParentMap(profileId);
+
     if (transaction.type !== "TRANSFER" || !transaction.transferId) {
-      return serializeTransaction(transaction);
+      return serializeTransaction(transaction, { categoryParentMap });
     }
 
     const pairedRows = await db
@@ -171,12 +190,17 @@ export class TransactionsService {
       )
       .limit(2);
 
-    const [serialized] = serializeTransactions(pairedRows).filter(
-      (row) => row.id === transaction.id
-    );
+    const [serialized] = serializeTransactions(
+      pairedRows,
+      categoryParentMap
+    ).filter((row) => row.id === transaction.id);
 
     return (
-      serialized ?? serializeTransaction(transaction, { direction: "OUTFLOW" })
+      serialized ??
+      serializeTransaction(transaction, {
+        direction: "OUTFLOW",
+        categoryParentMap,
+      })
     );
   }
 
@@ -209,7 +233,7 @@ export class TransactionsService {
         .values({
           profileId,
           accountId: payload.accountId,
-          categoryId: payload.categoryId,
+          categoryId: payload.subcategoryId ?? payload.categoryId,
           type: payload.type,
           amount: payload.amount,
           description: payload.description,
@@ -240,7 +264,8 @@ export class TransactionsService {
         })
         .where(eq(accounts.id, payload.accountId));
 
-      return serializeTransaction(inserted);
+      const categoryParentMap = await loadCategoryParentMap(profileId);
+      return serializeTransaction(inserted, { categoryParentMap });
     });
   }
 
@@ -293,7 +318,7 @@ export class TransactionsService {
           await tx.insert(transactions).values({
             profileId,
             accountId: item.accountId,
-            categoryId: item.categoryId ?? null,
+            categoryId: item.subcategoryId ?? item.categoryId ?? null,
             type: item.type,
             amount: item.amount,
             description: item.description,
@@ -509,8 +534,13 @@ export class TransactionsService {
       const updates: Record<string, unknown> = { updatedAt: new Date() };
       if (payload.accountId !== undefined)
         updates.accountId = payload.accountId;
-      if (payload.categoryId !== undefined)
-        updates.categoryId = payload.categoryId;
+      if (
+        payload.categoryId !== undefined ||
+        payload.subcategoryId !== undefined
+      ) {
+        updates.categoryId =
+          payload.subcategoryId ?? payload.categoryId ?? null;
+      }
       if (payload.amount !== undefined) updates.amount = payload.amount;
       if (payload.description !== undefined)
         updates.description = payload.description;
@@ -571,7 +601,8 @@ export class TransactionsService {
           .where(eq(accounts.id, newAccountId));
       }
 
-      return serializeTransaction(updated);
+      const categoryParentMap = await loadCategoryParentMap(profileId);
+      return serializeTransaction(updated, { categoryParentMap });
     });
   }
 

@@ -24,19 +24,39 @@ function inferDirection(
   );
 }
 
+export type CategoryParentMap = Map<string, string | null>;
+
+function splitCategory(
+  storedId: string | null,
+  parentMap?: CategoryParentMap
+): { categoryId: string | undefined; subcategoryId: string | undefined } {
+  if (!storedId) return { categoryId: undefined, subcategoryId: undefined };
+  const parentId = parentMap?.get(storedId);
+  if (parentId) {
+    return { categoryId: parentId, subcategoryId: storedId };
+  }
+  return { categoryId: storedId, subcategoryId: undefined };
+}
+
 export function serializeTransaction(
   transaction: TransactionRow,
   options?: {
     direction?: TransactionDirection;
     linkedAccountId?: string;
     linkedTransactionId?: string;
+    categoryParentMap?: CategoryParentMap;
   }
 ): Transaction {
   const direction = inferDirection(transaction, options?.direction);
+  const { categoryId, subcategoryId } = splitCategory(
+    transaction.categoryId,
+    options?.categoryParentMap
+  );
 
   return {
     ...transaction,
-    categoryId: transaction.categoryId ?? undefined,
+    categoryId,
+    subcategoryId,
     direction,
     description: transaction.description ?? undefined,
     linkedAccountId: options?.linkedAccountId,
@@ -49,13 +69,17 @@ export function serializeTransaction(
   };
 }
 
-export function serializeTransactions(rows: TransactionRow[]): Transaction[] {
-  return serializeTransactionsWithContext(rows, rows);
+export function serializeTransactions(
+  rows: TransactionRow[],
+  categoryParentMap?: CategoryParentMap
+): Transaction[] {
+  return serializeTransactionsWithContext(rows, rows, categoryParentMap);
 }
 
 export function serializeTransactionsWithContext(
   rows: TransactionRow[],
-  transferContextRows: TransactionRow[]
+  transferContextRows: TransactionRow[],
+  categoryParentMap?: CategoryParentMap
 ): Transaction[] {
   const directionById = new Map<string, TransactionDirection>();
   const transferGroups = new Map<string, TransactionRow[]>();
@@ -95,6 +119,7 @@ export function serializeTransactionsWithContext(
       direction: directionById.get(row.id),
       linkedAccountId: linkedRow?.accountId,
       linkedTransactionId: linkedRow?.id,
+      categoryParentMap,
     });
   });
 }

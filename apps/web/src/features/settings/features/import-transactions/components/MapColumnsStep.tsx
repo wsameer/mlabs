@@ -35,11 +35,17 @@ export function MapColumnsStep({
   onBack,
   onNext,
 }: MapColumnsStepProps) {
-  // Filter fields based on amount mode
+  const typeMapped = mapping.type != null;
+  // Filter fields based on amount mode + whether type is mapped
   const visibleFields = MAPPABLE_FIELDS.filter((f) => {
-    if (amountMode === "signed")
-      return f.field !== "debit" && f.field !== "credit";
-    if (amountMode === "split") return f.field !== "amount";
+    if (amountMode === "signed" && (f.field === "debit" || f.field === "credit"))
+      return false;
+    if (amountMode === "split" && f.field === "amount") return false;
+    if (
+      !typeMapped &&
+      (f.field === "transferId" || f.field === "counterAccount")
+    )
+      return false;
     return true;
   });
 
@@ -56,9 +62,9 @@ export function MapColumnsStep({
       <Alert>
         <InfoIcon className="size-4" />
         <AlertDescription>
-          <strong>Transfer transactions</strong> cannot be imported
-          automatically. Import them as income/expense and convert them manually
-          after import.
+          <strong>Transfers</strong> are imported as income or expense rows and
+          flagged for later reconciliation. Merge the two legs into a proper
+          transfer from the Transactions page once both sides are imported.
         </AlertDescription>
       </Alert>
 

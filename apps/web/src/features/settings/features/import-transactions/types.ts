@@ -7,6 +7,10 @@ export type TransactionField =
   | "credit"
   | "description"
   | "category"
+  | "subcategory"
+  | "type"
+  | "transferId"
+  | "counterAccount"
   | "notes";
 
 export type AmountMode = "signed" | "split";
@@ -19,15 +23,21 @@ export type RowValidation = {
   errors: string[];
 };
 
+export type TransferLeg = "IN" | "OUT";
+
 export type ValidatedRow = {
   index: number;
   raw: string[];
   date: string;
   amount: string;
   type: "INCOME" | "EXPENSE";
+  isTransferLeg: boolean;
+  transferLeg?: TransferLeg;
   description: string;
   category: string;
   categoryId?: string;
+  subcategory: string;
+  subcategoryId?: string;
   notes: string;
   validation: RowValidation;
 };

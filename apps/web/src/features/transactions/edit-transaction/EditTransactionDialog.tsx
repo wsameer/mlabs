@@ -3,7 +3,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
 import { toast } from "sonner";
-import type { Transaction, CategoryWithSubcategories } from "@workspace/types";
+import type { Transaction } from "@workspace/types";
 
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
@@ -218,35 +218,19 @@ function EditIncomeExpenseForm({
     },
   });
 
-  // Transactions store only a single categoryId. If that id points to a
-  // subcategory, seed the picker with parentId=<parent> + subcategoryId=<id>
-  // so the trigger renders the full context.
   useEffect(() => {
     if (!transaction) return;
-    const id = transaction.categoryId ?? "";
-    let seededCategoryId = id;
-    let seededSubcategoryId: string | undefined = undefined;
-    if (id && categories) {
-      for (const parent of categories as CategoryWithSubcategories[]) {
-        const sub = parent.subcategories?.find((s) => s.id === id);
-        if (sub) {
-          seededCategoryId = parent.id;
-          seededSubcategoryId = sub.id;
-          break;
-        }
-      }
-    }
     form.reset({
       accountId: transaction.accountId,
-      categoryId: seededCategoryId,
-      subcategoryId: seededSubcategoryId,
+      categoryId: transaction.categoryId ?? "",
+      subcategoryId: transaction.subcategoryId ?? undefined,
       amount: transaction.amount,
       description: transaction.description ?? "",
       notes: transaction.notes ?? "",
       date: transaction.date,
       isCleared: transaction.isCleared,
     });
-  }, [transaction, form, categories]);
+  }, [transaction, form]);
 
   const subcategoryId = useWatch({
     control: form.control,
@@ -259,7 +243,8 @@ function EditIncomeExpenseForm({
         id: transaction.id,
         data: {
           accountId: data.accountId,
-          categoryId: data.subcategoryId || data.categoryId,
+          categoryId: data.categoryId,
+          subcategoryId: data.subcategoryId || null,
           amount: data.amount,
           description: data.description || undefined,
           notes: data.notes || undefined,
