@@ -136,7 +136,7 @@ export function TransactionsPage() {
   const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+    <div className="flex w-full max-w-2xl flex-col gap-4 md:max-w-xl">
       {/* Row 1: global date range */}
       <DateRangeFilter />
 
@@ -177,7 +177,7 @@ export function TransactionsPage() {
         <Card className="p-0">
           <CardContent className="p-0">
             <ScrollArea className="h-[75svh]">
-              <div>
+              <div className="pb-12 sm:pb-0">
                 {sortedDates.map((date) => {
                   const groupedTransactions = grouped[date];
                   const totals = totalsByDate[date] ?? {

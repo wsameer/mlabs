@@ -26,10 +26,18 @@ export function PresetChips({ value, onChange, disabled }: PresetChipsProps) {
         onChange(next[0] as TransactionFilterPreset);
       }}
       disabled={disabled}
-      className="flex flex-wrap gap-1"
+      spacing={2}
+      variant="outline"
+      size="sm"
     >
       {PRESETS.map((p) => (
-        <ToggleGroupItem key={p.value} value={p.value} className="text-xs" data-testid={`tx-filters-preset-${p.value}`}>
+        <ToggleGroupItem
+          aria-label={p.label}
+          key={p.value}
+          value={p.value}
+          className="text-xs"
+          data-testid={`tx-filters-preset-${p.value}`}
+        >
           {p.label}
         </ToggleGroupItem>
       ))}

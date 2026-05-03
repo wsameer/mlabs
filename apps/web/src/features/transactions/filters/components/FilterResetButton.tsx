@@ -16,10 +16,10 @@ export function FilterResetButton({
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="destructive"
       size="sm"
       onClick={onReset}
-      className={`h-8 gap-1 text-xs text-muted-foreground ${className ?? ""}`}
+      className={`${className ?? ""}`}
       data-testid="tx-filters-reset"
     >
       <XIcon className="size-3" />

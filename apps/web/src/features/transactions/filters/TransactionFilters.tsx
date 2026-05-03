@@ -30,9 +30,7 @@ export function TransactionFilters({ disabled }: { disabled?: boolean }) {
     if (!categories || !filters.categoryIds) return;
     const known = new Set(categories.map((c) => c.id));
     const cleaned = sanitizeCategoryIds(filters.categoryIds, known);
-    if (
-      (cleaned?.length ?? 0) !== (filters.categoryIds?.length ?? 0)
-    ) {
+    if ((cleaned?.length ?? 0) !== (filters.categoryIds?.length ?? 0)) {
       setFilters({ categoryIds: cleaned });
     }
   }, [categories, filters.categoryIds, setFilters]);
@@ -52,16 +50,7 @@ export function TransactionFilters({ disabled }: { disabled?: boolean }) {
             setFilters({ q: next.length > 0 ? next : undefined })
           }
           disabled={disabled}
-          className="min-w-[220px] flex-1"
-        />
-
-        <CategoryMultiSelect
-          options={options}
-          value={filters.categoryIds ?? []}
-          onChange={(next) =>
-            setFilters({ categoryIds: next.length > 0 ? next : undefined })
-          }
-          disabled={disabled}
+          className="min-w-55 flex-1"
         />
 
         <AmountRangeInputs
@@ -69,6 +58,15 @@ export function TransactionFilters({ disabled }: { disabled?: boolean }) {
           max={filters.maxAmount}
           onCommit={({ min, max }) =>
             setFilters({ minAmount: min, maxAmount: max })
+          }
+          disabled={disabled}
+        />
+
+        <CategoryMultiSelect
+          options={options}
+          value={filters.categoryIds ?? []}
+          onChange={(next) =>
+            setFilters({ categoryIds: next.length > 0 ? next : undefined })
           }
           disabled={disabled}
         />

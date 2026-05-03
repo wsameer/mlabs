@@ -187,8 +187,8 @@ function SummaryContent({
             </CardAction>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-72">
-              <ItemGroup className="mt-1">
+            <ScrollArea className="h-52">
+              <ItemGroup>
                 {categories.map((cat) => (
                   <Item
                     key={cat.id}
@@ -231,24 +231,58 @@ function SummaryContent({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ItemGroup>
-              {accounts.map((acct) => (
-                <Item key={acct.id} variant="muted" size={"xs"}>
-                  <ItemContent className="truncate">
-                    <p className="truncate">{acct.name}</p>
-                  </ItemContent>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <Badge variant="outline">{acct.percentage}%</Badge>
-                    <span className="font-medium tabular-nums">
-                      {formatCurrency(acct.total)}
-                    </span>
-                  </div>
-                </Item>
-              ))}
-            </ItemGroup>
+            <ScrollArea className="h-52">
+              <ItemGroup>
+                {accounts.map((acct) => (
+                  <Item key={acct.id} variant="muted" size={"xs"}>
+                    <ItemContent className="truncate">
+                      <p className="truncate">{acct.name}</p>
+                    </ItemContent>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <Badge variant="outline">{acct.percentage}%</Badge>
+                      <span className="font-medium tabular-nums">
+                        {formatCurrency(acct.total)}
+                      </span>
+                    </div>
+                  </Item>
+                ))}
+              </ItemGroup>
+            </ScrollArea>
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared row
+// ---------------------------------------------------------------------------
+
+function SummaryRow({
+  label,
+  value,
+  variant,
+}: {
+  label: string;
+  value: number;
+  variant: "income" | "expense" | "net";
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span
+        className={cn(
+          "text-xs font-medium tabular-nums",
+          variant === "income" && "text-emerald-600 dark:text-emerald-400",
+          variant === "expense" && "text-red-600 dark:text-red-400",
+          variant === "net" && value >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : variant === "net" && "text-red-600 dark:text-red-400"
+        )}
+      >
+        {formatCurrency(value)}
+      </span>
     </div>
   );
 }
@@ -325,37 +359,5 @@ export function TransactionsSummaryMobile({
         </DrawerContent>
       </Drawer>
     </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared row
-// ---------------------------------------------------------------------------
-
-function SummaryRow({
-  label,
-  value,
-  variant,
-}: {
-  label: string;
-  value: number;
-  variant: "income" | "expense" | "net";
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span
-        className={cn(
-          "text-sm font-medium tabular-nums",
-          variant === "income" && "text-emerald-600 dark:text-emerald-400",
-          variant === "expense" && "text-red-600 dark:text-red-400",
-          variant === "net" && value >= 0
-            ? "text-emerald-600 dark:text-emerald-400"
-            : variant === "net" && "text-red-600 dark:text-red-400"
-        )}
-      >
-        {formatCurrency(value)}
-      </span>
-    </div>
   );
 }

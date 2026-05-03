@@ -37,9 +37,8 @@ export const CategoryTile = forwardRef<HTMLButtonElement, CategoryTileProps>(
         className={cn(
           "group/tile relative flex aspect-[1.15/1] min-w-0 flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-card p-1.5 text-center transition-all",
           "hover:border-border hover:bg-muted/60",
-          "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
-          selected &&
-            "border-primary/60 bg-primary/5 ring-1 ring-primary/30"
+          "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none",
+          selected && "border-primary/60 bg-primary/5 ring-1 ring-primary/30"
         )}
       >
         <span
@@ -49,12 +48,12 @@ export const CategoryTile = forwardRef<HTMLButtonElement, CategoryTileProps>(
         >
           {category.icon ?? "•"}
         </span>
-        <span className="line-clamp-2 w-full break-words text-[10px]/tight font-medium text-foreground">
+        <span className="line-clamp-2 w-full text-[9px]/tight font-medium wrap-break-word text-foreground">
           {category.name}
         </span>
         {hasChildren && (
           <ChevronRightIcon
-            className="absolute right-1 top-1 size-2.5 text-muted-foreground/70"
+            className="absolute top-1 right-1 size-2.5 text-muted-foreground/70"
             aria-hidden
           />
         )}
