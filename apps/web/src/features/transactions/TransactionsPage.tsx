@@ -233,6 +233,8 @@ export function TransactionsPage() {
                             : undefined;
                           const isPendingTransfer =
                             tx.type !== "TRANSFER" && !!tx.transferId;
+                          const typeFallback =
+                            tx.type === "INCOME" ? "Income" : "Expense";
                           const categoryName = isPendingTransfer
                             ? tx.type === "INCOME"
                               ? "Transfer in"
@@ -241,7 +243,7 @@ export function TransactionsPage() {
                               ? tx.direction === "OUTFLOW"
                                 ? "Transfer out"
                                 : "Transfer in"
-                              : (cat?.name ?? "Uncategorized");
+                              : (cat?.name ?? typeFallback);
                           const subcategoryName =
                             tx.type === "TRANSFER" || isPendingTransfer
                               ? undefined

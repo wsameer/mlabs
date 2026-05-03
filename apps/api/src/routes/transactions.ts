@@ -79,11 +79,13 @@ const BulkCreateBodySchema = z.object({
         type: z.enum(["INCOME", "EXPENSE"]),
         accountId: z.string().uuid(),
         categoryId: z.string().uuid().optional(),
+        subcategoryId: z.string().uuid().optional(),
         amount: z.string(),
         description: z.string().max(200).optional(),
         notes: z.string().optional(),
         date: z.string(),
         isCleared: z.boolean().default(false),
+        transferId: z.string().optional(),
       })
     )
     .min(1)
