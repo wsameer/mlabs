@@ -209,3 +209,156 @@ describe("mergeAsTransfer — pair case", () => {
     for (const row of rows) expect(row.categoryId).toBeNull();
   });
 });
+
+describe("mergeAsTransfer — orphan case", () => {
+  const ACCT_SRC = "00000000-0000-0000-0000-0000000000d1";
+  const ACCT_DST = "00000000-0000-0000-0000-0000000000d2";
+  const ORPHAN_OUT = "30000000-0000-0000-0000-000000000001";
+  const ORPHAN_IN = "30000000-0000-0000-0000-000000000002";
+
+  beforeAll(async () => {
+    await dbMod.db.insert(schemaMod.accounts).values([
+      { id: ACCT_SRC, profileId: PROFILE_ID, name: "Src", group: "chequing", currency: "CAD", balance: "800" },
+      { id: ACCT_DST, profileId: PROFILE_ID, name: "Dst", group: "chequing", currency: "CAD", balance: "300" },
+    ]);
+    await dbMod.db.insert(schemaMod.transactions).values([
+      {
+        id: ORPHAN_OUT,
+        profileId: PROFILE_ID,
+        accountId: ACCT_SRC,
+        categoryId: CAT_A,
+        type: "EXPENSE",
+        amount: "150",
+        description: "Src to Dst",
+        date: "2026-05-11",
+        transferId: "XFER-ORPH-OUT",
+      },
+      {
+        id: ORPHAN_IN,
+        profileId: PROFILE_ID,
+        accountId: ACCT_DST,
+        categoryId: CAT_B,
+        type: "INCOME",
+        amount: "50",
+        description: "Dst from Src",
+        date: "2026-05-12",
+        transferId: "XFER-ORPH-IN",
+      },
+    ]);
+  });
+
+  it("creates counter inflow when pending is EXPENSE and credits the destination", async () => {
+    const srcBefore = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_SRC))
+    )[0]?.balance;
+
+    const dstBefore = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_DST))
+    )[0]?.balance;
+
+    const merged = await service.mergeAsTransfer(PROFILE_ID, ORPHAN_OUT, {
+      counterAccountId: ACCT_DST,
+    });
+
+    expect(merged).toHaveLength(2);
+    for (const row of merged) expect(row.type).toBe("TRANSFER");
+    for (const row of merged) expect(row.transferId).toBe("XFER-ORPH-OUT");
+
+    const srcAfter = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_SRC))
+    )[0]?.balance;
+
+    const dstAfter = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_DST))
+    )[0]?.balance;
+
+    // Source account balance must be unchanged (only counter/destination is credited)
+    expect(srcAfter).toBe(srcBefore);
+    expect(Number(dstAfter)).toBe(Number(dstBefore) + 150);
+
+    // Verify the pending row was updated in DB
+    const pendingRow = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.transactions)
+        .where(eq(schemaMod.transactions.id, ORPHAN_OUT))
+    )[0];
+    expect(pendingRow?.type).toBe("TRANSFER");
+    expect(pendingRow?.categoryId).toBeNull();
+
+    const pendingRowMerged = merged.find((r) => r.id === ORPHAN_OUT);
+    const counterRowMerged = merged.find((r) => r.id !== ORPHAN_OUT);
+    expect(pendingRowMerged?.direction).toBe("OUTFLOW");
+    expect(counterRowMerged?.direction).toBe("INFLOW");
+  });
+
+  it("creates counter outflow when pending is INCOME and debits the destination", async () => {
+    const dstBefore = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_DST))
+    )[0]?.balance;
+
+    const srcBefore = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_SRC))
+    )[0]?.balance;
+
+    const merged = await service.mergeAsTransfer(PROFILE_ID, ORPHAN_IN, {
+      counterAccountId: ACCT_SRC,
+    });
+
+    expect(merged).toHaveLength(2);
+    for (const row of merged) expect(row.type).toBe("TRANSFER");
+    for (const row of merged) expect(row.transferId).toBe("XFER-ORPH-IN");
+
+    const dstAfter = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_DST))
+    )[0]?.balance;
+
+    const srcAfter = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.accounts)
+        .where(eq(schemaMod.accounts.id, ACCT_SRC))
+    )[0]?.balance;
+
+    // Destination (ACCT_DST) account balance must be unchanged (only counter/source is debited)
+    expect(dstAfter).toBe(dstBefore);
+    expect(Number(srcAfter)).toBe(Number(srcBefore) - 50);
+
+    // Verify the pending row was updated in DB
+    const pendingRow = (
+      await dbMod.db
+        .select()
+        .from(schemaMod.transactions)
+        .where(eq(schemaMod.transactions.id, ORPHAN_IN))
+    )[0];
+    expect(pendingRow?.type).toBe("TRANSFER");
+    expect(pendingRow?.categoryId).toBeNull();
+
+    // Direction: pending INCOME row should be labeled INFLOW, not OUTFLOW.
+    const pendingRowMerged = merged.find((r) => r.id === ORPHAN_IN);
+    const counterRowMerged = merged.find((r) => r.id !== ORPHAN_IN);
+    expect(pendingRowMerged?.direction).toBe("INFLOW");
+    expect(counterRowMerged?.direction).toBe("OUTFLOW");
+  });
+});

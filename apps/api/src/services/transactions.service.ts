@@ -1009,10 +1009,102 @@ export class TransactionsService {
         return serializeTransactions(refreshed, categoryParentMap);
       }
 
-      throw new BadRequestError(
-        "Counter account is required when no paired leg exists",
-        "COUNTER_ACCOUNT_REQUIRED"
-      );
+      if (!opts?.counterAccountId) {
+        throw new BadRequestError(
+          "Counter account is required when no paired leg exists",
+          "COUNTER_ACCOUNT_REQUIRED"
+        );
+      }
+
+      if (opts.counterAccountId === pending.accountId) {
+        throw new BadRequestError(
+          "Counter account must be different from the source account",
+          "SAME_ACCOUNT_TRANSFER"
+        );
+      }
+
+      const [counterAccount] = await tx
+        .select()
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.id, opts.counterAccountId),
+            eq(accounts.profileId, profileId)
+          )
+        )
+        .limit(1);
+
+      if (!counterAccount) {
+        throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
+      }
+
+      await tx
+        .update(transactions)
+        .set({
+          type: "TRANSFER",
+          categoryId: null,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(transactions.id, pending.id),
+            eq(transactions.profileId, profileId)
+          )
+        );
+
+      const counterCreatedAt =
+        pending.type === "INCOME"
+          ? new Date(pending.createdAt.getTime() - 1)
+          : new Date();
+
+      const [inserted] = await tx
+        .insert(transactions)
+        .values({
+          profileId,
+          accountId: opts.counterAccountId,
+          type: "TRANSFER",
+          amount: pending.amount,
+          description: pending.description,
+          notes: pending.notes,
+          date: pending.date,
+          isCleared: pending.isCleared,
+          transferId: pending.transferId,
+          createdAt: counterCreatedAt,
+        })
+        .returning();
+
+      if (!inserted) {
+        throw new InternalServerError(
+          "Failed to create counter leg",
+          "COUNTER_LEG_CREATE_FAILED"
+        );
+      }
+
+      const balanceDelta =
+        pending.type === "EXPENSE"
+          ? Number(pending.amount)
+          : -Number(pending.amount);
+
+      await tx
+        .update(accounts)
+        .set({
+          balance: String(Number(counterAccount.balance) + balanceDelta),
+          updatedAt: new Date(),
+        })
+        .where(eq(accounts.id, opts.counterAccountId));
+
+      const refreshed = await tx
+        .select()
+        .from(transactions)
+        .where(
+          and(
+            inArray(transactions.id, [pending.id, inserted.id]),
+            eq(transactions.profileId, profileId)
+          )
+        );
+
+      const categoryParentMap = await loadCategoryParentMap(profileId);
+      return serializeTransactions(refreshed, categoryParentMap);
     });
   }
 }
