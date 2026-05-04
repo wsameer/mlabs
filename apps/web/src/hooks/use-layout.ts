@@ -4,7 +4,6 @@ import {
   headerTitleSelector,
   headerActionsSelector,
   mobileBackPathSelector,
-  onMobileBackSelector,
   sidebarLeftContentSelector,
 } from "@/stores/selectors/layout-selectors";
 
@@ -12,7 +11,6 @@ import {
 export const useHeaderTitle = () => useAppStore(headerTitleSelector);
 export const useHeaderActions = () => useAppStore(headerActionsSelector);
 export const useMobileBackPath = () => useAppStore(mobileBackPathSelector);
-export const useOnMobileBack = () => useAppStore(onMobileBackSelector);
 export const useSidebarLeftContent = () =>
   useAppStore(sidebarLeftContentSelector);
 
@@ -23,7 +21,6 @@ export const useHeaderConfig = () =>
       title: state.headerTitle,
       actions: state.headerActions,
       mobileBackPath: state.mobileBackPath,
-      onMobileBack: state.onMobileBack,
     }))
   );
 
@@ -34,7 +31,6 @@ export const useLayoutActions = () =>
       setHeaderTitle: state.setHeaderTitle,
       setHeaderActions: state.setHeaderActions,
       setMobileBackPath: state.setMobileBackPath,
-      setOnMobileBack: state.setOnMobileBack,
       setSidebarLeftContent: state.setSidebarLeftContent,
       resetLayout: state.resetLayout,
     }))

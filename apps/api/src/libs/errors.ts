@@ -57,11 +57,8 @@ export class InternalServerError extends AppError {
 }
 
 export function toHTTPException(error: AppError): HTTPException {
-  return new HTTPException(
-    error.statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-    {
-      message: error.message,
-      cause: error,
-    }
-  );
+  return new HTTPException(error.statusCode as 400 | 401 | 403 | 404 | 409 | 500, {
+    message: error.message,
+    cause: error,
+  });
 }

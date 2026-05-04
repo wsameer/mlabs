@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
-import { DASHBOARD_ROUTE, ONBOARDING_ROUTE, PROFILES_ROUTE } from "@/constants";
+import {
+  DASHBOARD_ROUTE,
+  ONBOARDING_ROUTE,
+  PROFILES_ROUTE,
+} from "@/constants";
 import { useAppStore } from "@/stores";
 
 export function BootstrapRedirect() {

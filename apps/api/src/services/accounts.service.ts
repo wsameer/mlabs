@@ -135,7 +135,9 @@ export class AccountsService {
       ...(payload.linkedAccountId !== undefined
         ? { linkedAccountId: payload.linkedAccountId }
         : {}),
-      ...(payload.metadata !== undefined ? { metadata: payload.metadata } : {}),
+      ...(payload.metadata !== undefined
+        ? { metadata: payload.metadata }
+        : {}),
       ...(payload.color !== undefined ? { color: payload.color } : {}),
       ...(payload.icon !== undefined ? { icon: payload.icon } : {}),
       ...(payload.isActive !== undefined ? { isActive: payload.isActive } : {}),

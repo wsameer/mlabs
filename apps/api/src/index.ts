@@ -1,8 +1,7 @@
 import { join } from "path";
 import { existsSync } from "fs";
 import { serve } from "@hono/node-server";
-import { OpenAPIHono } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { requestId } from "hono/request-id";
@@ -13,18 +12,14 @@ import { requestLogger } from "./middleware/request-logger.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { profileMiddleware } from "./middleware/profile.js";
 import { env } from "./libs/env.js";
-import { applyMigrationsIfEnabled } from "./libs/migrations.js";
 
 import health from "./routes/health.js";
 import bootstrap from "./routes/bootstrap.js";
 import profiles from "./routes/profiles.js";
 import accounts from "./routes/accounts.js";
-import categories from "./routes/categories.js";
-import transactions from "./routes/transactions.js";
-import reports from "./routes/reports.js";
 import { logger } from "./libs/logger.js";
 
-const app = new OpenAPIHono();
+const app = new Hono();
 
 function getWebDistPath() {
   const explicitPath = process.env.WEB_DIST_PATH;
@@ -107,27 +102,13 @@ app.route("/api/health", health);
 app.route("/api/bootstrap", bootstrap);
 app.route("/api/profiles", profiles);
 
-// OpenAPI Spec & Swagger UI (public — before profile middleware)
-app.doc("/api/spec", {
-  openapi: "3.1.0",
-  info: {
-    title: "mLabs API",
-    version: "1.0.0",
-    description:
-      "Personal finance app API — manage profiles, accounts, categories, and transactions.",
-  },
-});
-
-app.get("/api/docs", swaggerUI({ url: "/api/spec" }));
-
 // Profile middleware - validates X-Profile-Id header for all API routes
 app.use("/api/*", profileMiddleware);
 
 // Protected API Routes
-app.route("/api/categories", categories);
+// app.route("/api/categories", categories);
 app.route("/api/accounts", accounts);
-app.route("/api/transactions", transactions);
-app.route("/api/reports", reports);
+// app.route("/api/transactions", transactionRoutes);
 
 // Static File Serving (Production Only)
 if (env.NODE_ENV === "production") {
@@ -165,21 +146,16 @@ app.notFound((c) => {
 // Global error handler
 app.onError(errorHandler);
 
-// Apply migrations when desktop sidecar provides MIGRATIONS_FOLDER
-await applyMigrationsIfEnabled();
-
 // Server Startup
 const port = env.PORT;
-const host = env.HOST;
 
 const server = serve(
   {
     fetch: app.fetch,
     port,
-    hostname: host,
   },
   (info) => {
-    logger.info(`Server is running on http://${host}:${info.port}/api`);
+    logger.info(`Server is running on http://localhost:${info.port}/api`);
     logger.info(`Environment: ${env.NODE_ENV}`);
     logger.info(`Rate limiting: 100 requests per 15 minutes`);
   }
