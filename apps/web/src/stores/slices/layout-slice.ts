@@ -7,6 +7,8 @@ export type LayoutSlice = {
   headerActions: React.ReactNode | null;
   /** Path for mobile back button. When set, shows back arrow on mobile header */
   mobileBackPath: string | null;
+  /** Callback for mobile back button. When set, takes priority over mobileBackPath */
+  onMobileBack: (() => void) | null;
 
   // Sidebars (consolidated from ui-store + layout-store)
   sidebarLeftContent: React.ReactNode | null;
@@ -15,6 +17,7 @@ export type LayoutSlice = {
   setHeaderTitle: (title: string) => void;
   setHeaderActions: (actions: React.ReactNode | null) => void;
   setMobileBackPath: (path: string | null) => void;
+  setOnMobileBack: (callback: (() => void) | null) => void;
   setSidebarLeftContent: (content: React.ReactNode | null) => void;
   resetLayout: () => void;
 };
@@ -33,6 +36,7 @@ export const createLayoutSlice: StateCreator<
   headerTitle: "Dashboard",
   headerActions: null,
   mobileBackPath: null,
+  onMobileBack: null,
   sidebarLeftContent: null,
 
   // Actions
@@ -51,6 +55,11 @@ export const createLayoutSlice: StateCreator<
       state.mobileBackPath = path;
     }),
 
+  setOnMobileBack: (callback) =>
+    set((state) => {
+      state.onMobileBack = callback;
+    }),
+
   setSidebarLeftContent: (content) =>
     set((state) => {
       state.sidebarLeftContent = content;
@@ -61,6 +70,7 @@ export const createLayoutSlice: StateCreator<
       state.headerTitle = "Dashboard";
       state.headerActions = null;
       state.mobileBackPath = null;
+      state.onMobileBack = null;
       state.sidebarLeftContent = null;
     }),
 });

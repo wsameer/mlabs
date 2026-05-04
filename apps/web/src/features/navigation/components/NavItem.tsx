@@ -21,9 +21,9 @@ export const NavItem = ({
   return (
     <Button
       className={cn(
-        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-foreground opacity-50 hover:bg-background/40 hover:opacity-100 active:translate-y-0",
+        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-primary-foreground opacity-50 hover:bg-background/40 hover:opacity-100 active:translate-y-0",
         {
-          "opacity-100": isActive,
+          "text-foreground opacity-100": isActive,
           "cursor-not-allowed opacity-30": disabled,
         }
       )}
@@ -33,17 +33,11 @@ export const NavItem = ({
       disabled={disabled}
     >
       <div
-        className={`absolute inset-0 rounded-full bg-white transition-opacity dark:bg-background ${
+        className={`absolute inset-0 rounded-full bg-background transition-opacity ${
           isActive ? "opacity-100" : "opacity-0"
         }`}
       />
-      <span
-        className={cn("relative", {
-          "text-foreground": isActive,
-        })}
-      >
-        {icon}
-      </span>
+      <span className="relative">{icon}</span>
       <span className="sr-only">{label}</span>
     </Button>
   );

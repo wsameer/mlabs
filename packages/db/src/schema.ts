@@ -11,7 +11,7 @@ export const DATE_FORMATS = [
 export const WEEK_STARTS = ["SUNDAY", "MONDAY"] as const;
 export const PROFILE_TYPES = ["PERSONAL", "BUSINESS", "SHARED"] as const;
 export const ACCOUNT_GROUPS = [
-  "checking",
+  "chequing",
   "savings",
   "cash",
   "credit_card",
@@ -44,9 +44,7 @@ export const profiles = sqliteTable(
     isDefault: integer("is_default", { mode: "boolean" })
       .notNull()
       .default(false),
-    isActive: integer("is_active", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     isSetupComplete: integer("is_setup_complete", { mode: "boolean" })
       .notNull()
       .default(false),
@@ -93,9 +91,7 @@ export const accounts = sqliteTable(
     // Display
     color: text("color"),
     icon: text("icon"),
-    isActive: integer("is_active", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     includeInNetWorth: integer("include_in_net_worth", { mode: "boolean" })
       .notNull()
       .default(true),
@@ -125,9 +121,7 @@ export const categories = sqliteTable(
     icon: text("icon"),
     color: text("color"),
     parentId: text("parent_id"),
-    isActive: integer("is_active", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()

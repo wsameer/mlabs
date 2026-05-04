@@ -81,7 +81,10 @@ export function ProfilePickerPage() {
           })}
 
           <div className="flex justify-end pt-2">
-            <Button onClick={() => void continueWithProfile()} disabled={!selectedId}>
+            <Button
+              onClick={() => void continueWithProfile()}
+              disabled={!selectedId}
+            >
               Continue
             </Button>
           </div>

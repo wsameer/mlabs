@@ -25,7 +25,7 @@ export const TimeGrainSelect = () => {
   return (
     <Select
       items={GRAIN_OPTIONS}
-      defaultValue={timeGrain}
+      value={timeGrain}
       name="time-grain-selector"
       onValueChange={(v) => v && setTimeGrain(v)}
     >

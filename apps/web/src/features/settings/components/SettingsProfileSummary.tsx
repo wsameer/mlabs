@@ -1,10 +1,7 @@
 import { Card, CardContent } from "@workspace/ui/components/card";
 import type { Profile } from "@workspace/types";
 
-import {
-  getInitials,
-  WORKSPACE_TYPE_LABELS,
-} from "./settings-shared";
+import { getInitials, WORKSPACE_TYPE_LABELS } from "./settings-shared";
 
 type SettingsProfileSummaryProps = {
   profile: Profile;

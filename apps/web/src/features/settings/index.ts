@@ -1,1 +1,1 @@
-export { SettingsPage } from "./components/SettingsPage";
+export { SettingsPage } from "./SettingsPage";

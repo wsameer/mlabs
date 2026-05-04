@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, SearchIcon } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "@workspace/ui/components/button";
@@ -6,14 +6,30 @@ import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import { useHeaderConfig } from "@/hooks/use-layout";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
-  const { title: pageTitle, actions: headerActions, mobileBackPath } = useHeaderConfig();
-  const { setGlobalSearch } = useUiActions();
+  const {
+    title: pageTitle,
+    actions: headerActions,
+    mobileBackPath,
+    onMobileBack,
+  } = useHeaderConfig();
+  const { setGlobalSearch, setOpenCreateTransaction } = useUiActions();
+  const showBackButton = Boolean(mobileBackPath || onMobileBack);
+  const backendStatus = useAppStore((s) => s.backendStatus);
+  const isBackendConnected = backendStatus === "connected";
+
+  const handleAddTransaction = () => {
+    if (!isBackendConnected) return;
+    setOpenCreateTransaction(true);
+  };
 
   const handleBack = () => {
-    if (mobileBackPath) {
+    if (onMobileBack) {
+      onMobileBack();
+    } else if (mobileBackPath) {
       navigate({ to: mobileBackPath });
     }
   };
@@ -29,6 +45,9 @@ export const AppHeader = () => {
         <p className="text-base text-muted-foreground">{pageTitle}</p>
       </div>
       <div className="flex items-center gap-2">
+        <Button variant="default" size="sm" onClick={handleAddTransaction}>
+          <PlusIcon /> Add Transaction
+        </Button>
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
@@ -44,8 +63,8 @@ export const AppHeader = () => {
 
   const renderMobileHeader = () => (
     <div className="flex w-full items-center justify-between gap-3 md:hidden">
-      <div className="flex">
-        {mobileBackPath && (
+      <div className="flex gap-1">
+        {showBackButton && (
           <Button
             variant="ghost"
             size="icon"
@@ -55,11 +74,12 @@ export const AppHeader = () => {
             <ArrowLeftIcon className="size-5" />
           </Button>
         )}
-        <h4 className="flex-1 scroll-m-20 text-lg font-semibold tracking-wide">
+        <h4 className="flex-1 scroll-m-20 text-xl font-medium tracking-wide">
           {pageTitle}
         </h4>
       </div>
       <div className="flex gap-1">
+        {headerActions}
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
@@ -68,13 +88,12 @@ export const AppHeader = () => {
           <SearchIcon data-icon="inline-start" />
           <p className="text-muted-foreground">⌘K</p>
         </Button>
-        {headerActions}
       </div>
     </div>
   );
 
   return (
-    <header className="sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+    <header className="sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b bg-background p-3">
       {renderDesktopHeader()}
       {renderMobileHeader()}
     </header>
