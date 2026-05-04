@@ -16,29 +16,25 @@ import {
   startOfYear,
   endOfYear,
   isAfter,
-  isSameDay,
   min,
   max,
   format,
   getYear,
+  isToday,
 } from "date-fns";
-import { nowInTz, DEFAULT_TIMEZONE } from "@/lib/timezone";
 
 type NavigateOptions = {
   current: DateRange;
   grain: TimeGrain;
   direction: DateNavDirections;
-  tz?: string;
-  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export function navigateDateRange({
   current,
   grain,
   direction,
-  tz = DEFAULT_TIMEZONE,
 }: NavigateOptions): DateRange {
-  const today = nowInTz(tz);
+  const today = new Date();
   const isPrev = direction === "prev";
 
   switch (grain) {
@@ -92,18 +88,13 @@ export function navigateDateRange({
 }
 
 // Used to disable buttons — derived, not stored
-export function getNavigationBoundaries(
-  current: DateRange,
-  grain: TimeGrain,
-  tz: string = DEFAULT_TIMEZONE
-) {
+export function getNavigationBoundaries(current: DateRange, grain: TimeGrain) {
   if (grain === "all") return { prevDisabled: true, nextDisabled: true };
 
-  const today = nowInTz(tz);
+  const today = new Date();
 
   const prevDisabled = !isAfter(current.from, ALL_DATA_START);
-  const nextDisabled =
-    isSameDay(current.to, today) || isAfter(current.to, today);
+  const nextDisabled = isToday(current.to) || isAfter(current.to, today);
 
   return { prevDisabled, nextDisabled };
 }

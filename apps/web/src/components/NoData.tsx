@@ -10,8 +10,8 @@ export function NoData() {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="h-auto w-10 p-2">
-          <RabbitIcon className="size-6" />
+        <EmptyMedia variant="icon" className="h-auto w-14 p-2">
+          <RabbitIcon className="size-10" />
         </EmptyMedia>
         <EmptyTitle>No Data Available</EmptyTitle>
       </EmptyHeader>

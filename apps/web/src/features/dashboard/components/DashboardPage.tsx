@@ -1,5 +1,3 @@
-import { useState, useMemo } from "react";
-import { format } from "date-fns";
 import { CashflowPieChart } from "@/components/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
@@ -11,13 +9,23 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { CategoryStatList } from "@/components/CategoryStatList";
-import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
-import { useDateRange } from "@/hooks/use-filters";
-import { useCategoryTotals } from "../api/use-category-totals";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import { buildCategoryColorMap } from "@/lib/category-colors";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 
-type TabType = "INCOME" | "EXPENSE";
+// const testData = [
+//   {
+//     id: 1,
+//     category: "Housing",
+//     weight: "40%",
+//     value: 4400,
+//   },
+//   { id: 2, category: "Groceries", weight: "20%", value: 1400 },
+//   { id: 3, category: "Food & Dining", weight: "10%", value: 710 },
+//   { id: 4, category: "Travel", weight: "10%", value: 710 },
+//   { id: 5, category: "Utilities", weight: "5%", value: 320 },
+//   { id: 6, category: "Salary", weight: "25%", value: 8220 },
+//   { id: 7, category: "Salary", weight: "25%", value: 8220 },
+//   { id: 8, category: "Salary", weight: "25%", value: 8220 },
+// ];
 
 export function DashboardPage() {
   useLayoutConfig({
@@ -25,47 +33,21 @@ export function DashboardPage() {
     actions: <TimeGrainSelect />,
   });
 
-  const [activeTab, setActiveTab] = useState<TabType>("EXPENSE");
-  const dateRange = useDateRange();
-
-  const { data, isLoading } = useCategoryTotals({
-    startDate: format(dateRange.from, "yyyy-MM-dd"),
-    endDate: format(dateRange.to, "yyyy-MM-dd"),
-    type: activeTab,
-  });
-
-  const colorMap = useMemo(
-    () => buildCategoryColorMap(data?.items ?? []),
-    [data?.items]
-  );
-
   const renderTransactionsSummary = () => (
-    <ScrollArea className="h-[70svh]">
-      <Card className="m-0.5">
+    <>
+      <Card className="w-full border-none">
         <CardContent>
-          <CashflowPieChart
-            data={data}
-            colorMap={colorMap}
-            isLoading={isLoading}
-          />
+          <CashflowPieChart />
         </CardContent>
       </Card>
-      <div className="mt-2">
-        <CategoryStatList data={data?.items ?? []} colorMap={colorMap} />
-      </div>
-    </ScrollArea>
+      <CategoryStatList data={[]} />
+    </>
   );
 
   return (
     <div className="flex w-full flex-col gap-3 lg:w-1/3">
       <DateRangeFilter />
-      <Tabs
-        value={activeTab === "EXPENSE" ? "expense" : "income"}
-        onValueChange={(v) =>
-          setActiveTab(v === "income" ? "INCOME" : "EXPENSE")
-        }
-        className="w-full"
-      >
+      <Tabs defaultValue="expense" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="income">Income</TabsTrigger>
           <TabsTrigger value="expense">Expense</TabsTrigger>

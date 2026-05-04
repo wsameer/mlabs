@@ -1,26 +1,5 @@
+import type { TransactionItemProps } from "../types";
 import React from "react";
-
-import type { TransactionType } from "@workspace/types";
-
-export interface TransactionItemProps {
-  id: number;
-  /** Parent category name (e.g. "Utilities") */
-  category: string;
-  /** Subcategory name, rendered below parent (e.g. "Heat & Hydro") */
-  categorySub?: string;
-  /** Merchant / payee name */
-  merchant: string;
-  /** Account + date line (e.g. "TD Chequing Bank") */
-  merchantSub?: string;
-  /** Formatted amount string (e.g. "$600.00") */
-  amount: string;
-  type: TransactionType;
-  /** Accessible label for the button */
-  "aria-label"?: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  /** Arbitrary className forwarded to the root element */
-  className?: string;
-}
 
 interface CellProps {
   primary: string;
@@ -32,7 +11,7 @@ const Cell = ({ primary, secondary, align = "left" }: CellProps) => (
   <div
     className={`flex min-w-0 flex-col gap-0.5 ${align === "right" ? "items-end text-right" : "items-start"}`}
   >
-    <span className="block w-full truncate text-[11px] leading-snug font-medium text-foreground">
+    <span className="block w-full truncate text-xs leading-snug font-medium text-foreground">
       {primary}
     </span>
     {secondary && (
@@ -49,44 +28,35 @@ export const TransactionItem = React.forwardRef<
 >(
   (
     {
-      id,
       category,
       categorySub,
       merchant,
       merchantSub,
       amount,
-      type,
+      sign = "debit",
+      txDate,
       className = "",
       onClick,
       "aria-label": ariaLabel,
     },
     ref
   ) => {
-    function getAmountColor(type: TransactionType) {
-      if (type === "EXPENSE") {
-        return "text-red-600";
-      }
-
-      if (type === "INCOME") {
-        return "text-emerald-600 dark:text-emerald-400";
-      }
-
-      return "text-foreground";
-    }
+    const amountColor =
+      sign === "credit"
+        ? "text-emerald-600 dark:text-emerald-400"
+        : "text-foreground";
 
     return (
-      <li ref={ref}>
+      <li ref={ref} className={className}>
         <button
           type="button"
           tabIndex={0}
           aria-label={ariaLabel ?? `${merchant} - ${amount}`}
           onClick={onClick}
-          data-testid={`tx-list-item-${id}`}
           className={[
-            "group w-full cursor-pointer border-none text-left outline-none hover:rounded-none hover:bg-accent",
+            "group w-full cursor-pointer text-left outline-none hover:bg-primary/20",
             "grid grid-cols-[1fr_2fr_1fr] items-center gap-x-1 gap-y-0 px-3 py-2",
             "max-[360px]:grid-cols-1 max-[360px]:gap-y-1",
-            className,
           ].join(" ")}
         >
           <Cell
@@ -94,11 +64,11 @@ export const TransactionItem = React.forwardRef<
             secondary={categorySub ? [categorySub] : undefined}
           />
 
-          <Cell primary={merchant} secondary={[merchantSub ?? ""]} />
+          <Cell primary={merchant} secondary={[merchantSub ?? "", txDate]} />
 
           <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
             <span
-              className={`block truncate text-xs tabular-nums ${getAmountColor(type)}`}
+              className={`block truncate text-xs text-foreground tabular-nums ${amountColor}`}
             >
               {amount}
             </span>

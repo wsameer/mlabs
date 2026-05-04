@@ -24,21 +24,4 @@ export function getDatabase(databaseUrl: string) {
 
 // Export schema and types
 export * from "./schema.js";
-export {
-  DEFAULT_CATEGORIES,
-  DEFAULT_CATEGORY_TREE,
-  seedCategoriesForProfile,
-} from "./default-categories.js";
-export {
-  sql,
-  eq,
-  and,
-  or,
-  desc,
-  asc,
-  count,
-  sum,
-  isNull,
-  gte,
-  lte,
-} from "drizzle-orm";
+export { sql, eq, and, or, desc, asc, count, sum, isNull } from "drizzle-orm";

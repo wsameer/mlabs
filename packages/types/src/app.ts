@@ -2,7 +2,8 @@
 // App-level types (non-database)
 // ============================================================================
 
-import { AccountGroupSchema } from "./schema.js";
+import type z from "zod";
+import { AccountGroupSchema } from "./api.js";
 
 export type TimeGrain = "daily" | "weekly" | "monthly" | "yearly" | "all";
 
@@ -15,4 +16,5 @@ export type DateRange = {
 
 export type DateNavDirections = "prev" | "next";
 
-export const ACCOUNT_GROUPS = AccountGroupSchema.options;
+export const ACCOUNT_TYPES = AccountGroupSchema.options;
+export type AccountType = z.infer<typeof AccountGroupSchema>;

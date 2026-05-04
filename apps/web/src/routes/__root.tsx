@@ -19,13 +19,12 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
+import { NotFoundComponent } from "./404";
 import { AppHeader, AppSidebar } from "@/features/layout";
 import { SearchDialog } from "@/components/SearchDialog";
+import { CreateAccountDialog } from "@/features/accounts";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { AddTransactionPopover } from "@/features/transactions";
-import { CreateAccountDialog } from "@/features/add-accounts/CreateAccountDialog";
-
-import { NotFoundComponent } from "./404";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -80,10 +79,8 @@ function RootComponent() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <div className="relative flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-3">
+        <div className="flex flex-1 flex-col gap-4 overflow-x-auto overflow-y-hidden p-4">
           <Outlet />
-          {/* Progressive fade for mobile bottom bar */}
-          <div className="pointer-events-none fixed right-0 bottom-0 left-0 h-32 bg-linear-to-t from-background via-background/50 to-transparent md:hidden" />
         </div>
         <AppBottombar />
         <SearchDialog />

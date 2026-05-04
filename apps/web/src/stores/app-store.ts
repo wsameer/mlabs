@@ -56,7 +56,5 @@ if (import.meta.env.DEV) {
     subscribe: (callback: (state: AppStoreState) => void) =>
       useAppStore.subscribe(callback),
   };
-  console.log(
-    "🔍 Store helper available: window.store.get() | window.store.log()"
-  );
+  console.log("🔍 Store helper available: window.store.get() | window.store.log()");
 }

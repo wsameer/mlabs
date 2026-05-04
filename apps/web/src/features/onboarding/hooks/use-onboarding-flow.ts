@@ -54,7 +54,7 @@ function createInitialFormState(): OnboardingFormState {
     },
     firstAccount: {
       name: "",
-      group: "chequing",
+      group: "checking",
       balance: "",
     },
   };

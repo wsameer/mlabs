@@ -22,7 +22,7 @@ import {
 import type { OnboardingStepComponentProps } from "../../types";
 
 const ACCOUNT_GROUP_LABELS: Record<FirstAccount["group"], string> = {
-  chequing: "Chequing",
+  checking: "Chequing",
   savings: "Savings",
   cash: "Cash",
   credit_card: "Credit card",
@@ -108,7 +108,7 @@ export function FirstAccountStep({
                 {...field}
                 id="first-account-name"
                 autoComplete="off"
-                placeholder="My Chequing"
+                placeholder="Main chequing"
                 disabled={isSubmitting}
                 autoFocus
               />
