@@ -146,7 +146,7 @@ const getProfileRoute = createRoute({
 profilesRoute.openapi(getProfileRoute, async (c) => {
   const { id } = c.req.valid("param");
   const profile = await profilesService.getProfileById(id);
-  return c.json({ success: true as const, data: profile });
+  return c.json({ success: true as const, data: profile }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -184,7 +184,7 @@ profilesRoute.openapi(updateProfileRoute, async (c) => {
   const { id } = c.req.valid("param");
   const payload = c.req.valid("json") as unknown as UpdateProfile;
   const updatedProfile = await profilesService.updateProfile(id, payload);
-  return c.json({ success: true as const, data: updatedProfile });
+  return c.json({ success: true as const, data: updatedProfile }, 200);
 });
 
 export default profilesRoute;

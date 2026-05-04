@@ -106,7 +106,7 @@ categoriesRoute.openapi(getCategoryRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const category = await categoriesService.getCategoryById(profileId, id);
-  return c.json({ success: true as const, data: category });
+  return c.json({ success: true as const, data: category }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -181,7 +181,7 @@ categoriesRoute.openapi(updateCategoryRoute, async (c) => {
     id,
     payload
   );
-  return c.json({ success: true as const, data: updatedCategory });
+  return c.json({ success: true as const, data: updatedCategory }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -212,7 +212,7 @@ categoriesRoute.openapi(deleteCategoryRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const deletedCategory = await categoriesService.deleteCategory(profileId, id);
-  return c.json({ success: true as const, data: deletedCategory });
+  return c.json({ success: true as const, data: deletedCategory }, 200);
 });
 
 export default categoriesRoute;

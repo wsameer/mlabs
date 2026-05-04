@@ -182,7 +182,7 @@ transactionsRoute.openapi(getRoute, async (c) => {
     profileId,
     id
   );
-  return c.json({ success: true as const, data: transaction });
+  return c.json({ success: true as const, data: transaction }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -319,7 +319,7 @@ transactionsRoute.openapi(updateRoute, async (c) => {
       id,
       body as unknown as UpdateTransfer
     );
-    return c.json({ success: true as const, data: updated });
+    return c.json({ success: true as const, data: updated }, 200);
   }
 
   const updated = await transactionsService.updateIncomeExpense(
@@ -327,7 +327,7 @@ transactionsRoute.openapi(updateRoute, async (c) => {
     id,
     body as unknown as UpdateIncomeExpense
   );
-  return c.json({ success: true as const, data: updated });
+  return c.json({ success: true as const, data: updated }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -361,7 +361,7 @@ transactionsRoute.openapi(deleteRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const deleted = await transactionsService.deleteTransaction(profileId, id);
-  return c.json({ success: true as const, data: deleted });
+  return c.json({ success: true as const, data: deleted }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -412,7 +412,7 @@ transactionsRoute.openapi(mergeAsTransferRoute, async (c) => {
   const merged = await transactionsService.mergeAsTransfer(profileId, id, {
     counterAccountId: body.counterAccountId,
   });
-  return c.json({ success: true as const, data: merged });
+  return c.json({ success: true as const, data: merged }, 200);
 });
 
 export default transactionsRoute;

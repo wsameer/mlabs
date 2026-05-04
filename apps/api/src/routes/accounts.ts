@@ -138,7 +138,7 @@ accountsRoute.openapi(getAccountRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const account = await accountsService.getAccountById(profileId, id);
-  return c.json({ success: true as const, data: account });
+  return c.json({ success: true as const, data: account }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ accountsRoute.openapi(updateAccountRoute, async (c) => {
     id,
     payload
   );
-  return c.json({ success: true as const, data: updatedAccount });
+  return c.json({ success: true as const, data: updatedAccount }, 200);
 });
 
 // ---------------------------------------------------------------------------
@@ -244,7 +244,7 @@ accountsRoute.openapi(deleteAccountRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const deletedAccount = await accountsService.deleteAccount(profileId, id);
-  return c.json({ success: true as const, data: deletedAccount });
+  return c.json({ success: true as const, data: deletedAccount }, 200);
 });
 
 export default accountsRoute;
