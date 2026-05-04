@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-import type { Account, AccountGroup } from "@workspace/types";
+import type { Account, AccountGroupType } from "@workspace/types";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import {
   ACCOUNT_GROUP_METADATA,
@@ -8,7 +8,7 @@ import {
 } from "@/features/accounts/lib/account-groups";
 
 export type GroupedAccounts = {
-  group: AccountGroup;
+  group: AccountGroupType;
   meta: AccountGroupMetadata;
   accounts: Account[];
 };
@@ -19,7 +19,7 @@ export function useAccountsSection() {
   const grouped = useMemo<GroupedAccounts[]>(() => {
     if (!accounts?.length) return [];
 
-    const map = new Map<AccountGroup, Account[]>();
+    const map = new Map<AccountGroupType, Account[]>();
     for (const account of accounts) {
       const list = map.get(account.group) ?? [];
       list.push(account);
@@ -34,11 +34,11 @@ export function useAccountsSection() {
   }, [accounts]);
 
   // Expanded groups
-  const [expanded, setExpanded] = useState<Set<AccountGroup>>(
-    () => new Set(Object.keys(ACCOUNT_GROUP_METADATA) as AccountGroup[])
+  const [expanded, setExpanded] = useState<Set<AccountGroupType>>(
+    () => new Set(Object.keys(ACCOUNT_GROUP_METADATA) as AccountGroupType[])
   );
 
-  function toggleExpand(group: AccountGroup) {
+  function toggleExpand(group: AccountGroupType) {
     setExpanded((prev) => {
       const next = new Set(prev);
       if (next.has(group)) next.delete(group);
@@ -50,7 +50,7 @@ export function useAccountsSection() {
   // Add dialog state
   const [addOpen, setAddOpen] = useState(false);
   const [addDefaultGroup, setAddDefaultGroup] = useState<
-    AccountGroup | undefined
+    AccountGroupType | undefined
   >();
 
   // Edit dialog state
@@ -61,7 +61,7 @@ export function useAccountsSection() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Account | null>(null);
 
-  function handleAdd(group?: AccountGroup) {
+  function handleAdd(group?: AccountGroupType) {
     setAddDefaultGroup(group);
     setAddOpen(true);
   }

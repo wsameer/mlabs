@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
 import { toast } from "sonner";
-import type { Account, AccountGroup } from "@workspace/types";
+import type { Account, AccountGroupType } from "@workspace/types";
 import { useUpdateAccount } from "@/features/accounts/api/use-accounts";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ACCOUNT_GROUP_METADATA } from "@/features/accounts/lib/account-groups";
@@ -44,7 +44,7 @@ import {
 } from "@workspace/ui/components/field";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
-const ACCOUNT_GROUPS: AccountGroup[] = [
+const ACCOUNT_GROUPS: AccountGroupType[] = [
   "chequing",
   "savings",
   "cash",
@@ -383,7 +383,7 @@ function EditForm({ form, onSubmit, isPending, className }: EditFormProps) {
               className="w-full"
               value={groupValue}
               onChange={(e) =>
-                form.setValue("group", e.target.value as AccountGroup, {
+                form.setValue("group", e.target.value as AccountGroupType, {
                   shouldValidate: true,
                 })
               }

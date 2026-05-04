@@ -41,7 +41,7 @@ export const AccountGroupSchema = z.enum([
   "asset",
   "other",
 ]);
-export type AccountGroup = z.infer<typeof AccountGroupSchema>;
+export type AccountGroupType = z.infer<typeof AccountGroupSchema>;
 
 export const CategoryTypeSchema = z.enum(["INCOME", "EXPENSE"]);
 export type CategoryType = z.infer<typeof CategoryTypeSchema>;

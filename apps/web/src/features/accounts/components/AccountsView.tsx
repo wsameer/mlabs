@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { Account, AccountGroup } from "@workspace/types";
+import type { Account, AccountGroupType } from "@workspace/types";
 
 import { ACCOUNT_GROUP_METADATA } from "../lib/account-groups";
 import { AccountGroupSection } from "./AccountGroupSection";
@@ -13,7 +13,7 @@ interface AccountsViewProps {
 export function AccountsView({ accounts }: AccountsViewProps) {
   // Group accounts by type
   const groupedAccounts = useMemo(() => {
-    const groups: Partial<Record<AccountGroup, Account[]>> = {};
+    const groups: Partial<Record<AccountGroupType, Account[]>> = {};
 
     accounts.forEach((account) => {
       if (!groups[account.group]) {
@@ -24,7 +24,7 @@ export function AccountsView({ accounts }: AccountsViewProps) {
 
     // Sort accounts within each group by sortOrder, then by name
     Object.keys(groups).forEach((key) => {
-      groups[key as AccountGroup]!.sort((a, b) => {
+      groups[key as AccountGroupType]!.sort((a, b) => {
         if (a.sortOrder !== b.sortOrder) {
           return a.sortOrder - b.sortOrder;
         }
@@ -42,7 +42,7 @@ export function AccountsView({ accounts }: AccountsViewProps) {
     <div className="mx-auto w-full max-w-4xl space-y-2">
       {/* Account Groups */}
       {Object.entries(groupedAccounts).map(([group, groupAccounts], index) => {
-        const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroup];
+        const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroupType];
         const groupTotal = calculateGroupTotal(groupAccounts);
 
         return (

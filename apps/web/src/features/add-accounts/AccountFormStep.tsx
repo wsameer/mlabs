@@ -32,10 +32,10 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
-import { ACCOUNT_GROUPS, type AccountGroup } from "@workspace/types";
+import { ACCOUNT_GROUPS, type AccountGroupType } from "@workspace/types";
 
 // Which account groups are held at a financial institution
-const BANK_HELD_GROUPS: AccountGroup[] = [
+const BANK_HELD_GROUPS: AccountGroupType[] = [
   "chequing",
   "savings",
   "credit_card",
@@ -44,7 +44,7 @@ const BANK_HELD_GROUPS: AccountGroup[] = [
   "mortgage",
 ];
 
-const PLACEHOLDER_NAMES: Record<AccountGroup, string> = {
+const PLACEHOLDER_NAMES: Record<AccountGroupType, string> = {
   chequing: "TD Chequing",
   savings: "High Interest Savings",
   cash: "Wallet",
@@ -121,7 +121,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.output<typeof accountFormSchema>;
 
 interface Props {
-  type: AccountGroup;
+  type: AccountGroupType;
   onSuccess: (data: AccountFormValues) => void;
   onBack: () => void;
 }

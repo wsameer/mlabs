@@ -59,7 +59,7 @@ export type {
   HealthCheck,
   // Enum types
   ProfileType,
-  AccountGroup,
+  AccountGroupType,
   CategoryType,
   TransactionType,
   TransactionDirection,

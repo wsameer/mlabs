@@ -1,6 +1,6 @@
 import { ChevronDownIcon, PlusIcon } from "lucide-react";
 
-import type { Account, AccountGroup } from "@workspace/types";
+import type { Account, AccountGroupType } from "@workspace/types";
 import type { AccountGroupMetadata } from "@/features/accounts/lib/account-groups";
 
 import { Button } from "@workspace/ui/components/button";
@@ -9,12 +9,12 @@ import { ItemGroup } from "@workspace/ui/components/item";
 import { AccountItem } from "./AccountItem";
 
 interface AccountGroupListProps {
-  group: AccountGroup;
+  group: AccountGroupType;
   meta: AccountGroupMetadata;
   accounts: Account[];
   isExpanded: boolean;
-  onToggle: (group: AccountGroup) => void;
-  onAdd: (group: AccountGroup) => void;
+  onToggle: (group: AccountGroupType) => void;
+  onAdd: (group: AccountGroupType) => void;
   onEdit: (account: Account) => void;
   onDelete: (account: Account) => void;
 }

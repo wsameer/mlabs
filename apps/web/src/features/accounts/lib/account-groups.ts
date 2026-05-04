@@ -1,4 +1,4 @@
-import type { AccountGroup } from "@workspace/types";
+import type { AccountGroupType } from "@workspace/types";
 import type { LucideIcon } from "lucide-react";
 import {
   BuildingIcon,
@@ -19,7 +19,7 @@ export interface AccountGroupMetadata {
 }
 
 export const ACCOUNT_GROUP_METADATA: Record<
-  AccountGroup,
+  AccountGroupType,
   AccountGroupMetadata
 > = {
   chequing: {
@@ -79,7 +79,7 @@ export const ACCOUNT_GROUP_METADATA: Record<
 };
 
 export function getAccountGroupMetadata(
-  group: AccountGroup
+  group: AccountGroupType
 ): AccountGroupMetadata {
   return ACCOUNT_GROUP_METADATA[group];
 }
