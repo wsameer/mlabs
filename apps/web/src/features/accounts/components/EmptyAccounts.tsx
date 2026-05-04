@@ -1,5 +1,4 @@
 import { LandmarkIcon } from "lucide-react";
-import { useUiActions } from "@/hooks/use-ui-store";
 import { Button } from "@workspace/ui/components/button";
 import {
   Empty,
@@ -14,10 +13,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import { AddAccount } from "@/features/add-accounts/AddAccount";
 
 export function EmptyAccounts() {
-  const { setOpenCreateAccount } = useUiActions();
-
   return (
     <Empty>
       <EmptyHeader>
@@ -31,9 +29,7 @@ export function EmptyAccounts() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <Button onClick={() => setOpenCreateAccount(true)}>
-          Create Account
-        </Button>
+        <AddAccount />
         <Tooltip>
           <TooltipTrigger
             render={<Button variant="outline">Import Accounts</Button>}

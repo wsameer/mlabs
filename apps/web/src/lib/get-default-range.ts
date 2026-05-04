@@ -1,10 +1,13 @@
 import { ALL_DATA_START } from "@/constants";
 import type { DateRange, TimeGrain } from "@workspace/types";
 import { startOfDay, startOfWeek, startOfMonth, startOfYear } from "date-fns";
+import { nowInTz, DEFAULT_TIMEZONE } from "@/lib/timezone";
 
-export function getDefaultRange(grain: TimeGrain): DateRange {
-  const now = new Date();
-
+export function getDefaultRange(
+  grain: TimeGrain,
+  tz: string = DEFAULT_TIMEZONE
+): DateRange {
+  const now = nowInTz(tz);
   switch (grain) {
     case "daily":
       return { from: startOfDay(now), to: now };

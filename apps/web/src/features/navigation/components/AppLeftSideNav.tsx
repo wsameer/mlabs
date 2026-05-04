@@ -1,4 +1,3 @@
-import { PlusIcon } from "lucide-react";
 import React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 
@@ -14,13 +13,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
-import { cn } from "@workspace/ui/lib/utils";
 
 import {
   PRIMARY_NAVIGATION_OPTIONS,
   SECONDARY_NAV_OPTIONS,
 } from "@/features/navigation/constants";
-import { useUiActions } from "@/hooks/use-ui-store";
 import { useBackendStatus } from "@/hooks/use-app";
 
 import { TeamSwitcher } from "./TeamSwitcher";
@@ -29,7 +26,6 @@ export function AppLeftSideNav({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { setOpenMobile, isMobile } = useSidebar();
-  const { setOpenCreateTransaction } = useUiActions();
   const router = useRouterState();
   const backendStatus = useBackendStatus();
   const isBackendConnected = backendStatus === "connected";
@@ -96,31 +92,6 @@ export function AppLeftSideNav({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenu className="gap-2">
-            <SidebarMenuItem className="mb-2">
-              <SidebarMenuButton
-                className={cn(
-                  "rounded-full bg-primary/80 px-2.5 text-secondary md:px-2",
-                  {
-                    "bg-muted": !isBackendConnected,
-                    "hover:bg-primary hover:text-white active:bg-primary":
-                      isBackendConnected,
-                  }
-                )}
-                variant="outline"
-                aria-label="Add transaction"
-                onClick={() =>
-                  isBackendConnected && setOpenCreateTransaction(true)
-                }
-                tooltip={{
-                  children: "Add new transaction",
-                  hidden: false,
-                }}
-                disabled={!isBackendConnected}
-              >
-                <PlusIcon />
-                <span>Add transaction</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
             {SECONDARY_NAV_OPTIONS.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton

@@ -1,11 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import {
-  DASHBOARD_ROUTE,
-  ONBOARDING_ROUTE,
-  PROFILES_ROUTE,
-} from "@/constants";
+import { DASHBOARD_ROUTE, ONBOARDING_ROUTE, PROFILES_ROUTE } from "@/constants";
 import { ProfilePickerPage } from "@/features/profiles";
 import { useAppStatus } from "@/hooks/use-app";
 

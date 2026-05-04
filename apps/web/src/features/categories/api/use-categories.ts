@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
 import type {
   Category,
-  InsertCategory,
+  CreateCategory,
   UpdateCategory,
   CategoryQuery,
 } from "@workspace/types";
@@ -39,7 +39,7 @@ export function useCategory(id: string) {
 export function useCreateCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: InsertCategory) =>
+    mutationFn: (data: CreateCategory) =>
       apiClient<Category>("/categories", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });

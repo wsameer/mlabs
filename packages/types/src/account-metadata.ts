@@ -4,8 +4,8 @@ import { z } from "zod/v4";
 // Account Metadata Schemas (per account group)
 // ============================================================================
 
-// Checking: no type-specific metadata
-export const CheckingMetadataSchema = z.object({});
+// Chequing: no type-specific metadata
+export const ChequingMetadataSchema = z.object({});
 
 // Savings: no metadata (goals will be a separate feature)
 export const SavingsMetadataSchema = z.object({});
@@ -70,7 +70,7 @@ export const OtherMetadataSchema = z.object({});
 // ============================================================================
 
 export const AccountMetadataSchemas = {
-  checking: CheckingMetadataSchema,
+  chequing: ChequingMetadataSchema,
   savings: SavingsMetadataSchema,
   cash: CashMetadataSchema,
   credit_card: CreditCardMetadataSchema,
@@ -85,7 +85,7 @@ export const AccountMetadataSchemas = {
 // Type exports
 // ============================================================================
 
-export type CheckingMetadata = z.infer<typeof CheckingMetadataSchema>;
+export type ChequingMetadata = z.infer<typeof ChequingMetadataSchema>;
 export type SavingsMetadata = z.infer<typeof SavingsMetadataSchema>;
 export type CashMetadata = z.infer<typeof CashMetadataSchema>;
 export type CreditCardMetadata = z.infer<typeof CreditCardMetadataSchema>;
@@ -96,7 +96,7 @@ export type AssetMetadata = z.infer<typeof AssetMetadataSchema>;
 export type OtherMetadata = z.infer<typeof OtherMetadataSchema>;
 
 export type AccountMetadataMap = {
-  checking: CheckingMetadata;
+  chequing: ChequingMetadata;
   savings: SavingsMetadata;
   cash: CashMetadata;
   credit_card: CreditCardMetadata;
@@ -107,5 +107,4 @@ export type AccountMetadataMap = {
   other: OtherMetadata;
 };
 
-export type AccountGroup = keyof AccountMetadataMap;
-export type AccountMetadata = AccountMetadataMap[AccountGroup];
+export type AccountMetadata = AccountMetadataMap[keyof AccountMetadataMap];
