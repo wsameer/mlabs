@@ -47,7 +47,7 @@ export function SearchInput({
         onChange={(e) => setLocal(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className="h-8 pl-7 pr-7 text-xs"
+        className="h-8 pr-7 pl-7 text-xs"
         data-testid="tx-filters-search"
       />
       {!disabled && local.length > 0 && (

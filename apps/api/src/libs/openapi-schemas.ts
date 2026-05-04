@@ -21,7 +21,10 @@ export const ErrorResponseSchema = z.object({
 });
 
 export const IdParamSchema = z.object({
-  id: z.string().uuid().openapi({ example: "550e8400-e29b-41d4-a716-446655440000" }),
+  id: z
+    .string()
+    .uuid()
+    .openapi({ example: "550e8400-e29b-41d4-a716-446655440000" }),
 });
 
 // ---------------------------------------------------------------------------
@@ -50,8 +53,15 @@ export const AccountSchema = z.object({
   profileId: z.string().uuid(),
   name: z.string(),
   group: z.enum([
-    "chequing", "savings", "cash", "credit_card",
-    "investment", "loan", "mortgage", "asset", "other",
+    "chequing",
+    "savings",
+    "cash",
+    "credit_card",
+    "investment",
+    "loan",
+    "mortgage",
+    "asset",
+    "other",
   ]),
   balance: z.string(),
   currency: z.string(),

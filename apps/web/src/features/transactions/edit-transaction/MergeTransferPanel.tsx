@@ -13,11 +13,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field";
 
 interface Props {
   transaction: Transaction;
@@ -82,7 +78,8 @@ export function MergeTransferPanel({ transaction, accounts, onMerged }: Props) {
 
   if (counter) {
     const counterAccountName =
-      accounts?.find((a) => a.id === counter.accountId)?.name ?? "another account";
+      accounts?.find((a) => a.id === counter.accountId)?.name ??
+      "another account";
     return (
       <Alert>
         <AlertDescription className="flex flex-col gap-2 text-xs">
@@ -112,7 +109,9 @@ export function MergeTransferPanel({ transaction, accounts, onMerged }: Props) {
       <AlertDescription className="flex flex-col gap-2 text-xs">
         <span>No counter leg found yet. Pick the destination account:</span>
         <Field>
-          <FieldLabel htmlFor="merge-counter-account">Counter account</FieldLabel>
+          <FieldLabel htmlFor="merge-counter-account">
+            Counter account
+          </FieldLabel>
           <NativeSelect
             id="merge-counter-account"
             className="w-full"
@@ -127,9 +126,7 @@ export function MergeTransferPanel({ transaction, accounts, onMerged }: Props) {
               </NativeSelectOption>
             ))}
           </NativeSelect>
-          {pickedAccountId === "" && (
-            <FieldError>Required</FieldError>
-          )}
+          {pickedAccountId === "" && <FieldError>Required</FieldError>}
         </Field>
         <Button
           type="button"

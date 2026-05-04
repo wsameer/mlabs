@@ -420,7 +420,12 @@ function EditIncomeExpenseForm({
       {/* Actions */}
       <div className="flex justify-between gap-2 md:hidden">
         {onDelete && (
-          <Button type="button" variant="destructive" onClick={onDelete} data-testid="tx-edit-delete">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onDelete}
+            data-testid="tx-edit-delete"
+          >
             Delete
           </Button>
         )}
@@ -445,7 +450,11 @@ function EditIncomeExpenseForm({
             Delete
           </Button>
         )}
-        <Button type="submit" disabled={updateTransaction.isPending} data-testid="tx-edit-save">
+        <Button
+          type="submit"
+          disabled={updateTransaction.isPending}
+          data-testid="tx-edit-save"
+        >
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>
@@ -686,7 +695,12 @@ function EditTransferForm({
       {/* Actions */}
       <div className="flex justify-between gap-2 md:hidden">
         {onDelete && (
-          <Button type="button" variant="destructive" onClick={onDelete} data-testid="tx-edit-delete">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onDelete}
+            data-testid="tx-edit-delete"
+          >
             Delete
           </Button>
         )}
@@ -711,7 +725,11 @@ function EditTransferForm({
             Delete
           </Button>
         )}
-        <Button type="submit" disabled={updateTransaction.isPending} data-testid="tx-edit-save">
+        <Button
+          type="submit"
+          disabled={updateTransaction.isPending}
+          data-testid="tx-edit-save"
+        >
           {updateTransaction.isPending ? "Saving..." : "Save"}
         </Button>
       </div>

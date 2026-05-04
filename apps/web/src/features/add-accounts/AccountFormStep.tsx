@@ -205,7 +205,9 @@ export function AccountFormStep({ type, onSuccess, onBack }: Props) {
         sortOrder: 0,
         ...(data.institutionName && { institutionName: data.institutionName }),
         ...(data.accountNumber && { accountNumber: data.accountNumber }),
-        ...(data.description?.trim() && { description: data.description.trim() }),
+        ...(data.description?.trim() && {
+          description: data.description.trim(),
+        }),
         ...(data.notes?.trim() && { notes: data.notes.trim() }),
         ...(data.creditLimit && { creditLimit: data.creditLimit }),
         ...(data.originalAmount && { originalAmount: data.originalAmount }),

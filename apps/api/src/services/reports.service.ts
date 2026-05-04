@@ -38,10 +38,7 @@ export class ReportsService {
       .orderBy(sql`SUM(CAST(${transactions.amount} AS REAL)) DESC`);
 
     // Compute grand total and percentages
-    const grandTotal = rows.reduce(
-      (sum, row) => sum + Number(row.total),
-      0
-    );
+    const grandTotal = rows.reduce((sum, row) => sum + Number(row.total), 0);
 
     const items = rows.map((row) => ({
       categoryId: row.categoryId,

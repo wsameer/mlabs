@@ -6,11 +6,7 @@ import {
 } from "react-hook-form";
 import { DollarSignIcon } from "lucide-react";
 
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field";
 import {
   InputGroup,
   InputGroupAddon,

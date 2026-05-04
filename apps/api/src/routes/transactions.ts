@@ -40,7 +40,10 @@ const TransactionQueryRouteSchema = z.object({
   endDate: z.string().optional().openapi({ example: "2026-12-31" }),
   minAmount: z.string().optional(),
   maxAmount: z.string().optional(),
-  isCleared: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  isCleared: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
   transferId: z.string().optional(),
   search: z.string().optional(),
   limit: z
@@ -121,7 +124,8 @@ const listRoute = createRoute({
   path: "/",
   tags: ["Transactions"],
   summary: "List transactions",
-  description: "Returns paginated transactions with optional filters for date, type, amount, and search.",
+  description:
+    "Returns paginated transactions with optional filters for date, type, amount, and search.",
   request: { query: TransactionQueryRouteSchema },
   responses: {
     200: {
@@ -159,7 +163,9 @@ const getRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(TransactionSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(TransactionSchema) },
+      },
       description: "Transaction details",
     },
     404: {
@@ -172,7 +178,10 @@ const getRoute = createRoute({
 transactionsRoute.openapi(getRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
-  const transaction = await transactionsService.getTransactionById(profileId, id);
+  const transaction = await transactionsService.getTransactionById(
+    profileId,
+    id
+  );
   return c.json({ success: true as const, data: transaction });
 });
 
@@ -185,7 +194,8 @@ const bulkRoute = createRoute({
   path: "/bulk",
   tags: ["Transactions"],
   summary: "Bulk import transactions",
-  description: "Import multiple income/expense transactions at once (e.g. from CSV). Max 500 per request.",
+  description:
+    "Import multiple income/expense transactions at once (e.g. from CSV). Max 500 per request.",
   request: {
     body: {
       content: { "application/json": { schema: BulkCreateBodySchema } },
@@ -193,7 +203,11 @@ const bulkRoute = createRoute({
   },
   responses: {
     201: {
-      content: { "application/json": { schema: apiResponseSchema(BulkImportResultSchema) } },
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(BulkImportResultSchema),
+        },
+      },
       description: "Bulk import result with success and failure counts",
     },
   },
@@ -202,7 +216,10 @@ const bulkRoute = createRoute({
 transactionsRoute.openapi(bulkRoute, async (c) => {
   const profileId = c.get("profileId");
   const payload = c.req.valid("json") as unknown as BulkCreateTransactions;
-  const result = await transactionsService.bulkCreateIncomeExpense(profileId, payload.transactions);
+  const result = await transactionsService.bulkCreateIncomeExpense(
+    profileId,
+    payload.transactions
+  );
   return c.json({ success: true as const, data: result }, 201);
 });
 
@@ -327,7 +344,9 @@ const deleteRoute = createRoute({
   responses: {
     200: {
       content: {
-        "application/json": { schema: apiResponseSchema(z.array(TransactionSchema)) },
+        "application/json": {
+          schema: apiResponseSchema(z.array(TransactionSchema)),
+        },
       },
       description: "Deleted transaction(s)",
     },

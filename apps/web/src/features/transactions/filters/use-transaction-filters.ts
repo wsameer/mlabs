@@ -9,9 +9,7 @@ import { getActiveFilterCount, swapIfInverted } from "./filter-utils";
 
 type Patch = Partial<TransactionFilterState>;
 
-function stripDefaults(
-  next: TransactionFilterState
-): Record<string, unknown> {
+function stripDefaults(next: TransactionFilterState): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   if (next.preset !== "all") out.preset = next.preset;
   if (next.q && next.q.length > 0) out.q = next.q;

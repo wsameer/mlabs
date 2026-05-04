@@ -8,7 +8,10 @@ function setError(code: string, detail: string): void {
   if (!root) return;
   root.dataset.state = "error";
   const status = root.querySelector<HTMLElement>(".status");
-  if (status) status.textContent = STARTUP_ERROR_MESSAGES[code as keyof typeof STARTUP_ERROR_MESSAGES] ?? code;
+  if (status)
+    status.textContent =
+      STARTUP_ERROR_MESSAGES[code as keyof typeof STARTUP_ERROR_MESSAGES] ??
+      code;
   const pre = root.querySelector<HTMLElement>(".error");
   if (pre) {
     pre.hidden = false;

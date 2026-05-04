@@ -101,7 +101,10 @@ export function useTransferCounterLeg(
         transactions: Transaction[];
         total: number;
       }>("/transactions", {
-        params: toQueryParams({ transferId: transferId! } as Record<string, unknown>),
+        params: toQueryParams({ transferId: transferId! } as Record<
+          string,
+          unknown
+        >),
         signal,
       });
       return result;

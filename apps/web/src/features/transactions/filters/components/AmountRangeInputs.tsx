@@ -4,7 +4,10 @@ import { Input } from "@workspace/ui/components/input";
 export interface AmountRangeInputsProps {
   min: number | undefined;
   max: number | undefined;
-  onCommit: (next: { min: number | undefined; max: number | undefined }) => void;
+  onCommit: (next: {
+    min: number | undefined;
+    max: number | undefined;
+  }) => void;
   className?: string;
   disabled?: boolean;
 }

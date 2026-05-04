@@ -13,9 +13,15 @@ export const STARTUP_ERROR_MESSAGES: Record<StartupErrorCode, string> = {
 };
 
 export function mapStartupError(err: unknown): StartupErrorCode {
-  const message = typeof err === "string" ? err : String((err as Error)?.message ?? err ?? "");
+  const message =
+    typeof err === "string"
+      ? err
+      : String((err as Error)?.message ?? err ?? "");
   const lower = message.toLowerCase();
-  if (lower.includes("eaddrinuse") || lower.includes("address already in use")) {
+  if (
+    lower.includes("eaddrinuse") ||
+    lower.includes("address already in use")
+  ) {
     return "PORT_3001_IN_USE";
   }
   if (lower.includes("eacces") || lower.includes("permission denied")) {

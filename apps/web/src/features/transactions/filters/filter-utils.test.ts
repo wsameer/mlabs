@@ -78,10 +78,7 @@ describe("toApiQuery", () => {
   });
 
   it("passes categoryIds when preset is not uncategorized", () => {
-    const q = toApiQuery(
-      { preset: "all", categoryIds: ["a", "b"] },
-      range
-    );
+    const q = toApiQuery({ preset: "all", categoryIds: ["a", "b"] }, range);
     expect(q.categoryIds).toEqual(["a", "b"]);
   });
 

@@ -64,15 +64,26 @@ function resolveEsbuild() {
   }
   const pnpmRoot = path.join(repoRoot, "node_modules", ".pnpm");
   if (existsSync(pnpmRoot)) {
-    const entries = readdirSync(pnpmRoot).filter((d) => d.startsWith("esbuild@"));
+    const entries = readdirSync(pnpmRoot).filter((d) =>
+      d.startsWith("esbuild@")
+    );
     // Prefer the highest version available.
     entries.sort().reverse();
     for (const entry of entries) {
-      const bin = path.join(pnpmRoot, entry, "node_modules", "esbuild", "bin", "esbuild");
+      const bin = path.join(
+        pnpmRoot,
+        entry,
+        "node_modules",
+        "esbuild",
+        "bin",
+        "esbuild"
+      );
       if (existsSync(bin)) return bin;
     }
   }
-  throw new Error("Could not locate esbuild binary; install it or run `pnpm install`.");
+  throw new Error(
+    "Could not locate esbuild binary; install it or run `pnpm install`."
+  );
 }
 
 function stageApi() {
@@ -147,12 +158,7 @@ function findDep(dep) {
     );
     matches.sort().reverse();
     for (const entry of matches) {
-      const candidate = path.join(
-        pnpmRoot,
-        entry,
-        "node_modules",
-        dep
-      );
+      const candidate = path.join(pnpmRoot, entry, "node_modules", dep);
       if (existsSync(candidate)) return candidate;
     }
   }

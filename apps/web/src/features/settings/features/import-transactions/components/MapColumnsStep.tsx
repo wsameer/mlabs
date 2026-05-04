@@ -38,7 +38,10 @@ export function MapColumnsStep({
   const typeMapped = mapping.type != null;
   // Filter fields based on amount mode + whether type is mapped
   const visibleFields = MAPPABLE_FIELDS.filter((f) => {
-    if (amountMode === "signed" && (f.field === "debit" || f.field === "credit"))
+    if (
+      amountMode === "signed" &&
+      (f.field === "debit" || f.field === "credit")
+    )
       return false;
     if (amountMode === "split" && f.field === "amount") return false;
     if (!typeMapped && f.field === "transferId") return false;

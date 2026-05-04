@@ -1,8 +1,4 @@
-import type {
-  FieldPath,
-  FieldValues,
-  UseFormRegister,
-} from "react-hook-form";
+import type { FieldPath, FieldValues, UseFormRegister } from "react-hook-form";
 
 import { Field, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";

@@ -8,9 +8,11 @@ describe("waitForHealth", () => {
   });
 
   it("resolves when fetch returns ok", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ success: true }), { status: 200 })
-    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ success: true }), { status: 200 })
+      );
     vi.stubGlobal("fetch", fetchMock);
     await expect(
       waitForHealth("http://127.0.0.1:3001", { retries: 3, delayMs: 1 })

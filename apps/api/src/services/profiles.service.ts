@@ -1,8 +1,4 @@
-import {
-  accounts,
-  profiles,
-  seedCategoriesForProfile,
-} from "@workspace/db";
+import { accounts, profiles, seedCategoriesForProfile } from "@workspace/db";
 import type {
   CreateOnboardingProfile,
   Profile,

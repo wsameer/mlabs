@@ -59,7 +59,13 @@ export function CategoryMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
-            <Button variant="outline" size="sm" disabled={disabled} className="h-8 gap-1 text-xs" data-testid="tx-filters-category-trigger">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={disabled}
+              className="h-8 gap-1 text-xs"
+              data-testid="tx-filters-category-trigger"
+            >
               {triggerLabel}
               <ChevronDownIcon className="size-3 text-muted-foreground" />
             </Button>

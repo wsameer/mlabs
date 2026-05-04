@@ -20,7 +20,10 @@ function targetTriple() {
   return `${node}-apple-darwin`;
 }
 
-async function waitForHealth(url, { retries = 80, delayMs = 250, isChildAlive } = {}) {
+async function waitForHealth(
+  url,
+  { retries = 80, delayMs = 250, isChildAlive } = {}
+) {
   for (let i = 0; i < retries; i++) {
     if (isChildAlive && !isChildAlive()) {
       throw new Error("sidecar exited before health endpoint became ready");

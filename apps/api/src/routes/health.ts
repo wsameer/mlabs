@@ -19,7 +19,8 @@ const route = createRoute({
   path: "/",
   tags: ["Health"],
   summary: "Health check",
-  description: "Returns the health status of the API and database connectivity.",
+  description:
+    "Returns the health status of the API and database connectivity.",
   responses: {
     200: {
       content: {
@@ -37,9 +38,11 @@ const route = createRoute({
         "application/json": {
           schema: z.object({
             success: z.boolean(),
-            error: z.object({
-              message: z.string(),
-            }).optional(),
+            error: z
+              .object({
+                message: z.string(),
+              })
+              .optional(),
             data: HealthCheckSchema,
           }),
         },

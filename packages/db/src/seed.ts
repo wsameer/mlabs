@@ -133,7 +133,16 @@ type AccountDef = {
   key: string;
   linkedAccountKey?: string;
   name: string;
-  group: "chequing" | "savings" | "cash" | "credit_card" | "investment" | "loan" | "mortgage" | "asset" | "other";
+  group:
+    | "chequing"
+    | "savings"
+    | "cash"
+    | "credit_card"
+    | "investment"
+    | "loan"
+    | "mortgage"
+    | "asset"
+    | "other";
   balance: string;
   currency?: string;
   institutionName?: string;
@@ -275,7 +284,11 @@ const ACCOUNT_DEFS: AccountDef[] = [
     description: "First Home Savings Account",
     includeInNetWorth: true,
     sortOrder: 9,
-    metadata: { subtype: "FHSA", contributionRoom: "8000", annualLimit: "8000" },
+    metadata: {
+      subtype: "FHSA",
+      contributionRoom: "8000",
+      annualLimit: "8000",
+    },
   },
   // ── Cash ──
   {
@@ -380,7 +393,11 @@ const ACCOUNT_DEFS: AccountDef[] = [
     description: "Vehicle",
     includeInNetWorth: true,
     sortOrder: 15,
-    metadata: { assetType: "vehicle", purchaseDate: "2023-06-01", purchasePrice: "38000" },
+    metadata: {
+      assetType: "vehicle",
+      purchaseDate: "2023-06-01",
+      purchasePrice: "38000",
+    },
   },
   // ── Other ──
   {
@@ -424,28 +441,170 @@ type RecurringRule = ExpenseRule | TransferRule;
 
 const RECURRING_RULES: RecurringRule[] = [
   // Income
-  { kind: "biweekly", type: "INCOME", accountKey: "checking", categoryName: "Salary", amount: 5500, jitterPct: 0.02, description: "Salary deposit" },
+  {
+    kind: "biweekly",
+    type: "INCOME",
+    accountKey: "checking",
+    categoryName: "Salary",
+    amount: 5500,
+    jitterPct: 0.02,
+    description: "Salary deposit",
+  },
   // Housing
-  { kind: "biweekly", type: "EXPENSE", accountKey: "checking", categoryName: "Mortgage", amount: 2650, jitterPct: 0, description: "Mortgage payment - RBC" },
+  {
+    kind: "biweekly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Mortgage",
+    amount: 2650,
+    jitterPct: 0,
+    description: "Mortgage payment - RBC",
+  },
   // Utilities
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Heat & Hydro", amount: 125, jitterPct: 0.1,  description: "Hydro One",       dayOfMonth: 10 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Heat & Hydro", amount: 45,  jitterPct: 0.15, description: "Enbridge Gas",    dayOfMonth: 12 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Wifi",         amount: 85,  jitterPct: 0,    description: "Rogers Internet", dayOfMonth: 15 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Phone Bill",   amount: 75,  jitterPct: 0,    description: "Bell Mobility",   dayOfMonth: 18 },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Heat & Hydro",
+    amount: 125,
+    jitterPct: 0.1,
+    description: "Hydro One",
+    dayOfMonth: 10,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Heat & Hydro",
+    amount: 45,
+    jitterPct: 0.15,
+    description: "Enbridge Gas",
+    dayOfMonth: 12,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Wifi",
+    amount: 85,
+    jitterPct: 0,
+    description: "Rogers Internet",
+    dayOfMonth: 15,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Phone Bill",
+    amount: 75,
+    jitterPct: 0,
+    description: "Bell Mobility",
+    dayOfMonth: 18,
+  },
   // Entertainment (streaming)
-  { kind: "monthly", type: "EXPENSE", accountKey: "rogersCC", categoryName: "Streaming", amount: 16.99, jitterPct: 0, description: "Netflix", dayOfMonth: 3 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "visa",     categoryName: "Streaming", amount: 11.99, jitterPct: 0, description: "Spotify", dayOfMonth: 7 },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "rogersCC",
+    categoryName: "Streaming",
+    amount: 16.99,
+    jitterPct: 0,
+    description: "Netflix",
+    dayOfMonth: 3,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "visa",
+    categoryName: "Streaming",
+    amount: 11.99,
+    jitterPct: 0,
+    description: "Spotify",
+    dayOfMonth: 7,
+  },
   // Healthcare
-  { kind: "monthly", type: "EXPENSE", accountKey: "rogersCC", categoryName: "Gym & Fitness", amount: 49.99, jitterPct: 0, description: "GoodLife Fitness", dayOfMonth: 1 },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "rogersCC",
+    categoryName: "Gym & Fitness",
+    amount: 49.99,
+    jitterPct: 0,
+    description: "GoodLife Fitness",
+    dayOfMonth: 1,
+  },
   // Transportation
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Subway",         amount: 156, jitterPct: 0, description: "TTC Monthly Pass",                 dayOfMonth: 1 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Car Payment",    amount: 520, jitterPct: 0, description: "Auto loan payment - Toyota Financial", dayOfMonth: 5 },
-  { kind: "monthly", type: "EXPENSE", accountKey: "checking", categoryName: "Auto Insurance", amount: 185, jitterPct: 0, description: "Auto insurance - TD Insurance",    dayOfMonth: 20 },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Subway",
+    amount: 156,
+    jitterPct: 0,
+    description: "TTC Monthly Pass",
+    dayOfMonth: 1,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Car Payment",
+    amount: 520,
+    jitterPct: 0,
+    description: "Auto loan payment - Toyota Financial",
+    dayOfMonth: 5,
+  },
+  {
+    kind: "monthly",
+    type: "EXPENSE",
+    accountKey: "checking",
+    categoryName: "Auto Insurance",
+    amount: 185,
+    jitterPct: 0,
+    description: "Auto insurance - TD Insurance",
+    dayOfMonth: 20,
+  },
   // Transfers
-  { kind: "monthly", type: "TRANSFER", fromAccountKey: "checking", toAccountKey: "tfsa",     amount: 500, jitterPct: 0,    description: "TFSA contribution",         dayOfMonth: 16 },
-  { kind: "monthly", type: "TRANSFER", fromAccountKey: "checking", toAccountKey: "fhsa",     amount: 666, jitterPct: 0,    description: "FHSA contribution",         dayOfMonth: 16 },
-  { kind: "monthly", type: "TRANSFER", fromAccountKey: "checking", toAccountKey: "visa",     amount: 800, jitterPct: 0.15, description: "Visa payment",              dayOfMonth: 20 },
-  { kind: "monthly", type: "TRANSFER", fromAccountKey: "checking", toAccountKey: "rogersCC", amount: 250, jitterPct: 0.2,  description: "Rogers Mastercard payment", dayOfMonth: 20 },
+  {
+    kind: "monthly",
+    type: "TRANSFER",
+    fromAccountKey: "checking",
+    toAccountKey: "tfsa",
+    amount: 500,
+    jitterPct: 0,
+    description: "TFSA contribution",
+    dayOfMonth: 16,
+  },
+  {
+    kind: "monthly",
+    type: "TRANSFER",
+    fromAccountKey: "checking",
+    toAccountKey: "fhsa",
+    amount: 666,
+    jitterPct: 0,
+    description: "FHSA contribution",
+    dayOfMonth: 16,
+  },
+  {
+    kind: "monthly",
+    type: "TRANSFER",
+    fromAccountKey: "checking",
+    toAccountKey: "visa",
+    amount: 800,
+    jitterPct: 0.15,
+    description: "Visa payment",
+    dayOfMonth: 20,
+  },
+  {
+    kind: "monthly",
+    type: "TRANSFER",
+    fromAccountKey: "checking",
+    toAccountKey: "rogersCC",
+    amount: 250,
+    jitterPct: 0.2,
+    description: "Rogers Mastercard payment",
+    dayOfMonth: 20,
+  },
 ];
 
 // ── One-off transaction definitions ──────────────────────────────────────────
@@ -475,54 +634,358 @@ type OneOff = OneOffTx | OneOffTransfer;
 
 const ONE_OFFS: OneOff[] = [
   // Groceries
-  { kind: "tx", accountKey: "visa",     categoryName: "Groceries", type: "EXPENSE", amount: "85.00",  description: "Loblaws",           daysBack: 1 },
-  { kind: "tx", accountKey: "cash",     categoryName: "Groceries", type: "EXPENSE", amount: "12.00",  description: "Farmers market",    daysBack: 6 },
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Groceries", type: "EXPENSE", amount: "112.45", description: "Metro",             daysBack: 14 },
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Groceries", type: "EXPENSE", amount: "243.60", description: "Costco Wholesale",  daysBack: 18 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Groceries", type: "EXPENSE", amount: "67.20",  description: "No Frills",         daysBack: 40 },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Groceries",
+    type: "EXPENSE",
+    amount: "85.00",
+    description: "Loblaws",
+    daysBack: 1,
+  },
+  {
+    kind: "tx",
+    accountKey: "cash",
+    categoryName: "Groceries",
+    type: "EXPENSE",
+    amount: "12.00",
+    description: "Farmers market",
+    daysBack: 6,
+  },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Groceries",
+    type: "EXPENSE",
+    amount: "112.45",
+    description: "Metro",
+    daysBack: 14,
+  },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Groceries",
+    type: "EXPENSE",
+    amount: "243.60",
+    description: "Costco Wholesale",
+    daysBack: 18,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Groceries",
+    type: "EXPENSE",
+    amount: "67.20",
+    description: "No Frills",
+    daysBack: 40,
+  },
   // Restaurants / Coffee / Takeout / Alcohol
-  { kind: "tx", accountKey: "visa",     categoryName: "Restaurants", type: "EXPENSE", amount: "42.00", description: "Thai Express",  daysBack: 3 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Coffee",      type: "EXPENSE", amount: "6.50",  description: "Tim Hortons",   daysBack: 5 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Coffee",      type: "EXPENSE", amount: "5.25",  description: "Tim Hortons",   daysBack: 32 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Coffee",      type: "EXPENSE", amount: "6.80",  description: "Tim Hortons",   daysBack: 58 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Takeout",     type: "EXPENSE", amount: "38.50", description: "Uber Eats",     daysBack: 22 },
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Takeout",     type: "EXPENSE", amount: "29.75", description: "SkipTheDishes", daysBack: 47 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Alcohol",     type: "EXPENSE", amount: "54.25", description: "LCBO",          daysBack: 11 },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Restaurants",
+    type: "EXPENSE",
+    amount: "42.00",
+    description: "Thai Express",
+    daysBack: 3,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Coffee",
+    type: "EXPENSE",
+    amount: "6.50",
+    description: "Tim Hortons",
+    daysBack: 5,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Coffee",
+    type: "EXPENSE",
+    amount: "5.25",
+    description: "Tim Hortons",
+    daysBack: 32,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Coffee",
+    type: "EXPENSE",
+    amount: "6.80",
+    description: "Tim Hortons",
+    daysBack: 58,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Takeout",
+    type: "EXPENSE",
+    amount: "38.50",
+    description: "Uber Eats",
+    daysBack: 22,
+  },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Takeout",
+    type: "EXPENSE",
+    amount: "29.75",
+    description: "SkipTheDishes",
+    daysBack: 47,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Alcohol",
+    type: "EXPENSE",
+    amount: "54.25",
+    description: "LCBO",
+    daysBack: 11,
+  },
   // Shopping (subs)
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Home Goods",  type: "EXPENSE", amount: "89.99",  description: "Canadian Tire", daysBack: 25 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Home Goods",  type: "EXPENSE", amount: "150.00", description: "Amazon.ca",     daysBack: 4 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Home Goods",  type: "EXPENSE", amount: "89.99",  description: "Amazon.ca",     daysBack: 38 },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Home Goods",
+    type: "EXPENSE",
+    amount: "89.99",
+    description: "Canadian Tire",
+    daysBack: 25,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Home Goods",
+    type: "EXPENSE",
+    amount: "150.00",
+    description: "Amazon.ca",
+    daysBack: 4,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Home Goods",
+    type: "EXPENSE",
+    amount: "89.99",
+    description: "Amazon.ca",
+    daysBack: 38,
+  },
   // Healthcare (subs)
-  { kind: "tx", accountKey: "visa", categoryName: "Pharmacy", type: "EXPENSE", amount: "38.75",  description: "Shoppers Drug Mart", daysBack: 16 },
-  { kind: "tx", accountKey: "hsa",  categoryName: "Dental",   type: "EXPENSE", amount: "150.00", description: "Dental cleaning",    daysBack: 20 },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Pharmacy",
+    type: "EXPENSE",
+    amount: "38.75",
+    description: "Shoppers Drug Mart",
+    daysBack: 16,
+  },
+  {
+    kind: "tx",
+    accountKey: "hsa",
+    categoryName: "Dental",
+    type: "EXPENSE",
+    amount: "150.00",
+    description: "Dental cleaning",
+    daysBack: 20,
+  },
   // Transportation (subs)
-  { kind: "tx", accountKey: "visa",     categoryName: "Fuel",   type: "EXPENSE", amount: "65.00", description: "Petro Canada",  daysBack: 7 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Fuel",   type: "EXPENSE", amount: "72.40", description: "Shell",         daysBack: 29 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Fuel",   type: "EXPENSE", amount: "68.15", description: "Petro Canada",  daysBack: 55 },
-  { kind: "tx", accountKey: "checking", categoryName: "Subway", type: "EXPENSE", amount: "40.00", description: "Presto top-up", daysBack: 42 },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Fuel",
+    type: "EXPENSE",
+    amount: "65.00",
+    description: "Petro Canada",
+    daysBack: 7,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Fuel",
+    type: "EXPENSE",
+    amount: "72.40",
+    description: "Shell",
+    daysBack: 29,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Fuel",
+    type: "EXPENSE",
+    amount: "68.15",
+    description: "Petro Canada",
+    daysBack: 55,
+  },
+  {
+    kind: "tx",
+    accountKey: "checking",
+    categoryName: "Subway",
+    type: "EXPENSE",
+    amount: "40.00",
+    description: "Presto top-up",
+    daysBack: 42,
+  },
   // Entertainment (subs)
-  { kind: "tx", accountKey: "visa",     categoryName: "Movies", type: "EXPENSE", amount: "25.00",  description: "Cineplex",              daysBack: 8 },
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Movies", type: "EXPENSE", amount: "52.30",  description: "Cineplex - date night", daysBack: 35 },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Movies",
+    type: "EXPENSE",
+    amount: "25.00",
+    description: "Cineplex",
+    daysBack: 8,
+  },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Movies",
+    type: "EXPENSE",
+    amount: "52.30",
+    description: "Cineplex - date night",
+    daysBack: 35,
+  },
   // Housing (subs)
-  { kind: "tx", accountKey: "checking", categoryName: "Property Taxes", type: "EXPENSE", amount: "810.00",  description: "City of Toronto property tax", daysBack: 60 },
-  { kind: "tx", accountKey: "visa",     categoryName: "Home Insurance", type: "EXPENSE", amount: "1680.00", description: "TD Home Insurance - annual",   daysBack: 75 },
+  {
+    kind: "tx",
+    accountKey: "checking",
+    categoryName: "Property Taxes",
+    type: "EXPENSE",
+    amount: "810.00",
+    description: "City of Toronto property tax",
+    daysBack: 60,
+  },
+  {
+    kind: "tx",
+    accountKey: "visa",
+    categoryName: "Home Insurance",
+    type: "EXPENSE",
+    amount: "1680.00",
+    description: "TD Home Insurance - annual",
+    daysBack: 75,
+  },
   // Income
-  { kind: "tx", accountKey: "wealthSimpleCash", categoryName: "Freelance",     type: "INCOME", amount: "1200.00", description: "Freelance logo project",    daysBack: 10 },
-  { kind: "tx", accountKey: "wealthSimpleCash", categoryName: "Freelance",     type: "INCOME", amount: "2400.00", description: "Freelance website project", daysBack: 52 },
-  { kind: "tx", accountKey: "tfsa",             categoryName: "Dividends",     type: "INCOME", amount: "320.50",  description: "TFSA dividend payout",      daysBack: 22 },
-  { kind: "tx", accountKey: "rrsp",             categoryName: "Dividends",     type: "INCOME", amount: "185.75",  description: "RRSP dividend payout",      daysBack: 22 },
-  { kind: "tx", accountKey: "checking",         categoryName: "Refund",        type: "INCOME", amount: "1450.00", description: "CRA tax refund",            daysBack: 67 },
-  { kind: "tx", accountKey: "checking",         categoryName: "CRA Benefits",  type: "INCOME", amount: "124.00",  description: "GST/HST credit - CRA",      daysBack: 45 },
-  { kind: "tx", accountKey: "cash",             categoryName: "Gift",          type: "INCOME", amount: "200.00",  description: "Birthday gift",             daysBack: 48 },
+  {
+    kind: "tx",
+    accountKey: "wealthSimpleCash",
+    categoryName: "Freelance",
+    type: "INCOME",
+    amount: "1200.00",
+    description: "Freelance logo project",
+    daysBack: 10,
+  },
+  {
+    kind: "tx",
+    accountKey: "wealthSimpleCash",
+    categoryName: "Freelance",
+    type: "INCOME",
+    amount: "2400.00",
+    description: "Freelance website project",
+    daysBack: 52,
+  },
+  {
+    kind: "tx",
+    accountKey: "tfsa",
+    categoryName: "Dividends",
+    type: "INCOME",
+    amount: "320.50",
+    description: "TFSA dividend payout",
+    daysBack: 22,
+  },
+  {
+    kind: "tx",
+    accountKey: "rrsp",
+    categoryName: "Dividends",
+    type: "INCOME",
+    amount: "185.75",
+    description: "RRSP dividend payout",
+    daysBack: 22,
+  },
+  {
+    kind: "tx",
+    accountKey: "checking",
+    categoryName: "Refund",
+    type: "INCOME",
+    amount: "1450.00",
+    description: "CRA tax refund",
+    daysBack: 67,
+  },
+  {
+    kind: "tx",
+    accountKey: "checking",
+    categoryName: "CRA Benefits",
+    type: "INCOME",
+    amount: "124.00",
+    description: "GST/HST credit - CRA",
+    daysBack: 45,
+  },
+  {
+    kind: "tx",
+    accountKey: "cash",
+    categoryName: "Gift",
+    type: "INCOME",
+    amount: "200.00",
+    description: "Birthday gift",
+    daysBack: 48,
+  },
   // USD transactions on BMO USD Chequing (raw USD, no conversion)
-  { kind: "tx", accountKey: "bmoUsd", categoryName: "Home Goods", type: "EXPENSE", amount: "45.20",  description: "Amazon.com",        daysBack: 14 },
-  { kind: "tx", accountKey: "bmoUsd", categoryName: "Events",     type: "EXPENSE", amount: "312.00", description: "Marriott Seattle",  daysBack: 41 },
-  { kind: "tx", accountKey: "bmoUsd", categoryName: "Freelance",  type: "INCOME",  amount: "800.00", description: "US client payment", daysBack: 30 },
+  {
+    kind: "tx",
+    accountKey: "bmoUsd",
+    categoryName: "Home Goods",
+    type: "EXPENSE",
+    amount: "45.20",
+    description: "Amazon.com",
+    daysBack: 14,
+  },
+  {
+    kind: "tx",
+    accountKey: "bmoUsd",
+    categoryName: "Events",
+    type: "EXPENSE",
+    amount: "312.00",
+    description: "Marriott Seattle",
+    daysBack: 41,
+  },
+  {
+    kind: "tx",
+    accountKey: "bmoUsd",
+    categoryName: "Freelance",
+    type: "INCOME",
+    amount: "800.00",
+    description: "US client payment",
+    daysBack: 30,
+  },
   // Pending
-  { kind: "tx", accountKey: "rogersCC", categoryName: "Fuel", type: "EXPENSE", amount: "72.00", description: "Costco Gas (pending)", daysBack: 0, isCleared: false },
+  {
+    kind: "tx",
+    accountKey: "rogersCC",
+    categoryName: "Fuel",
+    type: "EXPENSE",
+    amount: "72.00",
+    description: "Costco Gas (pending)",
+    daysBack: 0,
+    isCleared: false,
+  },
   // One-off transfers
-  { kind: "transfer", fromAccountKey: "checking", toAccountKey: "savings", amount: "500.00", description: "Transfer to savings",         daysBack: 2 },
-  { kind: "transfer", fromAccountKey: "checking", toAccountKey: "tfsa",    amount: "500.00", description: "TFSA contribution (pending)", daysBack: 0, isCleared: false },
+  {
+    kind: "transfer",
+    fromAccountKey: "checking",
+    toAccountKey: "savings",
+    amount: "500.00",
+    description: "Transfer to savings",
+    daysBack: 2,
+  },
+  {
+    kind: "transfer",
+    fromAccountKey: "checking",
+    toAccountKey: "tfsa",
+    amount: "500.00",
+    description: "TFSA contribution (pending)",
+    daysBack: 0,
+    isCleared: false,
+  },
 ];
 
 // ── Main seed function ────────────────────────────────────────────────────────
@@ -569,11 +1032,17 @@ async function seed() {
     const seededCategories = await seedCategoriesForProfile(db, profileId);
 
     const catByName = new Map(seededCategories.map((c) => [c.name, c]));
-    const incomeCount = seededCategories.filter((c) => c.type === "INCOME").length;
-    const expenseCount = seededCategories.filter((c) => c.type === "EXPENSE").length;
+    const incomeCount = seededCategories.filter(
+      (c) => c.type === "INCOME"
+    ).length;
+    const expenseCount = seededCategories.filter(
+      (c) => c.type === "EXPENSE"
+    ).length;
     const parentCount = seededCategories.filter((c) => !c.parentId).length;
     const childCount = seededCategories.length - parentCount;
-    console.log(`✅ Created ${seededCategories.length} categories (${parentCount} parents, ${childCount} sub-categories)`);
+    console.log(
+      `✅ Created ${seededCategories.length} categories (${parentCount} parents, ${childCount} sub-categories)`
+    );
 
     // Accounts — insert all, then resolve linkedAccountKey references
     console.log("🏦 Seeding accounts...");
@@ -597,7 +1066,10 @@ async function seed() {
         const linkedId = accountIdByKey.get(def.linkedAccountKey);
         const selfId = accountIdByKey.get(def.key);
         if (linkedId && selfId) {
-          await db.update(accounts).set({ linkedAccountId: linkedId }).where(eq(accounts.id, selfId));
+          await db
+            .update(accounts)
+            .set({ linkedAccountId: linkedId })
+            .where(eq(accounts.id, selfId));
         }
       }
     }
@@ -617,17 +1089,22 @@ async function seed() {
           const date = monthsAgo(mo, day);
           if (date > today) continue;
 
-          const amount = rule.jitterPct > 0 ? jitter(rule.amount, rule.jitterPct) : rule.amount.toFixed(2);
+          const amount =
+            rule.jitterPct > 0
+              ? jitter(rule.amount, rule.jitterPct)
+              : rule.amount.toFixed(2);
 
           if (rule.type === "TRANSFER") {
-            allTxRows.push(...makeTransferPair({
-              profileId,
-              fromAccountId: accountIdByKey.get(rule.fromAccountKey)!,
-              toAccountId: accountIdByKey.get(rule.toAccountKey)!,
-              amount,
-              description: rule.description,
-              date,
-            }));
+            allTxRows.push(
+              ...makeTransferPair({
+                profileId,
+                fromAccountId: accountIdByKey.get(rule.fromAccountKey)!,
+                toAccountId: accountIdByKey.get(rule.toAccountKey)!,
+                amount,
+                description: rule.description,
+                date,
+              })
+            );
           } else {
             allTxRows.push({
               profileId,
@@ -646,17 +1123,22 @@ async function seed() {
         const maxDays = MONTHS_OF_HISTORY * 30;
         for (let d = 0; d <= maxDays; d += 14) {
           const date = daysAgo(d);
-          const amount = rule.jitterPct > 0 ? jitter(rule.amount, rule.jitterPct) : rule.amount.toFixed(2);
+          const amount =
+            rule.jitterPct > 0
+              ? jitter(rule.amount, rule.jitterPct)
+              : rule.amount.toFixed(2);
 
           if (rule.type === "TRANSFER") {
-            allTxRows.push(...makeTransferPair({
-              profileId,
-              fromAccountId: accountIdByKey.get(rule.fromAccountKey)!,
-              toAccountId: accountIdByKey.get(rule.toAccountKey)!,
-              amount,
-              description: rule.description,
-              date,
-            }));
+            allTxRows.push(
+              ...makeTransferPair({
+                profileId,
+                fromAccountId: accountIdByKey.get(rule.fromAccountKey)!,
+                toAccountId: accountIdByKey.get(rule.toAccountKey)!,
+                amount,
+                description: rule.description,
+                date,
+              })
+            );
           } else {
             allTxRows.push({
               profileId,
@@ -677,15 +1159,17 @@ async function seed() {
     for (const item of ONE_OFFS) {
       const date = daysAgo(item.daysBack);
       if (item.kind === "transfer") {
-        allTxRows.push(...makeTransferPair({
-          profileId,
-          fromAccountId: accountIdByKey.get(item.fromAccountKey)!,
-          toAccountId: accountIdByKey.get(item.toAccountKey)!,
-          amount: item.amount,
-          description: item.description,
-          date,
-          isCleared: item.isCleared,
-        }));
+        allTxRows.push(
+          ...makeTransferPair({
+            profileId,
+            fromAccountId: accountIdByKey.get(item.fromAccountKey)!,
+            toAccountId: accountIdByKey.get(item.toAccountKey)!,
+            amount: item.amount,
+            description: item.description,
+            date,
+            isCleared: item.isCleared,
+          })
+        );
       } else {
         allTxRows.push({
           profileId,
@@ -702,9 +1186,9 @@ async function seed() {
 
     await db.insert(transactions).values(allTxRows);
 
-    const incomeRows  = allTxRows.filter((r) => r.type === "INCOME").length;
+    const incomeRows = allTxRows.filter((r) => r.type === "INCOME").length;
     const expenseRows = allTxRows.filter((r) => r.type === "EXPENSE").length;
-    const xferLegs    = allTxRows.filter((r) => r.type === "TRANSFER").length;
+    const xferLegs = allTxRows.filter((r) => r.type === "TRANSFER").length;
     const pendingRows = allTxRows.filter((r) => !r.isCleared).length;
 
     console.log(`\n✨ Database seeding completed successfully!`);
@@ -723,7 +1207,9 @@ async function seed() {
     process.exit(0);
   } catch (error) {
     console.error("❌ Seed failed:", error);
-    console.error("⚠️  Seed partially applied — run `pnpm db:reset` to retry from clean state");
+    console.error(
+      "⚠️  Seed partially applied — run `pnpm db:reset` to retry from clean state"
+    );
     process.exit(1);
   }
 }

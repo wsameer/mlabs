@@ -23,12 +23,25 @@ const accountsRoute = new OpenAPIHono<ProfileEnv>();
 const AccountQueryRouteSchema = z.object({
   group: z
     .enum([
-      "chequing", "savings", "cash", "credit_card",
-      "investment", "loan", "mortgage", "asset", "other",
+      "chequing",
+      "savings",
+      "cash",
+      "credit_card",
+      "investment",
+      "loan",
+      "mortgage",
+      "asset",
+      "other",
     ])
     .optional(),
-  isActive: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
-  includeInNetWorth: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  isActive: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
+  includeInNetWorth: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
   search: z.string().optional(),
 });
 
@@ -36,8 +49,15 @@ const CreateAccountBodySchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(100),
   group: z.enum([
-    "chequing", "savings", "cash", "credit_card",
-    "investment", "loan", "mortgage", "asset", "other",
+    "chequing",
+    "savings",
+    "cash",
+    "credit_card",
+    "investment",
+    "loan",
+    "mortgage",
+    "asset",
+    "other",
   ]),
   balance: z.string().optional(),
   currency: z.string().length(3).default("CAD"),
@@ -68,12 +88,15 @@ const listAccountsRoute = createRoute({
   path: "/",
   tags: ["Accounts"],
   summary: "List accounts",
-  description: "Returns all accounts for the current profile, with optional filters.",
+  description:
+    "Returns all accounts for the current profile, with optional filters.",
   request: { query: AccountQueryRouteSchema },
   responses: {
     200: {
       content: {
-        "application/json": { schema: apiResponseSchema(z.array(AccountSchema)) },
+        "application/json": {
+          schema: apiResponseSchema(z.array(AccountSchema)),
+        },
       },
       description: "List of accounts",
     },
@@ -99,7 +122,9 @@ const getAccountRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(AccountSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(AccountSchema) },
+      },
       description: "Account details",
     },
     404: {
@@ -132,7 +157,9 @@ const createAccountRoute = createRoute({
   },
   responses: {
     201: {
-      content: { "application/json": { schema: apiResponseSchema(AccountSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(AccountSchema) },
+      },
       description: "Account created",
     },
   },
@@ -141,7 +168,10 @@ const createAccountRoute = createRoute({
 accountsRoute.openapi(createAccountRoute, async (c) => {
   const profileId = c.get("profileId");
   const payload = c.req.valid("json") as unknown as CreateAccount;
-  const createdAccount = await accountsService.createAccount(profileId, payload);
+  const createdAccount = await accountsService.createAccount(
+    profileId,
+    payload
+  );
   return c.json({ success: true as const, data: createdAccount }, 201);
 });
 
@@ -162,7 +192,9 @@ const updateAccountRoute = createRoute({
   },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(AccountSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(AccountSchema) },
+      },
       description: "Account updated",
     },
     404: {
@@ -176,7 +208,11 @@ accountsRoute.openapi(updateAccountRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const payload = c.req.valid("json") as unknown as UpdateAccount;
-  const updatedAccount = await accountsService.updateAccount(profileId, id, payload);
+  const updatedAccount = await accountsService.updateAccount(
+    profileId,
+    id,
+    payload
+  );
   return c.json({ success: true as const, data: updatedAccount });
 });
 
@@ -192,7 +228,9 @@ const deleteAccountRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(AccountSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(AccountSchema) },
+      },
       description: "Account deleted",
     },
     404: {

@@ -17,7 +17,8 @@ describe("ApiEnvSchema", () => {
       NODE_ENV: "production",
       LOG_LEVEL: "info",
       CORS_ORIGIN: "http://127.0.0.1:3001",
-      MIGRATIONS_FOLDER: "/Applications/mLabs.app/Contents/Resources/migrations",
+      MIGRATIONS_FOLDER:
+        "/Applications/mLabs.app/Contents/Resources/migrations",
       WEB_DIST_PATH: "/Applications/mLabs.app/Contents/Resources/web",
     });
     expect(result.success).toBe(true);

@@ -98,7 +98,9 @@ export function DeleteTransactionDialog({
         />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline" data-testid="tx-delete-cancel">Cancel</Button>
+            <Button variant="outline" data-testid="tx-delete-cancel">
+              Cancel
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -152,7 +154,12 @@ function DeleteContent({
       </div>
 
       <div className="hidden justify-end gap-2 md:flex">
-        <Button type="button" variant="outline" onClick={onCancel} data-testid="tx-delete-cancel">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          data-testid="tx-delete-cancel"
+        >
           Cancel
         </Button>
         <Button

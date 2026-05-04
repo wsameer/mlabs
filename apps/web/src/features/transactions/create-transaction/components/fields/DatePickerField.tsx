@@ -2,11 +2,7 @@ import { useState } from "react";
 import { CalendarIcon } from "lucide-react";
 
 import { Calendar } from "@workspace/ui/components/calendar";
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field";
 import {
   InputGroup,
   InputGroupAddon,

@@ -29,4 +29,16 @@ export {
   DEFAULT_CATEGORY_TREE,
   seedCategoriesForProfile,
 } from "./default-categories.js";
-export { sql, eq, and, or, desc, asc, count, sum, isNull, gte, lte } from "drizzle-orm";
+export {
+  sql,
+  eq,
+  and,
+  or,
+  desc,
+  asc,
+  count,
+  sum,
+  isNull,
+  gte,
+  lte,
+} from "drizzle-orm";

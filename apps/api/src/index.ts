@@ -113,7 +113,8 @@ app.doc("/api/spec", {
   info: {
     title: "mLabs API",
     version: "1.0.0",
-    description: "Personal finance app API — manage profiles, accounts, categories, and transactions.",
+    description:
+      "Personal finance app API — manage profiles, accounts, categories, and transactions.",
   },
 });
 

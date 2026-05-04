@@ -23,7 +23,10 @@ const categoriesRoute = new OpenAPIHono<ProfileEnv>();
 
 const CategoryQueryRouteSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]).optional(),
-  isActive: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  isActive: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
   parentId: z.string().uuid().optional(),
   search: z.string().optional(),
 });
@@ -50,7 +53,8 @@ const listCategoriesRoute = createRoute({
   path: "/",
   tags: ["Categories"],
   summary: "List categories",
-  description: "Returns categories with nested subcategories for the current profile.",
+  description:
+    "Returns categories with nested subcategories for the current profile.",
   request: { query: CategoryQueryRouteSchema },
   responses: {
     200: {
@@ -67,7 +71,10 @@ const listCategoriesRoute = createRoute({
 categoriesRoute.openapi(listCategoriesRoute, async (c) => {
   const profileId = c.get("profileId");
   const filters = c.req.valid("query") as unknown as CategoryQuery;
-  const categoryList = await categoriesService.listCategories(profileId, filters);
+  const categoryList = await categoriesService.listCategories(
+    profileId,
+    filters
+  );
   return c.json({ success: true as const, data: categoryList });
 });
 
@@ -83,7 +90,9 @@ const getCategoryRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(CategorySchema) },
+      },
       description: "Category details",
     },
     404: {
@@ -116,7 +125,9 @@ const createCategoryRoute = createRoute({
   },
   responses: {
     201: {
-      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(CategorySchema) },
+      },
       description: "Category created",
     },
   },
@@ -125,7 +136,10 @@ const createCategoryRoute = createRoute({
 categoriesRoute.openapi(createCategoryRoute, async (c) => {
   const profileId = c.get("profileId");
   const payload = c.req.valid("json") as unknown as CreateCategory;
-  const createdCategory = await categoriesService.createCategory(profileId, payload);
+  const createdCategory = await categoriesService.createCategory(
+    profileId,
+    payload
+  );
   return c.json({ success: true as const, data: createdCategory }, 201);
 });
 
@@ -146,7 +160,9 @@ const updateCategoryRoute = createRoute({
   },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(CategorySchema) },
+      },
       description: "Category updated",
     },
     404: {
@@ -160,7 +176,11 @@ categoriesRoute.openapi(updateCategoryRoute, async (c) => {
   const profileId = c.get("profileId");
   const { id } = c.req.valid("param");
   const payload = c.req.valid("json") as unknown as UpdateCategory;
-  const updatedCategory = await categoriesService.updateCategory(profileId, id, payload);
+  const updatedCategory = await categoriesService.updateCategory(
+    profileId,
+    id,
+    payload
+  );
   return c.json({ success: true as const, data: updatedCategory });
 });
 
@@ -176,7 +196,9 @@ const deleteCategoryRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(CategorySchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(CategorySchema) },
+      },
       description: "Category deleted",
     },
     404: {

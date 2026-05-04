@@ -155,8 +155,22 @@ describe("mergeAsTransfer — pair case", () => {
 
   beforeAll(async () => {
     await dbMod.db.insert(schemaMod.accounts).values([
-      { id: ACCT_A, profileId: PROFILE_ID, name: "A", group: "chequing", currency: "CAD", balance: "500" },
-      { id: ACCT_B, profileId: PROFILE_ID, name: "B", group: "chequing", currency: "CAD", balance: "1000" },
+      {
+        id: ACCT_A,
+        profileId: PROFILE_ID,
+        name: "A",
+        group: "chequing",
+        currency: "CAD",
+        balance: "500",
+      },
+      {
+        id: ACCT_B,
+        profileId: PROFILE_ID,
+        name: "B",
+        group: "chequing",
+        currency: "CAD",
+        balance: "1000",
+      },
     ]);
     await dbMod.db.insert(schemaMod.transactions).values([
       {
@@ -186,7 +200,9 @@ describe("mergeAsTransfer — pair case", () => {
 
   it("upgrades both legs to TRANSFER and leaves balances unchanged", async () => {
     const before = await dbMod.db.select().from(schemaMod.accounts);
-    const balancesBefore = Object.fromEntries(before.map((a) => [a.id, a.balance]));
+    const balancesBefore = Object.fromEntries(
+      before.map((a) => [a.id, a.balance])
+    );
 
     const merged = await service.mergeAsTransfer(PROFILE_ID, PENDING_OUT);
 
@@ -197,7 +213,9 @@ describe("mergeAsTransfer — pair case", () => {
     for (const row of merged) expect(row.transferId).toBe(PAIR_XID);
 
     const after = await dbMod.db.select().from(schemaMod.accounts);
-    const balancesAfter = Object.fromEntries(after.map((a) => [a.id, a.balance]));
+    const balancesAfter = Object.fromEntries(
+      after.map((a) => [a.id, a.balance])
+    );
     expect(balancesAfter[ACCT_A]).toBe(balancesBefore[ACCT_A]);
     expect(balancesAfter[ACCT_B]).toBe(balancesBefore[ACCT_B]);
 
@@ -218,8 +236,22 @@ describe("mergeAsTransfer — orphan case", () => {
 
   beforeAll(async () => {
     await dbMod.db.insert(schemaMod.accounts).values([
-      { id: ACCT_SRC, profileId: PROFILE_ID, name: "Src", group: "chequing", currency: "CAD", balance: "800" },
-      { id: ACCT_DST, profileId: PROFILE_ID, name: "Dst", group: "chequing", currency: "CAD", balance: "300" },
+      {
+        id: ACCT_SRC,
+        profileId: PROFILE_ID,
+        name: "Src",
+        group: "chequing",
+        currency: "CAD",
+        balance: "800",
+      },
+      {
+        id: ACCT_DST,
+        profileId: PROFILE_ID,
+        name: "Dst",
+        group: "chequing",
+        currency: "CAD",
+        balance: "300",
+      },
     ]);
     await dbMod.db.insert(schemaMod.transactions).values([
       {
@@ -374,39 +406,103 @@ describe("mergeAsTransfer — errors", () => {
   const AMBIG_XID = "XFER-AMBIG";
 
   beforeAll(async () => {
-    await dbMod.db.insert(schemaMod.accounts).values([
-      { id: ACCT, profileId: PROFILE_ID, name: "Err", group: "chequing", currency: "CAD", balance: "0" },
-    ]);
+    await dbMod.db
+      .insert(schemaMod.accounts)
+      .values([
+        {
+          id: ACCT,
+          profileId: PROFILE_ID,
+          name: "Err",
+          group: "chequing",
+          currency: "CAD",
+          balance: "0",
+        },
+      ]);
     await dbMod.db.insert(schemaMod.transactions).values([
-      { id: NO_XID, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13" },
-      { id: ALREADY_T, profileId: PROFILE_ID, accountId: ACCT, type: "TRANSFER", amount: "10", date: "2026-05-13", transferId: "XFER-T" },
-      { id: AMBIG_1, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
-      { id: AMBIG_2, profileId: PROFILE_ID, accountId: ACCT, type: "INCOME", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
-      { id: AMBIG_3, profileId: PROFILE_ID, accountId: ACCT, type: "INCOME", amount: "10", date: "2026-05-13", transferId: AMBIG_XID },
-      { id: ORPHAN, profileId: PROFILE_ID, accountId: ACCT, type: "EXPENSE", amount: "10", date: "2026-05-13", transferId: "XFER-LONELY" },
+      {
+        id: NO_XID,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "EXPENSE",
+        amount: "10",
+        date: "2026-05-13",
+      },
+      {
+        id: ALREADY_T,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "TRANSFER",
+        amount: "10",
+        date: "2026-05-13",
+        transferId: "XFER-T",
+      },
+      {
+        id: AMBIG_1,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "EXPENSE",
+        amount: "10",
+        date: "2026-05-13",
+        transferId: AMBIG_XID,
+      },
+      {
+        id: AMBIG_2,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "INCOME",
+        amount: "10",
+        date: "2026-05-13",
+        transferId: AMBIG_XID,
+      },
+      {
+        id: AMBIG_3,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "INCOME",
+        amount: "10",
+        date: "2026-05-13",
+        transferId: AMBIG_XID,
+      },
+      {
+        id: ORPHAN,
+        profileId: PROFILE_ID,
+        accountId: ACCT,
+        type: "EXPENSE",
+        amount: "10",
+        date: "2026-05-13",
+        transferId: "XFER-LONELY",
+      },
     ]);
   });
 
   it("throws NO_TRANSFER_ID when transferId is null", async () => {
-    await expect(service.mergeAsTransfer(PROFILE_ID, NO_XID)).rejects.toMatchObject({
+    await expect(
+      service.mergeAsTransfer(PROFILE_ID, NO_XID)
+    ).rejects.toMatchObject({
       code: "NO_TRANSFER_ID",
     });
   });
 
   it("throws ALREADY_TRANSFER when row is already TRANSFER", async () => {
-    await expect(service.mergeAsTransfer(PROFILE_ID, ALREADY_T)).rejects.toMatchObject({
+    await expect(
+      service.mergeAsTransfer(PROFILE_ID, ALREADY_T)
+    ).rejects.toMatchObject({
       code: "ALREADY_TRANSFER",
     });
   });
 
   it("throws AMBIGUOUS_TRANSFER_GROUP when >2 rows share transferId", async () => {
-    await expect(service.mergeAsTransfer(PROFILE_ID, AMBIG_1)).rejects.toMatchObject({
+    await expect(
+      service.mergeAsTransfer(PROFILE_ID, AMBIG_1)
+    ).rejects.toMatchObject({
       code: "AMBIGUOUS_TRANSFER_GROUP",
     });
   });
 
   it("throws COUNTER_ACCOUNT_REQUIRED for orphan without counterAccountId", async () => {
-    await expect(service.mergeAsTransfer(PROFILE_ID, ORPHAN)).rejects.toMatchObject({
+    await expect(
+      service.mergeAsTransfer(PROFILE_ID, ORPHAN)
+    ).rejects.toMatchObject({
       code: "COUNTER_ACCOUNT_REQUIRED",
     });
   });

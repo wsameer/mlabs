@@ -12,8 +12,8 @@ const bin = path.join(tauri, "bin");
 describe("sidecar bundle layout", () => {
   it("produces a Node sidecar renamed with the host target triple", () => {
     expect(existsSync(bin)).toBe(true);
-    const entries = readdirSync(bin).filter((f) =>
-      f.startsWith("mlabs-api-") && !f.endsWith(".sig")
+    const entries = readdirSync(bin).filter(
+      (f) => f.startsWith("mlabs-api-") && !f.endsWith(".sig")
     );
     expect(entries.length).toBeGreaterThan(0);
     const first = entries[0];

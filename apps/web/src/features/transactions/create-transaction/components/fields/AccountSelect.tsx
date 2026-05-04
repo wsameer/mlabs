@@ -6,11 +6,7 @@ import {
 } from "react-hook-form";
 
 import type { Account } from "@workspace/types";
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@workspace/ui/components/field";
+import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field";
 import {
   NativeSelect,
   NativeSelectOption,

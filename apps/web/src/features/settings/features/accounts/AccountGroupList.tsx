@@ -40,10 +40,7 @@ export function AccountGroupList({
           className="flex flex-1 items-center gap-2 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-muted/50"
           onClick={() => onToggle(group)}
         >
-          <Icon
-            className="size-3.5 shrink-0"
-            style={{ color: meta.color }}
-          />
+          <Icon className="size-3.5 shrink-0" style={{ color: meta.color }} />
           <span className="text-xs font-medium">{meta.label}</span>
           <span className="text-xs text-muted-foreground">
             {accounts.length}

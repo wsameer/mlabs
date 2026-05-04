@@ -48,7 +48,13 @@ export function TransactionFiltersDrawer({ disabled }: { disabled?: boolean }) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button type="button" variant="secondary" disabled={disabled} className="gap-1" data-testid="tx-filters-drawer-trigger">
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={disabled}
+          className="gap-1"
+          data-testid="tx-filters-drawer-trigger"
+        >
           <SlidersHorizontalIcon className="size-3" />
           Filters
           {activeFilterCount > 0 && (

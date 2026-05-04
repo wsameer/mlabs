@@ -1,8 +1,5 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import type {
-  CreateOnboardingProfile,
-  UpdateProfile,
-} from "@workspace/types";
+import type { CreateOnboardingProfile, UpdateProfile } from "@workspace/types";
 
 import { profilesService } from "../services/profiles.service.js";
 import {
@@ -30,8 +27,15 @@ const CreateOnboardingProfileSchema = z.object({
     .object({
       name: z.string().min(1),
       group: z.enum([
-        "chequing", "savings", "cash", "credit_card",
-        "investment", "loan", "mortgage", "asset", "other",
+        "chequing",
+        "savings",
+        "cash",
+        "credit_card",
+        "investment",
+        "loan",
+        "mortgage",
+        "asset",
+        "other",
       ]),
       balance: z.string().optional(),
     })
@@ -60,7 +64,8 @@ const createProfileRoute = createRoute({
   path: "/",
   tags: ["Profiles"],
   summary: "Create onboarding profile",
-  description: "Creates a new profile/workspace during onboarding, optionally with a first account.",
+  description:
+    "Creates a new profile/workspace during onboarding, optionally with a first account.",
   request: {
     body: {
       content: {
@@ -70,7 +75,9 @@ const createProfileRoute = createRoute({
   },
   responses: {
     201: {
-      content: { "application/json": { schema: apiResponseSchema(ProfileSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(ProfileSchema) },
+      },
       description: "Profile created",
     },
   },
@@ -124,7 +131,9 @@ const getProfileRoute = createRoute({
   request: { params: IdParamSchema },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(ProfileSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(ProfileSchema) },
+      },
       description: "Profile details",
     },
     404: {
@@ -159,7 +168,9 @@ const updateProfileRoute = createRoute({
   },
   responses: {
     200: {
-      content: { "application/json": { schema: apiResponseSchema(ProfileSchema) } },
+      content: {
+        "application/json": { schema: apiResponseSchema(ProfileSchema) },
+      },
       description: "Profile updated",
     },
     404: {
