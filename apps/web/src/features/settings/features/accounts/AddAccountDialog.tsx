@@ -148,7 +148,8 @@ export function AddAccountDialog({ open, onOpenChange, defaultGroup }: Props) {
   const createAccount = useCreateAccount();
 
   const form = useForm<AddAccountFormData>({
-    resolver: zodResolver(AddAccountFormSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(AddAccountFormSchema) as any,
     defaultValues: {
       name: "",
       group: defaultGroup ?? "chequing",
@@ -202,6 +203,7 @@ export function AddAccountDialog({ open, onOpenChange, defaultGroup }: Props) {
         interestRate: data.interestRate || undefined,
         isActive: data.isActive,
         includeInNetWorth: data.includeInNetWorth,
+        sortOrder: 0,
         notes: data.notes?.trim() || undefined,
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       },

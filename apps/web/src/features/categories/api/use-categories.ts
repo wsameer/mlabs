@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, toQueryParams } from "@/lib/api-client";
 import type {
   Category,
+  CategoryWithSubcategories,
   CreateCategory,
   UpdateCategory,
   CategoryQuery,
@@ -20,7 +21,7 @@ export function useCategories(filters?: CategoryQuery) {
   return useQuery({
     queryKey: categoryKeys.list(filters),
     queryFn: ({ signal }) =>
-      apiClient<Category[]>("/categories", {
+      apiClient<CategoryWithSubcategories[]>("/categories", {
         params: toQueryParams(filters as Record<string, unknown>),
         signal,
       }),
