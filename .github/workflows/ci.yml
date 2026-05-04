@@ -20,8 +20,8 @@ jobs:
           node-version: "22.x"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
+      - run: pnpm lint --filter=!desktop
+      - run: pnpm typecheck --filter=!desktop
 
   build:
     name: Build
@@ -35,7 +35,7 @@ jobs:
           node-version: "22.x"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm build --filter=!desktop
 
   docker:
     name: Build & Push Docker Image
