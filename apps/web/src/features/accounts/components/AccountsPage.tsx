@@ -25,6 +25,7 @@ import { AddAccount } from "@/features/add-accounts/AddAccount";
 import { calculateAccountTotals } from "../lib/account-calculations";
 import { formatCurrency } from "../lib/format-utils";
 import { NetWorthChart } from "@/features/net-worth-chart";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -115,7 +116,9 @@ export function AccountsPage() {
             </CardAction>
           </CardHeader>
           <CardContent>
-            <div className="h-2/4">Dummy data</div>
+            <ScrollArea className="h-10">
+              <div className="h-2/4">Dummy data</div>
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>

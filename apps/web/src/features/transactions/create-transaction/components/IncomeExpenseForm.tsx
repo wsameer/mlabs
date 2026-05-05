@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { useCreateTransaction } from "../../api/use-transactions";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { useTimezone } from "@/hooks/use-timezone";
 import { todayString } from "@/lib/timezone";
+import { useScopedAccountId } from "../use-scoped-account-id";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { FieldGroup } from "@workspace/ui/components/field";
@@ -35,6 +37,7 @@ export function IncomeExpenseForm({ type, className }: IncomeExpenseFormProps) {
   const tz = useTimezone();
   const { data: accounts } = useAccounts({ isActive: true });
   const { data: categories } = useCategories({ type, isActive: true });
+  const scopedAccountId = useScopedAccountId();
 
   const today = todayString(tz);
 
@@ -44,7 +47,7 @@ export function IncomeExpenseForm({ type, className }: IncomeExpenseFormProps) {
     mode: "onChange",
     defaultValues: {
       type,
-      accountId: "",
+      accountId: scopedAccountId ?? "",
       categoryId: "",
       subcategoryId: undefined,
       amount: "",
@@ -59,6 +62,12 @@ export function IncomeExpenseForm({ type, className }: IncomeExpenseFormProps) {
     control: form.control,
     name: "subcategoryId",
   });
+
+  useEffect(() => {
+    if (!scopedAccountId) return;
+    if (form.getValues("accountId")) return;
+    form.setValue("accountId", scopedAccountId, { shouldValidate: true });
+  }, [scopedAccountId, form]);
 
   function onSubmit(data: IncomeExpenseFormValues) {
     createTransaction.mutate(

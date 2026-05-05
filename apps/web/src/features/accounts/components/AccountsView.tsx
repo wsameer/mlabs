@@ -5,6 +5,7 @@ import { ACCOUNT_GROUP_METADATA } from "../lib/account-groups";
 import { AccountGroupSection } from "./AccountGroupSection";
 import { AccountCard } from "./AccountCard";
 import { calculateGroupTotal } from "../lib/account-calculations";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 interface AccountsViewProps {
   accounts: Account[];
@@ -39,29 +40,33 @@ export function AccountsView({ accounts }: AccountsViewProps) {
   const currency = accounts[0]?.currency ?? "CAD";
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-2">
-      {/* Account Groups */}
-      {Object.entries(groupedAccounts).map(([group, groupAccounts], index) => {
-        const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroupType];
-        const groupTotal = calculateGroupTotal(groupAccounts);
+    <ScrollArea className="h-56">
+      <div className="mx-auto w-full max-w-4xl space-y-2">
+        {/* Account Groups */}
+        {Object.entries(groupedAccounts).map(
+          ([group, groupAccounts], index) => {
+            const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroupType];
+            const groupTotal = calculateGroupTotal(groupAccounts);
 
-        return (
-          <AccountGroupSection
-            key={group}
-            id={group}
-            label={metadata.label}
-            icon={metadata.icon}
-            accountCount={groupAccounts.length}
-            total={Math.abs(groupTotal)}
-            currency={currency}
-            defaultOpen={index === 0}
-          >
-            {groupAccounts.map((account) => (
-              <AccountCard key={account.id} account={account} />
-            ))}
-          </AccountGroupSection>
-        );
-      })}
-    </div>
+            return (
+              <AccountGroupSection
+                key={group}
+                id={group}
+                label={metadata.label}
+                icon={metadata.icon}
+                accountCount={groupAccounts.length}
+                total={Math.abs(groupTotal)}
+                currency={currency}
+                defaultOpen={index === 0}
+              >
+                {groupAccounts.map((account) => (
+                  <AccountCard key={account.id} account={account} />
+                ))}
+              </AccountGroupSection>
+            );
+          }
+        )}
+      </div>
+    </ScrollArea>
   );
 }
