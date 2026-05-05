@@ -3,6 +3,7 @@ import { useAppStore } from "@/stores";
 import {
   headerTitleSelector,
   headerActionsSelector,
+  breadcrumbsSelector,
   mobileBackPathSelector,
   onMobileBackSelector,
   sidebarLeftContentSelector,
@@ -11,6 +12,7 @@ import {
 // Individual atomic selectors (use these by default)
 export const useHeaderTitle = () => useAppStore(headerTitleSelector);
 export const useHeaderActions = () => useAppStore(headerActionsSelector);
+export const useBreadcrumbs = () => useAppStore(breadcrumbsSelector);
 export const useMobileBackPath = () => useAppStore(mobileBackPathSelector);
 export const useOnMobileBack = () => useAppStore(onMobileBackSelector);
 export const useSidebarLeftContent = () =>
@@ -22,6 +24,7 @@ export const useHeaderConfig = () =>
     useShallow((state) => ({
       title: state.headerTitle,
       actions: state.headerActions,
+      breadcrumbs: state.breadcrumbs,
       mobileBackPath: state.mobileBackPath,
       onMobileBack: state.onMobileBack,
     }))
@@ -33,6 +36,7 @@ export const useLayoutActions = () =>
     useShallow((state) => ({
       setHeaderTitle: state.setHeaderTitle,
       setHeaderActions: state.setHeaderActions,
+      setBreadcrumbs: state.setBreadcrumbs,
       setMobileBackPath: state.setMobileBackPath,
       setOnMobileBack: state.setOnMobileBack,
       setSidebarLeftContent: state.setSidebarLeftContent,

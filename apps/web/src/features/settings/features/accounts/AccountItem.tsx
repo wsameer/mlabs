@@ -20,7 +20,7 @@ interface AccountItemProps {
 
 export function AccountItem({ account, onEdit, onDelete }: AccountItemProps) {
   return (
-    <Item variant="default" size="xs">
+    <Item variant="default" size="xs" className="hover:bg-muted">
       <ItemContent>
         <ItemTitle>{account.name}</ItemTitle>
         {account.institutionName && (

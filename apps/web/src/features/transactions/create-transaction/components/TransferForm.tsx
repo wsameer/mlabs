@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -7,6 +8,7 @@ import { useCreateTransaction } from "../../api/use-transactions";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { useTimezone } from "@/hooks/use-timezone";
 import { todayString } from "@/lib/timezone";
+import { useScopedAccountId } from "../use-scoped-account-id";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { FieldGroup } from "@workspace/ui/components/field";
@@ -28,6 +30,7 @@ export function TransferForm({ className }: TransferFormProps) {
   const { setOpenCreateTransaction } = useUiActions();
   const tz = useTimezone();
   const { data: accounts } = useAccounts({ isActive: true });
+  const scopedAccountId = useScopedAccountId();
 
   const today = todayString(tz);
 
@@ -37,7 +40,7 @@ export function TransferForm({ className }: TransferFormProps) {
     mode: "onChange",
     defaultValues: {
       type: "TRANSFER",
-      fromAccountId: "",
+      fromAccountId: scopedAccountId ?? "",
       toAccountId: "",
       amount: "",
       description: "",
@@ -46,6 +49,12 @@ export function TransferForm({ className }: TransferFormProps) {
       isCleared: false,
     },
   });
+
+  useEffect(() => {
+    if (!scopedAccountId) return;
+    if (form.getValues("fromAccountId")) return;
+    form.setValue("fromAccountId", scopedAccountId, { shouldValidate: true });
+  }, [scopedAccountId, form]);
 
   function onSubmit(data: TransferFormValues) {
     createTransaction.mutate(

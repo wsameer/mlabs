@@ -36,6 +36,10 @@ export function toApiQuery(
     base.categoryIds = state.categoryIds;
   }
 
+  if (state.accountIds?.length) {
+    base.accountId = state.accountIds[0];
+  }
+
   if (hasSearch(state.q)) {
     base.search = state.q!.trim();
   }

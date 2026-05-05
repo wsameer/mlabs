@@ -15,6 +15,8 @@ function stripDefaults(next: TransactionFilterState): Record<string, unknown> {
   if (next.q && next.q.length > 0) out.q = next.q;
   if (next.categoryIds && next.categoryIds.length > 0)
     out.categoryIds = next.categoryIds;
+  if (next.accountIds && next.accountIds.length > 0)
+    out.accountIds = next.accountIds;
   if (next.minAmount !== undefined) out.minAmount = next.minAmount;
   if (next.maxAmount !== undefined) out.maxAmount = next.maxAmount;
   return out;
@@ -56,11 +58,15 @@ export function useTransactionFilters() {
   );
 
   const resetFilters = useCallback(() => {
+    const preserved: Record<string, unknown> = {};
+    if (filters.accountIds && filters.accountIds.length > 0) {
+      preserved.accountIds = filters.accountIds;
+    }
     void navigate({
-      search: {} as never,
+      search: preserved as never,
       replace: true,
     });
-  }, [navigate]);
+  }, [filters.accountIds, navigate]);
 
   const setPreset = useCallback(
     (preset: TransactionFilterPreset) => setFilters({ preset }),
