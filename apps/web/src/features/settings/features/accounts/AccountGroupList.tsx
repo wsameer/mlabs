@@ -7,6 +7,14 @@ import { Button } from "@workspace/ui/components/button";
 import { ItemGroup } from "@workspace/ui/components/item";
 
 import { AccountItem } from "./AccountItem";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Badge } from "@workspace/ui/components/badge";
 
 interface AccountGroupListProps {
   group: AccountGroupType;
@@ -34,45 +42,50 @@ export function AccountGroupList({
   return (
     <div className="flex flex-col gap-2">
       {/* Group header */}
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className="flex flex-1 items-center gap-2 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-muted/50"
-          onClick={() => onToggle(group)}
-        >
-          <Icon className="size-3.5 shrink-0" style={{ color: meta.color }} />
-          <span className="text-xs font-medium">{meta.label}</span>
-          <span className="text-xs text-muted-foreground">
-            {accounts.length}
-          </span>
-          <ChevronDownIcon
-            className={`ml-auto size-3 text-muted-foreground transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
-          />
-        </button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-6"
-          title={`Add ${meta.label.toLowerCase()} account`}
-          onClick={() => onAdd(group)}
-        >
-          <PlusIcon className="size-3" />
-        </Button>
-      </div>
 
-      {/* Accounts in this group */}
-      {isExpanded && (
-        <ItemGroup>
-          {accounts.map((account) => (
-            <AccountItem
-              key={account.id}
-              account={account}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
-        </ItemGroup>
-      )}
+      <Card size="sm">
+        <CardHeader onClick={() => onToggle(group)}>
+          <CardTitle className="flex flex-row items-center-safe gap-1">
+            <Icon className="size-3.5 shrink-0" style={{ color: meta.color }} />
+            {meta.label}
+            <Badge variant="default">{accounts.length}</Badge>
+          </CardTitle>
+          <CardAction className="flex flex-row items-center gap-1">
+            <Button variant="secondary" size="icon-sm">
+              <ChevronDownIcon
+                className={`transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
+              />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon-sm"
+              title={`Add ${meta.label.toLowerCase()} account`}
+              onClick={(e) => {
+                e.preventDefault();
+                onAdd(group);
+              }}
+            >
+              <PlusIcon />
+            </Button>
+          </CardAction>
+        </CardHeader>
+
+        {/* Accounts in this group */}
+        {isExpanded && (
+          <CardContent>
+            <ItemGroup>
+              {accounts.map((account) => (
+                <AccountItem
+                  key={account.id}
+                  account={account}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
+              ))}
+            </ItemGroup>
+          </CardContent>
+        )}
+      </Card>
     </div>
   );
 }

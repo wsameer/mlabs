@@ -20,7 +20,7 @@ interface AccountItemProps {
 
 export function AccountItem({ account, onEdit, onDelete }: AccountItemProps) {
   return (
-    <Item variant="outline" size="xs">
+    <Item variant="default" size="xs">
       <ItemContent>
         <ItemTitle>{account.name}</ItemTitle>
         {account.institutionName && (
@@ -39,22 +39,22 @@ export function AccountItem({ account, onEdit, onDelete }: AccountItemProps) {
         <ButtonGroup aria-label="Account actions" className="w-fit gap-0.5!">
           <ButtonGroup>
             <Button
-              variant="ghost"
-              size="icon"
+              variant="outline"
+              size="icon-sm"
               title="Edit"
               onClick={() => onEdit(account)}
             >
-              <PencilIcon className="size-3.5" />
+              <PencilIcon className="size-3" />
             </Button>
           </ButtonGroup>
           <ButtonGroup>
             <Button
-              variant="ghost"
-              size="icon"
+              variant="destructive"
+              size="icon-sm"
               title="Delete"
               onClick={() => onDelete(account)}
             >
-              <Trash2Icon className="size-3.5" />
+              <Trash2Icon className="size-3" />
             </Button>
           </ButtonGroup>
         </ButtonGroup>
