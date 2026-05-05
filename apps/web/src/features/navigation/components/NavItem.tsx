@@ -21,10 +21,11 @@ export const NavItem = ({
   return (
     <Button
       className={cn(
-        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-primary-foreground opacity-50 hover:bg-background/40 hover:opacity-100 active:translate-y-0",
+        "relative flex h-10.5 w-10.5 items-center justify-center rounded-full text-background/70 hover:bg-background/15 hover:text-background active:translate-y-0 dark:text-foreground/70 dark:hover:text-foreground",
         {
-          "text-foreground opacity-100": isActive,
-          "cursor-not-allowed opacity-30": disabled,
+          "text-foreground hover:text-foreground dark:text-card dark:hover:text-card":
+            isActive,
+          "cursor-not-allowed opacity-40": disabled,
         }
       )}
       variant="link"
@@ -33,9 +34,11 @@ export const NavItem = ({
       disabled={disabled}
     >
       <div
-        className={`absolute inset-0 rounded-full bg-background transition-opacity ${
+        className={cn(
+          "absolute inset-0 rounded-full transition-opacity",
+          "bg-background dark:bg-foreground",
           isActive ? "opacity-100" : "opacity-0"
-        }`}
+        )}
       />
       <span className="relative">{icon}</span>
       <span className="sr-only">{label}</span>

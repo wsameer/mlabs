@@ -55,7 +55,7 @@ export function AppBottombar() {
       {/* Single nav bar that stretches upward when expanded */}
       <nav
         className={cn(
-          "flex flex-col rounded-[40px] bg-secondary p-2 shadow-lg backdrop-blur-xl transition-all duration-300 ease-in-out",
+          "flex flex-col rounded-[40px] bg-foreground p-2 shadow-lg backdrop-blur-xl transition-all duration-300 ease-in-out dark:bg-card",
           {
             "rounded-4xl": isExpanded,
             "rounded-[42px]": !isExpanded,
@@ -124,8 +124,8 @@ export function AppBottombar() {
         </div>
       </nav>
 
-      {/* Add transaction button - stays separate */}
-      <div className="rounded-full bg-secondary p-2 shadow-lg backdrop-blur-xl">
+      {/* Add transaction button - Rausch primary, the page's only loud color moment */}
+      <div className="rounded-full bg-primary p-2 shadow-lg backdrop-blur-xl">
         <NavItem
           icon={<PlusIcon />}
           isActive={false}

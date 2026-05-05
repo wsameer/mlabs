@@ -40,9 +40,9 @@ export function DashboardPage() {
   );
 
   const renderTransactionsSummary = () => (
-    <ScrollArea className="h-[70svh]">
+    <ScrollArea className="h-[70svh] md:h-[80svh]">
       <Card className="m-0.5">
-        <CardContent>
+        <CardContent className="p-6 md:p-8">
           <CashflowPieChart
             data={data}
             colorMap={colorMap}
@@ -50,14 +50,14 @@ export function DashboardPage() {
           />
         </CardContent>
       </Card>
-      <div className="mt-2">
+      <div className="mt-4">
         <CategoryStatList data={data?.items ?? []} colorMap={colorMap} />
       </div>
     </ScrollArea>
   );
 
   return (
-    <div className="flex w-full flex-col gap-3 lg:w-1/3">
+    <div className="flex w-full flex-col gap-2 pt-2 lg:max-w-md">
       <DateRangeFilter />
       <Tabs
         value={activeTab === "EXPENSE" ? "expense" : "income"}
@@ -66,9 +66,19 @@ export function DashboardPage() {
         }
         className="w-full"
       >
-        <TabsList className="w-full">
-          <TabsTrigger value="income">Income</TabsTrigger>
-          <TabsTrigger value="expense">Expense</TabsTrigger>
+        <TabsList className="w-full rounded-full p-1">
+          <TabsTrigger
+            value="income"
+            className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
+          >
+            Income
+          </TabsTrigger>
+          <TabsTrigger
+            value="expense"
+            className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
+          >
+            Expense
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="income">{renderTransactionsSummary()}</TabsContent>
         <TabsContent value="expense">{renderTransactionsSummary()}</TabsContent>
