@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 import type { Transaction } from "@workspace/types";
 
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
+import { ACCOUNTS_ROUTE } from "@/constants";
 import { useUiActions } from "@/hooks/use-ui-store";
 import { useLayoutConfig } from "@/features/layout";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
@@ -44,6 +46,7 @@ import {
 } from "./filters";
 
 export function TransactionsPage() {
+  const router = useRouter();
   const { to, from } = useDateRange();
   const { setOpenCreateTransaction } = useUiActions();
   const {
@@ -113,10 +116,28 @@ export function TransactionsPage() {
     [transactions, categoryMap, accountMap]
   );
 
+  const isAccountScoped = (filterState.accountIds?.length ?? 0) > 0;
+
+  const handleMobileBack = useCallback(() => {
+    if (window.history.length > 1) {
+      router.history.back();
+    } else {
+      void router.navigate({ to: ACCOUNTS_ROUTE });
+    }
+  }, [router]);
+
   useLayoutConfig({
     pageTitle: "Transactions",
     actions: <TimeGrainSelect />,
     leftSidebarContent: sidebarContent,
+    breadcrumbs: isAccountScoped
+      ? [
+          { label: "Accounts", to: ACCOUNTS_ROUTE },
+          { label: "Transactions" },
+        ]
+      : null,
+    mobileBackPath: isAccountScoped ? ACCOUNTS_ROUTE : null,
+    onMobileBack: isAccountScoped ? handleMobileBack : null,
   });
 
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);

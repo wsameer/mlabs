@@ -90,7 +90,7 @@ export function AccountsPage() {
             </h3>
           </div>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-start">
           <AssetsLiabilitiesDisplay accounts={accounts} currency={currency} />
         </div>
       </div>
@@ -98,10 +98,10 @@ export function AccountsPage() {
       <NetWorthChart />
 
       <div className="flex flex-row flex-wrap gap-4 md:flex-wrap-reverse">
-        <div className="grow">
+        <div className="min-w-0 grow md:grow-3 md:basis-0">
           <AccountsView accounts={accounts} />
         </div>
-        <Card className="hidden grow md:flex">
+        <Card className="hidden min-w-0 md:flex md:grow-2 md:basis-0">
           <CardHeader>
             <CardTitle>Summary</CardTitle>
             <CardDescription>Active milestones for 2024</CardDescription>

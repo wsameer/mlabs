@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { useLayoutActions } from "@/hooks/use-layout";
+import type { Breadcrumb } from "@/stores/slices/layout-slice";
 
 type LayoutConfig = {
   pageTitle?: string;
   actions?: React.ReactNode;
+  /** Desktop-only crumbs. When present, the desktop header renders these instead of pageTitle. */
+  breadcrumbs?: Breadcrumb[] | null;
   mobileBackPath?: string | null;
   onMobileBack?: (() => void) | null;
   leftSidebarContent?: React.ReactNode;
@@ -13,6 +16,7 @@ export function useLayoutConfig(config: LayoutConfig) {
   const {
     setHeaderTitle,
     setHeaderActions,
+    setBreadcrumbs,
     setMobileBackPath,
     setOnMobileBack,
     setSidebarLeftContent: setLeftSidebarContent,
@@ -26,6 +30,10 @@ export function useLayoutConfig(config: LayoutConfig) {
   useEffect(() => {
     if (config.actions !== undefined) setHeaderActions(config.actions);
   }, [config.actions, setHeaderActions]);
+
+  useEffect(() => {
+    if (config.breadcrumbs !== undefined) setBreadcrumbs(config.breadcrumbs);
+  }, [config.breadcrumbs, setBreadcrumbs]);
 
   useEffect(() => {
     if (config.mobileBackPath !== undefined)

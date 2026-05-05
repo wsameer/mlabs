@@ -4,6 +4,7 @@ import type { AppStoreState } from "@/stores/app-store";
 export const headerTitleSelector = (state: AppStoreState) => state.headerTitle;
 export const headerActionsSelector = (state: AppStoreState) =>
   state.headerActions;
+export const breadcrumbsSelector = (state: AppStoreState) => state.breadcrumbs;
 export const mobileBackPathSelector = (state: AppStoreState) =>
   state.mobileBackPath;
 export const onMobileBackSelector = (state: AppStoreState) =>

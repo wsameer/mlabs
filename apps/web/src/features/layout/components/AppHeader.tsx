@@ -1,7 +1,16 @@
+import { Fragment } from "react";
 import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 import { Button } from "@workspace/ui/components/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@workspace/ui/components/breadcrumb";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import { useHeaderConfig } from "@/hooks/use-layout";
@@ -13,6 +22,7 @@ export const AppHeader = () => {
   const {
     title: pageTitle,
     actions: headerActions,
+    breadcrumbs,
     mobileBackPath,
     onMobileBack,
   } = useHeaderConfig();
@@ -42,7 +52,36 @@ export const AppHeader = () => {
           orientation="vertical"
           className="mt-1 mr-2 data-[orientation=vertical]:h-4"
         />
-        <p className="text-base text-muted-foreground">{pageTitle}</p>
+        {breadcrumbs && breadcrumbs.length > 0 ? (
+          <Breadcrumb>
+            <BreadcrumbList className="text-base">
+              {breadcrumbs.map((crumb, i) => {
+                const isLast = i === breadcrumbs.length - 1;
+                return (
+                  <Fragment key={`${crumb.label}-${i}`}>
+                    <BreadcrumbItem>
+                      {isLast || !crumb.to ? (
+                        <BreadcrumbPage className="text-muted-foreground">
+                          {crumb.label}
+                        </BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink
+                          render={<Link to={crumb.to} />}
+                          className="text-muted-foreground"
+                        >
+                          {crumb.label}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                    {!isLast && <BreadcrumbSeparator />}
+                  </Fragment>
+                );
+              })}
+            </BreadcrumbList>
+          </Breadcrumb>
+        ) : (
+          <p className="text-base text-muted-foreground">{pageTitle}</p>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Button variant="default" size="sm" onClick={handleAddTransaction}>
