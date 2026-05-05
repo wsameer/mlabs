@@ -131,10 +131,7 @@ export function TransactionsPage() {
     actions: <TimeGrainSelect />,
     leftSidebarContent: sidebarContent,
     breadcrumbs: isAccountScoped
-      ? [
-          { label: "Accounts", to: ACCOUNTS_ROUTE },
-          { label: "Transactions" },
-        ]
+      ? [{ label: "Accounts", to: ACCOUNTS_ROUTE }, { label: "Transactions" }]
       : null,
     mobileBackPath: isAccountScoped ? ACCOUNTS_ROUTE : null,
     onMobileBack: isAccountScoped ? handleMobileBack : null,

@@ -406,18 +406,16 @@ describe("mergeAsTransfer — errors", () => {
   const AMBIG_XID = "XFER-AMBIG";
 
   beforeAll(async () => {
-    await dbMod.db
-      .insert(schemaMod.accounts)
-      .values([
-        {
-          id: ACCT,
-          profileId: PROFILE_ID,
-          name: "Err",
-          group: "chequing",
-          currency: "CAD",
-          balance: "0",
-        },
-      ]);
+    await dbMod.db.insert(schemaMod.accounts).values([
+      {
+        id: ACCT,
+        profileId: PROFILE_ID,
+        name: "Err",
+        group: "chequing",
+        currency: "CAD",
+        balance: "0",
+      },
+    ]);
     await dbMod.db.insert(schemaMod.transactions).values([
       {
         id: NO_XID,

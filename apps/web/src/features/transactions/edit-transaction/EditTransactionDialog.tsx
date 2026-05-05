@@ -168,7 +168,7 @@ export function EditTransactionDialog({
             {description}
           </SheetDescription>
         </SheetHeader>
-        <div className="px-4 pb-2">{content}</div>
+        <div className="px-6 pb-2">{content}</div>
         <SheetFooter className="pt-2">
           <SheetClose
             render={
