@@ -19,7 +19,7 @@ export function AssetsLiabilitiesDisplay({
   const { assets, liabilities } = calculateAccountTotals(accounts);
 
   return (
-    <div className="grid w-1/2 grid-cols-2 gap-3">
+    <div className="grid w-full grid-cols-2 gap-3 md:w-1/2">
       <Item variant="muted" className="flex-col items-stretch">
         <ItemContent className="gap-1">
           <ItemDescription className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
