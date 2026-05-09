@@ -260,6 +260,32 @@ function stageNodeModules() {
   }
 }
 
+function stageBunSidecar() {
+  const triple = "aarch64-apple-darwin"; // arm64 macOS only per spec
+  const dest = path.join(bin, `mlabs-api-${triple}`);
+  const entry = path.join(repoRoot, "apps", "api", "src", "index.ts");
+  const cmd = [
+    "bun build",
+    `"${entry}"`,
+    "--compile",
+    "--target=bun-darwin-arm64",
+    "--minify",
+    "--external @libsql/client",
+    "--external libsql",
+    "--external @libsql/darwin-arm64",
+    `--outfile "${dest}"`,
+  ].join(" ");
+  run(cmd);
+  execSync(`chmod +x "${dest}"`);
+  const stat = statSync(dest);
+  if (stat.size < 20_000_000) {
+    throw new Error(
+      `Bun-compiled sidecar is suspiciously small (${stat.size} bytes); expected >20MB`
+    );
+  }
+  console.log(`Staged Bun sidecar: ${dest} (${stat.size} bytes)`);
+}
+
 function main() {
   console.log("Staging mLabs desktop sidecar artifacts...");
   preflightBun();
