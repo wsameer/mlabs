@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { execSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,39 +8,45 @@ const tauri = path.resolve(root, "../src-tauri");
 const resources = path.join(tauri, "resources");
 const bin = path.join(tauri, "bin");
 
-describe("sidecar bundle layout", () => {
-  it("produces a Node sidecar renamed with the host target triple", () => {
+describe("sidecar bundle layout (bun-compiled)", () => {
+  it("produces a single Bun-compiled binary at the expected path", () => {
     expect(existsSync(bin)).toBe(true);
     const entries = readdirSync(bin).filter(
       (f) => f.startsWith("mlabs-api-") && !f.endsWith(".sig")
     );
-    expect(entries.length).toBeGreaterThan(0);
-    const first = entries[0];
-    const stat = statSync(path.join(bin, first));
+    expect(entries).toEqual(["mlabs-api-aarch64-apple-darwin"]);
+    const stat = statSync(path.join(bin, entries[0]));
     expect(stat.isFile()).toBe(true);
-    expect(stat.size).toBeGreaterThan(5_000_000); // Node binary >5MB
+    // Bun-compiled binary embeds the Hono+drizzle bundle; should be >20MB.
+    expect(stat.size).toBeGreaterThan(20_000_000);
   });
 
-  it("stages the API entry, migrations, web dist, and libsql modules", () => {
-    expect(existsSync(path.join(resources, "api", "index.js"))).toBe(true);
+  it("stages migrations, web dist, and the libsql native binding", () => {
     expect(existsSync(path.join(resources, "migrations"))).toBe(true);
     expect(existsSync(path.join(resources, "web", "index.html"))).toBe(true);
-    const libsql = path.join(resources, "node_modules", "@libsql");
-    expect(existsSync(libsql)).toBe(true);
-    expect(readdirSync(libsql).length).toBeGreaterThan(0);
+    expect(
+      existsSync(
+        path.join(resources, "node_modules", "@libsql", "darwin-arm64", "index.node")
+      )
+    ).toBe(true);
   });
 
-  it("produces syntactically valid JavaScript in api/index.js", () => {
-    const entry = path.join(resources, "api", "index.js");
-    // node --check exits non-zero on syntax errors
-    expect(() =>
-      execSync(`node --check "${entry}"`, { stdio: "pipe" })
-    ).not.toThrow();
+  it("stages exactly the libsql packages (no dep-tree bloat)", () => {
+    const nm = path.join(resources, "node_modules");
+    const scopes = readdirSync(nm).sort();
+    // We expect @libsql (client + darwin-arm64) plus libsql. No other top-level entries.
+    expect(scopes).toEqual(["@libsql", "libsql"]);
+    const libsqlScope = readdirSync(path.join(nm, "@libsql")).sort();
+    expect(libsqlScope).toEqual(["client", "darwin-arm64"]);
   });
 
   it("stages the drizzle migrations journal", () => {
     expect(
       existsSync(path.join(resources, "migrations", "meta", "_journal.json"))
     ).toBe(true);
+  });
+
+  it("does not stage an api/index.js (Bun binary embeds it)", () => {
+    expect(existsSync(path.join(resources, "api"))).toBe(false);
   });
 });
