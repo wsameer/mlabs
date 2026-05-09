@@ -26,6 +26,18 @@ function run(cmd, cwd = repoRoot) {
   execSync(cmd, { stdio: "inherit", cwd });
 }
 
+function preflightBun() {
+  try {
+    const version = execSync("bun --version", { encoding: "utf8" }).trim();
+    console.log(`Using bun ${version}`);
+  } catch {
+    throw new Error(
+      "bun is required but not on PATH. Install with:\n" +
+      "  curl -fsSL https://bun.sh/install | bash"
+    );
+  }
+}
+
 function clean() {
   rmSync(resources, { recursive: true, force: true });
   rmSync(bin, { recursive: true, force: true });
@@ -250,6 +262,7 @@ function stageNodeModules() {
 
 function main() {
   console.log("Staging mLabs desktop sidecar artifacts...");
+  preflightBun();
   clean();
   stageApi();
   stageWeb();
