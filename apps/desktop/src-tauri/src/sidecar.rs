@@ -46,7 +46,6 @@ pub fn start(app: &AppHandle) -> Result<(), SidecarError> {
 
     let app_data = resolve_app_data(app)?;
     let db_path = app_data.join("mlabs.db");
-    let api_entry = resolve_resource(app, "resources/api/index.js")?;
     let web_dist = resolve_resource(app, "resources/web")?;
     let migrations = resolve_resource(app, "resources/migrations")?;
     let node_modules = resolve_resource(app, "resources/node_modules")?;
@@ -62,7 +61,6 @@ pub fn start(app: &AppHandle) -> Result<(), SidecarError> {
         .shell()
         .sidecar("mlabs-api")
         .map_err(|e| SidecarError::Spawn(e.to_string()))?
-        .args([api_entry.to_string_lossy().to_string()])
         .env("NODE_ENV", "production")
         .env("HOST", API_HOST)
         .env("PORT", &port_str)
