@@ -1,4 +1,9 @@
-import { CalendarDaysIcon, CoinsIcon } from "lucide-react";
+import {
+  CalendarDaysIcon,
+  CoinsIcon,
+  MoonIcon,
+  SunIcon,
+} from "lucide-react";
 
 import {
   DATE_FORMATS,
@@ -6,12 +11,19 @@ import {
   WEEK_STARTS,
 } from "@workspace/types";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@workspace/ui/components/field";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "@workspace/ui/components/native-select";
+import { cn } from "@workspace/ui/lib/utils";
 
+import { useTheme } from "@/components/ThemeProvider";
 import {
   CURRENCY_LABELS,
   DATE_FORMAT_LABELS,
@@ -20,15 +32,69 @@ import {
 } from "../../components/settings-shared";
 import type { SettingsSectionProps } from "../../types";
 
+const SECTION_HEADING_CLASS =
+  "px-4 text-xs font-normal text-muted-foreground uppercase md:px-1 md:text-[0.7rem] md:font-semibold md:tracking-[0.18em]";
+
 export function PreferencesSection({ settings }: SettingsSectionProps) {
+  const { theme, setTheme } = useTheme();
+
   if (!settings.draft) return null;
 
   return (
     <div className="flex flex-col gap-5">
       <section className="space-y-1.5">
-        <p className="px-4 text-xs font-normal text-muted-foreground uppercase md:px-1 md:text-[0.7rem] md:font-semibold md:tracking-[0.18em]">
-          Regional
-        </p>
+        <p className={SECTION_HEADING_CLASS}>Appearance</p>
+        <Card className="rounded-xl p-0 md:rounded-lg">
+          <CardContent className="p-4">
+            <Field>
+              <FieldLabel htmlFor="appearance-theme">Theme</FieldLabel>
+              <div
+                id="appearance-theme"
+                role="radiogroup"
+                aria-label="Theme"
+                className="inline-flex w-fit rounded-full bg-muted p-1"
+              >
+                {(
+                  [
+                    { value: "light", label: "Light", Icon: SunIcon },
+                    { value: "dark", label: "Dark", Icon: MoonIcon },
+                  ] as const
+                ).map(({ value, label, Icon }) => {
+                  const isActive = theme === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={isActive}
+                      onClick={() => setTheme(value)}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors",
+                        isActive
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="size-3.5" />
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <FieldDescription>
+                Press{" "}
+                <kbd className="rounded border bg-muted px-1 text-[0.7rem]">
+                  D
+                </kbd>{" "}
+                anywhere to toggle.
+              </FieldDescription>
+            </Field>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-1.5">
+        <p className={SECTION_HEADING_CLASS}>Regional</p>
         <Card className="rounded-xl p-0 md:rounded-lg">
           <CardContent className="p-4">
             <FieldGroup>

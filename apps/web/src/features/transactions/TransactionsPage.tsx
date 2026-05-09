@@ -38,6 +38,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { useDateRange } from "@/hooks/use-filters";
 import { parseDateString, toDateString } from "@/lib/timezone";
 import {
+  AccountScopeBanner,
   SearchInput,
   TransactionFilters,
   TransactionFiltersDrawer,
@@ -131,10 +132,7 @@ export function TransactionsPage() {
     actions: <TimeGrainSelect />,
     leftSidebarContent: sidebarContent,
     breadcrumbs: isAccountScoped
-      ? [
-          { label: "Accounts", to: ACCOUNTS_ROUTE },
-          { label: "Transactions" },
-        ]
+      ? [{ label: "Accounts", to: ACCOUNTS_ROUTE }, { label: "Transactions" }]
       : null,
     mobileBackPath: isAccountScoped ? ACCOUNTS_ROUTE : null,
     onMobileBack: isAccountScoped ? handleMobileBack : null,
@@ -191,6 +189,11 @@ export function TransactionsPage() {
           accountMap={accountMap}
         />
       </div>
+
+      <AccountScopeBanner
+        accountIds={filterState.accountIds}
+        onClear={() => setFilters({ accountIds: undefined })}
+      />
 
       {transactions.length === 0 ? (
         <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
