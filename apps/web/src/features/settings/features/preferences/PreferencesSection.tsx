@@ -1,9 +1,4 @@
-import {
-  CalendarDaysIcon,
-  CoinsIcon,
-  MoonIcon,
-  SunIcon,
-} from "lucide-react";
+import { CalendarDaysIcon, CoinsIcon, MoonIcon, SunIcon } from "lucide-react";
 
 import {
   DATE_FORMATS,
