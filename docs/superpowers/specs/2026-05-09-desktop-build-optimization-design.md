@@ -98,7 +98,7 @@ Removed: `stageApi`, `stageNodeBinary`, `resolveEsbuild`, the `ROOT_DEPS`-walkin
 
 ### B. `packages/db/src/index.ts`
 
-No source-level shim needed. `@libsql/client` resolves through `NODE_PATH` at runtime (just like today). The only practical concern: the Bun-compiled binary's working directory is unspecified, but `NODE_PATH` is absolute, so resolution is robust.
+No source-level changes. `@libsql/client` and `libsql` are bundled into the Bun binary directly (per the "Why the JS wrappers are embedded" section above), so the import in `packages/db/src/index.ts` resolves at *bundle time*, not at runtime via `NODE_PATH`. At runtime, only the `.node` native binding is dlopen'd — `libsql` finds it via its own internal loader (`@neon-rs/load`), which walks up from `__dirname` until it finds `node_modules/@libsql/darwin-arm64/index.node`. `NODE_PATH` set by Rust ensures that walk hits the staged tree.
 
 ### C. `apps/desktop/src-tauri/src/sidecar.rs`
 
