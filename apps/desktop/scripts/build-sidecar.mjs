@@ -286,6 +286,40 @@ function stageBunSidecar() {
   console.log(`Staged Bun sidecar: ${dest} (${stat.size} bytes)`);
 }
 
+function stageLibsqlModules() {
+  const nmOut = path.join(resources, "node_modules");
+  mkdirSync(nmOut, { recursive: true });
+  const libsqlPkgs = ["@libsql/client", "libsql", "@libsql/darwin-arm64"];
+  for (const dep of libsqlPkgs) {
+    const src = findDep(dep);
+    if (!src) {
+      throw new Error(`Required libsql package not found in workspace: ${dep}`);
+    }
+    const destDir = path.join(nmOut, dep);
+    mkdirSync(path.dirname(destDir), { recursive: true });
+    cpSync(src, destDir, { recursive: true, dereference: true });
+    console.log(`Staged ${dep} from ${src}`);
+  }
+  // Sanity-check the native binding actually got copied.
+  const nodeBinding = path.join(
+    nmOut,
+    "@libsql",
+    "darwin-arm64",
+    "index.node"
+  );
+  if (!existsSync(nodeBinding)) {
+    throw new Error(
+      `libsql native binding missing after staging: ${nodeBinding}`
+    );
+  }
+  const stat = statSync(nodeBinding);
+  if (stat.size < 1_000_000) {
+    throw new Error(
+      `libsql native binding suspiciously small (${stat.size} bytes); expected >1MB`
+    );
+  }
+}
+
 function main() {
   console.log("Staging mLabs desktop sidecar artifacts...");
   preflightBun();
