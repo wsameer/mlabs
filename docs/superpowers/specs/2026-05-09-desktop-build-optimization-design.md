@@ -52,18 +52,23 @@ Same Tauri shell + sidecar architecture. Only the sidecar packaging changes.
 ```
 src-tauri/
   bin/
-    mlabs-api-aarch64-apple-darwin     # bun --compile output (~55MB; embeds Hono+drizzle JS, NOT libsql)
+    mlabs-api-aarch64-apple-darwin     # bun --compile output (~61MB; embeds Hono + drizzle + libsql JS wrappers)
   resources/
-    node_modules/                       # tiny: @libsql/client + libsql + @libsql/darwin-arm64 (~12MB)
+    node_modules/
+      @libsql/darwin-arm64/index.node  # ~8MB native binding only — everything else is embedded in the binary
     migrations/                         # unchanged
     web/                                # unchanged
 ```
 
-`resources/api/` is removed. `resources/node_modules/` is kept but shrinks from ~80–100MB to ~12MB because we only stage the libsql packages (which can't be embedded due to native binding loading) — everything else (hono, drizzle, pino, zod, etc.) is embedded in the Bun binary.
+`resources/api/` is removed. `resources/node_modules/` shrinks from ~80–100MB to ~8MB because only the native `.node` binding is staged at runtime — everything else (hono, drizzle, pino, zod, *and* the pure-JS libsql wrappers) is embedded directly in the Bun binary.
 
-### Why we still need a tiny `node_modules`
+### Why a tiny `node_modules` is still needed
 
-`@libsql/client` is a thin JS wrapper that internally `require()`s `libsql`, which in turn `require()`s `@libsql/darwin-arm64` to load `index.node` (the native binding) via Node's `process.dlopen()`. That nested require chain happens at runtime inside the package, not at bundling time, so we can't intercept it cleanly with a single `--external` and a custom loader. Marking all three (`@libsql/client`, `libsql`, `@libsql/darwin-arm64`) as `--external` and resolving them through `NODE_PATH` is the simplest reliable approach.
+The `.node` binding (`@libsql/darwin-arm64/index.node`) is a precompiled native shared object loaded via `process.dlopen()`. Native modules cannot be embedded in a Bun-compiled binary — they must exist on the filesystem at load time. Hence one external package, one staged file.
+
+### Why the JS wrappers are embedded (not external)
+
+The original design proposed marking `@libsql/client` and `libsql` external as well, expecting them to resolve via `NODE_PATH`. During implementation we found that Bun's compiled-binary virtual FS (`/$bunfs/root/`) doesn't honor `NODE_PATH` for packages with conditional exports the way `bun run` does. Bundling the JS wrappers into the binary sidesteps that issue entirely and is simpler.
 
 ## Component changes
 
@@ -81,13 +86,11 @@ New responsibilities, in order:
      --compile \
      --target=bun-darwin-arm64 \
      --minify \
-     --external @libsql/client \
-     --external libsql \
      --external @libsql/darwin-arm64 \
      --outfile src-tauri/bin/mlabs-api-aarch64-apple-darwin
    ```
-   `chmod +x` the output. Verify it is non-empty and reasonably sized (>20MB).
-4. **`stageLibsqlModules()`** — stages a tiny libsql-only `node_modules/` tree at `src-tauri/resources/node_modules/`. Three packages: `@libsql/client`, `libsql`, `@libsql/darwin-arm64`. Reuses `findDep` (kept from current script) to locate each, copies them with `cpSync` (dereference: true). Verifies `@libsql/darwin-arm64/index.node` exists.
+   `chmod +x` the output. Verify it is non-empty and reasonably sized (>20MB). Only the native `.node` binding is external; all pure-JS packages (including `@libsql/client` and `libsql`) get bundled.
+4. **`stageLibsqlModules()`** — stages just the `@libsql/darwin-arm64` package at `src-tauri/resources/node_modules/@libsql/darwin-arm64/`. Reuses `findDep` (kept from current script) to locate it, copies with `cpSync` (dereference: true). Verifies `index.node` exists and is >1MB.
 5. **`stageWeb()`** — unchanged from today: `pnpm --filter web exec vite build`, then copy `apps/web/dist` → `src-tauri/resources/web`.
 6. **`stageMigrations()`** — unchanged: copy `packages/db/migrations` → `src-tauri/resources/migrations`.
 

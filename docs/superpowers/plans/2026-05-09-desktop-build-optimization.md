@@ -926,3 +926,29 @@ Per the spec, these are explicitly NOT in this plan:
 - `src-tauri/resources/`: 71M
 - `src-tauri/resources/node_modules/`: 69M
 - `src-tauri/resources/api/index.js`: 118K
+
+## Final metrics (recorded 2026-05-09)
+
+| Artifact | Final | Baseline | Reduction |
+|---|---|---|---|
+| `mLabs.app` (total) | **77MB** | ~183MB (bin + resources combined) | **~58%** |
+| `mLabs_0.1.0_aarch64.dmg` | **29MB** | n/a (no prior dmg) | — |
+| `.app/Contents/MacOS/` (Rust binary + Bun sidecar + libs) | 67MB | 112MB (Node binary copy) | ~40% |
+| `.app/Contents/Resources/` (libsql native + migrations + web) | 9.7MB | 71MB (full dep tree) | ~86% |
+| Rust release binary (`target/release/mlabs`) | 5.6MB (LTO+stripped) | n/a | — |
+
+**Cold start:** double-click → `/api/health` returns 200 in **~1.15s** on M-series Mac (target: ≤2s) ✅
+
+**Outcome: PASS** on all four success criteria:
+1. ✅ `.app` size reduced by ≥ 50% (achieved: ~58%)
+2. ✅ Cold start ≤ 2s (achieved: 1.15s)
+3. ✅ All existing tests pass (13/13); extended smoke test passes (`/api/health` + `/api/bootstrap`)
+4. ✅ `pnpm dev` continues to work (drizzle still imports `@libsql/client` normally)
+
+### Notable implementation deviation
+
+The original spec proposed marking `@libsql/client`, `libsql`, and `@libsql/darwin-arm64` all `--external` and resolving via `NODE_PATH`. During Task 6 (smoke test wiring) we discovered Bun's compiled-binary virtual FS (`/$bunfs/root/`) does not honor `NODE_PATH` for packages with conditional exports the way `bun run` does. We bundled the pure-JS libsql wrappers into the binary and kept only the `.node` native addon external. The spec has been updated to reflect this. Net effect: smaller staged tree (~8MB instead of ~12MB), one fewer moving part.
+
+### Pre-existing icon issue (resolved)
+
+The first `tauri build` failed at the `.app` bundling step because `apps/desktop/src-tauri/icons/icon.png` was a 1×1-pixel placeholder from the original v2 scaffold (commit `f750b0b`). Generated a proper 2048×2048 placeholder via Swift+AppKit and ran `tauri icon` to produce the full Apple icon set. This is unrelated to the build optimization but was needed to complete end-to-end verification.
