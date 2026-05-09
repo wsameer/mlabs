@@ -920,6 +920,9 @@ Per the spec, these are explicitly NOT in this plan:
 
 ---
 
-## Baseline (recorded)
+## Baseline (recorded 2026-05-09)
 
-_Populate during Task 0._
+- `src-tauri/bin/`: 112M
+- `src-tauri/resources/`: 71M
+- `src-tauri/resources/node_modules/`: 69M
+- `src-tauri/resources/api/index.js`: 118K
