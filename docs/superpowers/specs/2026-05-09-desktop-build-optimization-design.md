@@ -52,15 +52,18 @@ Same Tauri shell + sidecar architecture. Only the sidecar packaging changes.
 ```
 src-tauri/
   bin/
-    mlabs-api-aarch64-apple-darwin     # bun --compile output (~55MB; embeds Hono+drizzle+libsql JS)
+    mlabs-api-aarch64-apple-darwin     # bun --compile output (~55MB; embeds Hono+drizzle JS, NOT libsql)
   resources/
-    native/
-      libsql.node                       # the one native module Bun cannot embed
+    node_modules/                       # tiny: @libsql/client + libsql + @libsql/darwin-arm64 (~12MB)
     migrations/                         # unchanged
     web/                                # unchanged
 ```
 
-`resources/api/` and `resources/node_modules/` are removed.
+`resources/api/` is removed. `resources/node_modules/` is kept but shrinks from ~80–100MB to ~12MB because we only stage the libsql packages (which can't be embedded due to native binding loading) — everything else (hono, drizzle, pino, zod, etc.) is embedded in the Bun binary.
+
+### Why we still need a tiny `node_modules`
+
+`@libsql/client` is a thin JS wrapper that internally `require()`s `libsql`, which in turn `require()`s `@libsql/darwin-arm64` to load `index.node` (the native binding) via Node's `process.dlopen()`. That nested require chain happens at runtime inside the package, not at bundling time, so we can't intercept it cleanly with a single `--external` and a custom loader. Marking all three (`@libsql/client`, `libsql`, `@libsql/darwin-arm64`) as `--external` and resolving them through `NODE_PATH` is the simplest reliable approach.
 
 ## Component changes
 
@@ -79,35 +82,28 @@ New responsibilities, in order:
      --target=bun-darwin-arm64 \
      --minify \
      --external @libsql/client \
+     --external libsql \
      --external @libsql/darwin-arm64 \
      --outfile src-tauri/bin/mlabs-api-aarch64-apple-darwin
    ```
    `chmod +x` the output. Verify it is non-empty and reasonably sized (>20MB).
-4. **`stageNativeBindings()`** — locates the `@libsql/darwin-arm64` package via `findDep` (kept from current script) and copies its `index.node` to `src-tauri/resources/native/libsql.node`. Verifies the file exists and is non-zero.
+4. **`stageLibsqlModules()`** — stages a tiny libsql-only `node_modules/` tree at `src-tauri/resources/node_modules/`. Three packages: `@libsql/client`, `libsql`, `@libsql/darwin-arm64`. Reuses `findDep` (kept from current script) to locate each, copies them with `cpSync` (dereference: true). Verifies `@libsql/darwin-arm64/index.node` exists.
 5. **`stageWeb()`** — unchanged from today: `pnpm --filter web exec vite build`, then copy `apps/web/dist` → `src-tauri/resources/web`.
 6. **`stageMigrations()`** — unchanged: copy `packages/db/migrations` → `src-tauri/resources/migrations`.
 
-Removed entirely: `stageApi`, `stageNodeBinary`, `stageNodeModules`, `resolveEsbuild`, `ROOT_DEPS` walking, `targetTriple` (only one target now).
+Removed: `stageApi`, `stageNodeBinary`, `resolveEsbuild`, the `ROOT_DEPS`-walking version of `stageNodeModules`, `targetTriple` (only one target now). `findDep` is kept and used by `stageLibsqlModules`.
 
-### B. `packages/db/src/libsql-loader.ts` (new file, small)
+### B. `packages/db/src/index.ts`
 
-`@libsql/client` is imported in exactly one place in the codebase: `packages/db/src/index.ts`. The loader lives next to it.
-
-Bun's compiled binary cannot resolve `@libsql/darwin-arm64` via normal Node-style module resolution at runtime, because there is no `node_modules` next to the binary in production. The loader provides a single point of resolution:
-
-- If `process.env.LIBSQL_NATIVE_PATH` is set (production: Rust sets this at spawn time), construct the libsql client against the native binding loaded from that absolute path.
-- Otherwise (dev: `pnpm dev`, `pnpm test`, etc.), defer to the standard `@libsql/client` import so normal resolution works.
-
-`packages/db/src/index.ts` is updated to call the loader instead of importing `createClient` from `@libsql/client` directly. No other source files change.
+No source-level shim needed. `@libsql/client` resolves through `NODE_PATH` at runtime (just like today). The only practical concern: the Bun-compiled binary's working directory is unspecified, but `NODE_PATH` is absolute, so resolution is robust.
 
 ### C. `apps/desktop/src-tauri/src/sidecar.rs`
 
 Small edits:
 
-- Drop the `NODE_PATH` env var.
 - Drop the `api_entry` positional arg passed to the sidecar (Bun-compiled binary needs no JS path).
-- Add `LIBSQL_NATIVE_PATH` env var pointing at `resources/native/libsql.node`, resolved via `resolve_resource(...)`.
 - Drop the `resolve_resource(...)` call for `resources/api/index.js` (no longer staged).
+- `NODE_PATH` env var stays, still pointing at `resources/node_modules` — but the staged tree is now ~12MB instead of ~100MB.
 
 Everything else — `preflight_port`, `app_data_dir` resolution, healthcheck loop, SIGTERM-then-SIGKILL shutdown, error mapping — stays unchanged.
 
@@ -140,8 +136,8 @@ User double-clicks mLabs.app
   → Tauri shell launches, shows splash (apps/desktop/src/main.ts)
   → Rust setup() calls sidecar::start()
       preflight_port(3001)
-      resolve resources/web, resources/migrations, resources/native/libsql.node
-      spawn bin/mlabs-api with envs:
+      resolve resources/web, resources/migrations, resources/node_modules
+      spawn bin/mlabs-api with envs (no positional args):
         NODE_ENV=production
         HOST=127.0.0.1
         PORT=3001
@@ -150,9 +146,9 @@ User double-clicks mLabs.app
         LOG_LEVEL=info
         WEB_DIST_PATH=<resources>/web
         MIGRATIONS_FOLDER=<resources>/migrations
-        LIBSQL_NATIVE_PATH=<resources>/native/libsql.node   ← new
-        # NODE_PATH removed
-  → Bun binary starts: parses embedded JS, applies migrations,
+        NODE_PATH=<resources>/node_modules   (now ~12MB libsql-only tree)
+  → Bun binary starts: parses embedded JS, requires `@libsql/client`
+    via NODE_PATH, dlopens libsql native binding, applies migrations,
     Hono server listens on 127.0.0.1:3001
   → Splash polls /api/health, redirects to API_BASE on success
 ```
@@ -162,7 +158,7 @@ User double-clicks mLabs.app
 | Risk | Likelihood | Mitigation |
 |---|---|---|
 | Bun has a runtime incompatibility with Hono/drizzle/libsql we don't catch until runtime. | Low — these libs are well-exercised on Bun. | Extend `smoke-sidecar.mjs` to hit a DB-touching route. Run it as a build gate. |
-| `LIBSQL_NATIVE_PATH` shim breaks dev mode. | Low. | Loader falls back to standard `@libsql/client` import when the env var is absent. Verified by running `pnpm dev` after the change. |
+| Bun's loader can't resolve `@libsql/client` via NODE_PATH at runtime. | Low — Bun supports NODE_PATH like Node. | Smoke test exercises a DB-touching route end-to-end. |
 | Bun's `process` / `Buffer` semantics differ from Node in a way that breaks pino, dotenv, or rate limiter. | Low. | Smoke test catches it. Fallback: switch to Node SEA in a follow-up; the Rust + staging architecture still works. |
 | Bun is missing on the build machine. | Certain on a fresh checkout. | `preflightBun()` errors with a clear install hint at the top of the staging script. |
 | `bun --compile` output is larger than estimated. | Low. | Acceptable up to ~80MB; if larger, profile with `bun build --analyze` and look for unexpected dep inclusions. |
