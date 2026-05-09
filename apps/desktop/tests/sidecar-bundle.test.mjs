@@ -31,13 +31,14 @@ describe("sidecar bundle layout (bun-compiled)", () => {
     ).toBe(true);
   });
 
-  it("stages exactly the libsql packages (no dep-tree bloat)", () => {
+  it("stages exactly the libsql native binding (no dep-tree bloat)", () => {
     const nm = path.join(resources, "node_modules");
     const scopes = readdirSync(nm).sort();
-    // We expect @libsql (client + darwin-arm64) plus libsql. No other top-level entries.
-    expect(scopes).toEqual(["@libsql", "libsql"]);
+    // Only @libsql/darwin-arm64 (the .node native addon) is staged at runtime.
+    // All pure-JS packages (@libsql/client, libsql, etc.) are bundled into the binary.
+    expect(scopes).toEqual(["@libsql"]);
     const libsqlScope = readdirSync(path.join(nm, "@libsql")).sort();
-    expect(libsqlScope).toEqual(["client", "darwin-arm64"]);
+    expect(libsqlScope).toEqual(["darwin-arm64"]);
   });
 
   it("stages the drizzle migrations journal", () => {

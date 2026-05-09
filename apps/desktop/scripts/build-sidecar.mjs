@@ -98,14 +98,15 @@ function stageBunSidecar() {
   const triple = "aarch64-apple-darwin"; // arm64 macOS only per spec
   const dest = path.join(bin, `mlabs-api-${triple}`);
   const entry = path.join(repoRoot, "apps", "api", "src", "index.ts");
+  // Bundle @libsql/client and libsql (pure JS) directly into the binary.
+  // Only keep @libsql/darwin-arm64 external — it is a .node native addon that
+  // cannot be embedded and must be loaded from the filesystem at runtime.
   const cmd = [
     "bun build",
     `"${entry}"`,
     "--compile",
     "--target=bun-darwin-arm64",
     "--minify",
-    "--external @libsql/client",
-    "--external libsql",
     "--external @libsql/darwin-arm64",
     `--outfile "${dest}"`,
   ].join(" ");
@@ -123,7 +124,10 @@ function stageBunSidecar() {
 function stageLibsqlModules() {
   const nmOut = path.join(resources, "node_modules");
   mkdirSync(nmOut, { recursive: true });
-  const libsqlPkgs = ["@libsql/client", "libsql", "@libsql/darwin-arm64"];
+  // Only the native .node binding needs to be staged — all pure-JS packages
+  // (@libsql/client, libsql, @neon-rs/load, detect-libc, etc.) are bundled
+  // directly into the binary at compile time.
+  const libsqlPkgs = ["@libsql/darwin-arm64"];
   for (const dep of libsqlPkgs) {
     const src = findDep(dep);
     if (!src) {
