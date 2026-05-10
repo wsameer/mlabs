@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  ChevronDownIcon,
-  PencilIcon,
-  PlusIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import type {
   Category,
@@ -16,14 +11,15 @@ import { useCategories } from "@/features/categories/api/use-categories";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { Button } from "@workspace/ui/components/button";
 import { Spinner } from "@workspace/ui/components/spinner";
-import { ButtonGroup } from "@workspace/ui/components/button-group";
 import {
   Item,
-  ItemGroup,
-  ItemContent,
   ItemActions,
+  ItemContent,
+  ItemGroup,
 } from "@workspace/ui/components/item";
+import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 
+import { CollapsibleGroup } from "@/components/CollapsibleGroup";
 import { AddCategoryDialog } from "./AddCategoryDialog";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
@@ -32,30 +28,15 @@ export function CategoriesSection() {
   const [activeTab, setActiveTab] = useState<CategoryType>("EXPENSE");
   const { data: categories, isPending } = useCategories({ type: activeTab });
 
-  // Add dialog state
   const [addOpen, setAddOpen] = useState(false);
   const [addParentId, setAddParentId] = useState<string | undefined>();
   const [addParentName, setAddParentName] = useState<string | undefined>();
 
-  // Edit dialog state
   const [editOpen, setEditOpen] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
 
-  // Delete dialog state
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
-
-  // Expanded parents
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
-  function toggleExpand(id: string) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   function handleAddCategory() {
     setAddParentId(undefined);
@@ -81,7 +62,6 @@ export function CategoriesSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Tab selector + Add button */}
       <div className="flex items-center justify-between">
         <Tabs
           value={activeTab}
@@ -94,7 +74,7 @@ export function CategoriesSection() {
         </Tabs>
         <Button onClick={handleAddCategory}>Add</Button>
       </div>
-      {/* Category list */}
+
       {isPending ? (
         <div className="flex justify-center py-12">
           <Spinner className="size-6 text-muted-foreground" />
@@ -104,75 +84,42 @@ export function CategoriesSection() {
           No {activeTab.toLowerCase()} categories yet.
         </div>
       ) : (
-        <ItemGroup>
+        <div className="flex flex-col gap-1">
           {(categories as CategoryWithSubcategories[]).map((cat) => {
-            const hasSubs = cat.subcategories && cat.subcategories.length > 0;
-            const isExpanded = expanded.has(cat.id);
-
+            const subs = cat.subcategories ?? [];
             return (
-              <div key={cat.id} className="flex flex-col gap-2">
-                {/* Parent row */}
-                <Item variant="muted" size="sm">
-                  {/* Expand toggle */}
-                  {hasSubs && (
-                    <button
-                      type="button"
-                      className="flex size-4 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground"
-                      onClick={() => toggleExpand(cat.id)}
+              <CollapsibleGroup
+                key={cat.id}
+                id={cat.id}
+                label={cat.name}
+                count={subs.length}
+                actions={
+                  <>
+                    <DropdownMenuItem onClick={() => handleAddSubcategory(cat)}>
+                      <PlusIcon />
+                      Add
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(cat)}>
+                      <PencilIcon />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => handleDeleteRequest(cat)}
                     >
-                      <ChevronDownIcon
-                        className={`size-3.5 transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
-                      />
-                    </button>
-                  )}
-
-                  {/* Name */}
-                  <ItemContent>{cat.name}</ItemContent>
-
-                  {/* Actions */}
-                  <ItemActions>
-                    <ButtonGroup
-                      aria-label="Category actions"
-                      className="w-fit gap-0.5!"
-                    >
-                      <ButtonGroup>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Add subcategory"
-                          onClick={() => handleAddSubcategory(cat)}
-                        >
-                          <PlusIcon className="size-3" />
-                        </Button>
-                      </ButtonGroup>
-                      <ButtonGroup>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Edit"
-                          onClick={() => handleEdit(cat)}
-                        >
-                          <PencilIcon className="size-3" />
-                        </Button>
-                      </ButtonGroup>
-                      <ButtonGroup>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          title="Delete"
-                          onClick={() => handleDeleteRequest(cat)}
-                        >
-                          <Trash2Icon className="size-3" />
-                        </Button>
-                      </ButtonGroup>
-                    </ButtonGroup>
-                  </ItemActions>
-                </Item>
-
-                {/* Subcategories */}
-                {hasSubs && isExpanded && (
-                  <ItemGroup className="flex flex-col gap-2 pl-4">
-                    {cat.subcategories!.map((sub) => (
+                      <Trash2Icon />
+                      Delete
+                    </DropdownMenuItem>
+                  </>
+                }
+              >
+                {subs.length === 0 ? (
+                  <p className="px-2 py-1 text-xs text-muted-foreground">
+                    No subcategories.
+                  </p>
+                ) : (
+                  <ItemGroup className="flex flex-col gap-1">
+                    {subs.map((sub) => (
                       <Item key={sub.id} variant="muted" size="xs">
                         <ItemContent>{sub.name}</ItemContent>
                         <ItemActions>
@@ -197,13 +144,12 @@ export function CategoriesSection() {
                     ))}
                   </ItemGroup>
                 )}
-              </div>
+              </CollapsibleGroup>
             );
           })}
-        </ItemGroup>
+        </div>
       )}
 
-      {/* Dialogs */}
       <AddCategoryDialog
         open={addOpen}
         onOpenChange={setAddOpen}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { Account, AccountGroupType } from "@workspace/types";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
@@ -33,20 +33,6 @@ export function useAccountsSection() {
     }));
   }, [accounts]);
 
-  // Expanded groups
-  const [expanded, setExpanded] = useState<Set<AccountGroupType>>(
-    () => new Set(Object.keys(ACCOUNT_GROUP_METADATA) as AccountGroupType[])
-  );
-
-  function toggleExpand(group: AccountGroupType) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(group)) next.delete(group);
-      else next.add(group);
-      return next;
-    });
-  }
-
   // Add dialog state
   const [addOpen, setAddOpen] = useState(false);
   const [addDefaultGroup, setAddDefaultGroup] = useState<
@@ -79,8 +65,6 @@ export function useAccountsSection() {
   return {
     isPending,
     grouped,
-    expanded,
-    toggleExpand,
     addOpen,
     setAddOpen,
     addDefaultGroup,

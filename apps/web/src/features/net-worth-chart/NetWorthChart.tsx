@@ -55,15 +55,18 @@ export function NetWorthChart() {
   const data = useMemo(() => generateDummyData(grain), [grain]);
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <CardTitle>Net Worth</CardTitle>
         <CardAction>
           <NetWorthTimeGrainSelect value={grain} onChange={setGrain} />
         </CardAction>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-65 w-full">
+      <CardContent className="flex min-h-0 flex-1 flex-col">
+        <ChartContainer
+          config={chartConfig}
+          className="h-full min-h-65 w-full flex-1"
+        >
           <AreaChart
             data={data}
             margin={{ top: 4, right: 4, bottom: 0, left: 0 }}

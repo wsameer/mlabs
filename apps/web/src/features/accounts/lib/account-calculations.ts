@@ -1,4 +1,4 @@
-import type { Account } from "@workspace/types";
+import type { Account, AccountGroupType } from "@workspace/types";
 import { ACCOUNT_GROUP_METADATA } from "./account-groups";
 
 export interface AccountTotals {
@@ -50,6 +50,42 @@ export function calculateAccountTotals(accounts: Account[]): AccountTotals {
  */
 export function calculateGroupTotal(accounts: Account[]): number {
   return accounts.reduce((sum, account) => {
+    return sum + parseFloat(account.balance);
+  }, 0);
+}
+
+export type GroupTotal = {
+  group: AccountGroupType;
+  total: number;
+  count: number;
+  isLiability: boolean;
+};
+
+export function calculateGroupTotals(accounts: Account[]): GroupTotal[] {
+  const map = new Map<AccountGroupType, { total: number; count: number }>();
+
+  accounts.forEach((account) => {
+    if (!account.isActive) return;
+    const entry = map.get(account.group) ?? { total: 0, count: 0 };
+    entry.total += parseFloat(account.balance);
+    entry.count += 1;
+    map.set(account.group, entry);
+  });
+
+  return Array.from(map.entries()).map(([group, { total, count }]) => ({
+    group,
+    total,
+    count,
+    isLiability: ACCOUNT_GROUP_METADATA[group].isLiability,
+  }));
+}
+
+const CASH_GROUPS: AccountGroupType[] = ["chequing", "savings", "cash"];
+
+export function calculateCashOnHand(accounts: Account[]): number {
+  return accounts.reduce((sum, account) => {
+    if (!account.isActive) return sum;
+    if (!CASH_GROUPS.includes(account.group)) return sum;
     return sum + parseFloat(account.balance);
   }, 0);
 }

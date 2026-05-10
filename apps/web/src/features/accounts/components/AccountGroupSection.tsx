@@ -1,10 +1,6 @@
-import { ChevronDown, type LucideIcon } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible";
-import { ItemGroup } from "@workspace/ui/components/item";
+import type { LucideIcon } from "lucide-react";
+
+import { CollapsibleGroup } from "@/components/CollapsibleGroup";
 import { formatCurrency } from "../lib/format-utils";
 
 interface AccountGroupSectionProps {
@@ -21,51 +17,23 @@ interface AccountGroupSectionProps {
 export function AccountGroupSection({
   id,
   label,
-  icon: Icon,
+  icon,
   accountCount,
   total,
   currency = "CAD",
   defaultOpen = false,
   children,
 }: AccountGroupSectionProps) {
-  const formatted = formatCurrency(total, currency);
-
   return (
-    <Collapsible
+    <CollapsibleGroup
       id={id}
+      label={label}
+      icon={icon}
+      count={accountCount}
+      meta={formatCurrency(total, currency)}
       defaultOpen={defaultOpen}
-      className="rounded-md border bg-background"
     >
-      <CollapsibleTrigger
-        className="group flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-left"
-        aria-label={`${label}, ${accountCount} ${accountCount === 1 ? "account" : "accounts"}, total ${formatted}`}
-      >
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="shrink-0 rounded bg-muted p-1.5" aria-hidden="true">
-            <Icon className="size-4 text-foreground" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-foreground">{label}</p>
-            <p className="text-xs text-muted-foreground">
-              {accountCount} {accountCount === 1 ? "account" : "accounts"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-foreground tabular-nums">
-            {formatted}
-          </span>
-          <ChevronDown
-            className="size-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
-            aria-hidden="true"
-          />
-        </div>
-      </CollapsibleTrigger>
-
-      <CollapsibleContent>
-        <ItemGroup className="p-2">{children}</ItemGroup>
-      </CollapsibleContent>
-    </Collapsible>
+      {children}
+    </CollapsibleGroup>
   );
 }

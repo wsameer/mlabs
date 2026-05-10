@@ -1,5 +1,4 @@
 export { AccountsPage } from "./components/AccountsPage";
-export { AssetsLiabilitiesDisplay } from "./components/AssetsLiabilitiesDisplay";
 export {
   calculateAccountTotals,
   calculateGroupTotal,

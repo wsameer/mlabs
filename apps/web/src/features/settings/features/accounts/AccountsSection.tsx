@@ -19,8 +19,6 @@ export function AccountsSection() {
   const {
     isPending,
     grouped,
-    expanded,
-    toggleExpand,
     addOpen,
     setAddOpen,
     addDefaultGroup,
@@ -61,8 +59,6 @@ export function AccountsSection() {
               group={group}
               meta={meta}
               accounts={accounts}
-              isExpanded={expanded.has(group)}
-              onToggle={toggleExpand}
               onAdd={handleAdd}
               onEdit={handleEdit}
               onDelete={handleDelete}
