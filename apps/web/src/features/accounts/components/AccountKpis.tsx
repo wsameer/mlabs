@@ -74,13 +74,11 @@ function KpiCard({
 }) {
   return (
     <Card className="gap-1 p-3">
-      <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="text-foreground text-lg tabular-nums">{value}</p>
-      {subLabel && (
-        <p className="text-muted-foreground text-xs">{subLabel}</p>
-      )}
+      <p className="text-lg text-foreground tabular-nums">{value}</p>
+      {subLabel && <p className="text-xs text-muted-foreground">{subLabel}</p>}
     </Card>
   );
 }
@@ -117,20 +115,20 @@ function AllocationDonut({
   return (
     <Card className="flex flex-1 flex-col gap-3 p-3">
       <CardHeader className="p-0">
-        <CardTitle className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+        <CardTitle className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           Asset allocation
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col p-0">
         {data.length === 0 ? (
-          <p className="text-muted-foreground py-6 text-center text-xs">
+          <p className="py-6 text-center text-xs text-muted-foreground">
             No assets yet.
           </p>
         ) : (
-          <div className="flex flex-1 items-center gap-4">
+          <div className="grid flex-1 grid-cols-2 items-center gap-4">
             <ChartContainer
               config={chartConfig}
-              className="aspect-square h-full max-h-40 min-h-28 shrink-0"
+              className="mx-auto aspect-square h-full max-h-40 min-h-28 w-full min-w-0"
             >
               <PieChart>
                 <ChartTooltip
@@ -146,7 +144,7 @@ function AllocationDonut({
                 />
               </PieChart>
             </ChartContainer>
-            <ul className="flex min-w-0 flex-1 flex-col gap-1.5 text-xs">
+            <ul className="flex w-4/5 min-w-0 flex-col gap-1.5 text-xs">
               {data.map((slice) => {
                 const pct =
                   totalAssets > 0
@@ -159,7 +157,7 @@ function AllocationDonut({
                       className="size-2 shrink-0 rounded-full"
                       style={{ backgroundColor: slice.fill }}
                     />
-                    <span className="text-foreground flex-1 truncate">
+                    <span className="flex-1 truncate text-foreground">
                       {slice.label}
                     </span>
                     <span className="text-muted-foreground tabular-nums">
@@ -172,7 +170,7 @@ function AllocationDonut({
           </div>
         )}
         {data.length > 0 && (
-          <p className="text-muted-foreground mt-3 text-xs">
+          <p className="mt-3 text-xs text-muted-foreground">
             Total assets:{" "}
             <span className="text-foreground tabular-nums">
               {formatCurrency(totalAssets, currency)}

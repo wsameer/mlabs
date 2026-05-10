@@ -14,6 +14,7 @@ import { EditAccountDialog } from "./EditAccountDialog";
 import { DeleteAccountDialog } from "./DeleteAccountDialog";
 import { AccountGroupList } from "./AccountGroupList";
 import { useAccountsSection } from "./useAccountsSection";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 
 export function AccountsSection() {
   const {
@@ -54,15 +55,18 @@ export function AccountsSection() {
       ) : (
         <div className="flex flex-col gap-5">
           {grouped.map(({ group, meta, accounts }) => (
-            <AccountGroupList
-              key={group}
-              group={group}
-              meta={meta}
-              accounts={accounts}
-              onAdd={handleAdd}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <Card key={group} size="sm">
+              <CardContent>
+                <AccountGroupList
+                  group={group}
+                  meta={meta}
+                  accounts={accounts}
+                  onAdd={handleAdd}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

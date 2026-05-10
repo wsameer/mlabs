@@ -1,4 +1,4 @@
-import { PencilIcon, Trash2Icon } from "lucide-react";
+import { MinusIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 
 import type { Account } from "@workspace/types";
 
@@ -20,7 +20,7 @@ interface AccountItemProps {
 
 export function AccountItem({ account, onEdit, onDelete }: AccountItemProps) {
   return (
-    <Item variant="default" size="xs" className="hover:bg-muted">
+    <Item variant="muted" size="xs" className="hover:bg-muted">
       <ItemContent>
         <ItemTitle>{account.name}</ItemTitle>
         {account.institutionName && (

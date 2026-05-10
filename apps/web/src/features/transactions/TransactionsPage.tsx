@@ -167,10 +167,12 @@ export function TransactionsPage() {
       {/* Row 1: global date range */}
       <DateRangeFilter />
 
-      {/* Row 2: desktop filters */}
-      <div className="hidden lg:block">
-        <TransactionFilters disabled={filtersDisabled} />
-      </div>
+      <Card className="hidden lg:block">
+        <CardContent>
+          {/* Row 2: desktop filters */}
+          <TransactionFilters disabled={filtersDisabled} />
+        </CardContent>
+      </Card>
 
       {/* Row 2 (mobile): search + Filters sheet + summary */}
       <div className="flex items-center gap-2 lg:hidden">

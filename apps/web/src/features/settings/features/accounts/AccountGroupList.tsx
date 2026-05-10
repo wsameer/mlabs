@@ -41,7 +41,7 @@ export function AccountGroupList({
       }
     >
       {accounts.length === 0 ? (
-        <p className="text-muted-foreground px-2 py-1 text-xs">
+        <p className="px-2 py-1 text-xs text-muted-foreground">
           No {meta.label.toLowerCase()} accounts.
         </p>
       ) : (

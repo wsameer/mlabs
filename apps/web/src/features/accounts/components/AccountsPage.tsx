@@ -53,7 +53,7 @@ export function AccountsPage() {
   if (isPending) {
     return (
       <div className="flex h-full min-h-[50vh] items-center justify-center">
-        <Spinner className="text-muted-foreground size-8" />
+        <Spinner className="size-8 text-muted-foreground" />
       </div>
     );
   }
@@ -83,12 +83,12 @@ export function AccountsPage() {
   const { netWorth } = calculateAccountTotals(accounts);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <header>
-        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           Net worth
         </p>
-        <p className="text-foreground mt-1 text-3xl tabular-nums md:text-4xl">
+        <p className="mt-1 text-2xl text-foreground tabular-nums md:text-3xl">
           {formatCurrency(netWorth, currency)}
         </p>
       </header>
@@ -103,7 +103,7 @@ export function AccountsPage() {
       </div>
 
       <section>
-        <h2 className="text-foreground mb-2 text-sm font-medium">Accounts</h2>
+        <h2 className="mb-2 text-sm font-medium text-foreground">Accounts</h2>
         <AccountsView accounts={accounts} />
       </section>
     </div>

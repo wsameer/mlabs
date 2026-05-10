@@ -23,6 +23,7 @@ import { CollapsibleGroup } from "@/components/CollapsibleGroup";
 import { AddCategoryDialog } from "./AddCategoryDialog";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 
 export function CategoriesSection() {
   const [activeTab, setActiveTab] = useState<CategoryType>("EXPENSE");
@@ -61,94 +62,99 @@ export function CategoriesSection() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as CategoryType)}
-        >
-          <TabsList>
-            <TabsTrigger value="EXPENSE">Expense</TabsTrigger>
-            <TabsTrigger value="INCOME">Income</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Button onClick={handleAddCategory}>Add</Button>
-      </div>
-
-      {isPending ? (
-        <div className="flex justify-center py-12">
-          <Spinner className="size-6 text-muted-foreground" />
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-3">
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as CategoryType)}
+          >
+            <TabsList>
+              <TabsTrigger value="EXPENSE">Expense</TabsTrigger>
+              <TabsTrigger value="INCOME">Income</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button onClick={handleAddCategory}>Add</Button>
         </div>
-      ) : !categories?.length ? (
-        <div className="py-12 text-center text-sm text-muted-foreground">
-          No {activeTab.toLowerCase()} categories yet.
-        </div>
-      ) : (
-        <div className="flex flex-col gap-1">
-          {(categories as CategoryWithSubcategories[]).map((cat) => {
-            const subs = cat.subcategories ?? [];
-            return (
-              <CollapsibleGroup
-                key={cat.id}
-                id={cat.id}
-                label={cat.name}
-                count={subs.length}
-                actions={
-                  <>
-                    <DropdownMenuItem onClick={() => handleAddSubcategory(cat)}>
-                      <PlusIcon />
-                      Add
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEdit(cat)}>
-                      <PencilIcon />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => handleDeleteRequest(cat)}
-                    >
-                      <Trash2Icon />
-                      Delete
-                    </DropdownMenuItem>
-                  </>
-                }
-              >
-                {subs.length === 0 ? (
-                  <p className="px-2 py-1 text-xs text-muted-foreground">
-                    No subcategories.
-                  </p>
-                ) : (
-                  <ItemGroup className="flex flex-col gap-1">
-                    {subs.map((sub) => (
-                      <Item key={sub.id} variant="muted" size="xs">
-                        <ItemContent>{sub.name}</ItemContent>
-                        <ItemActions>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Edit"
-                            onClick={() => handleEdit(sub)}
-                          >
-                            <PencilIcon className="size-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Delete"
-                            onClick={() => handleDeleteRequest(sub)}
-                          >
-                            <Trash2Icon className="size-3.5" />
-                          </Button>
-                        </ItemActions>
-                      </Item>
-                    ))}
-                  </ItemGroup>
-                )}
-              </CollapsibleGroup>
-            );
-          })}
-        </div>
-      )}
+      </CardHeader>
+      <CardContent>
+        {isPending ? (
+          <div className="flex justify-center py-12">
+            <Spinner className="size-6 text-muted-foreground" />
+          </div>
+        ) : !categories?.length ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            No {activeTab.toLowerCase()} categories yet.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {(categories as CategoryWithSubcategories[]).map((cat) => {
+              const subs = cat.subcategories ?? [];
+              return (
+                <CollapsibleGroup
+                  key={cat.id}
+                  id={cat.id}
+                  label={cat.name}
+                  count={subs.length}
+                  actions={
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => handleAddSubcategory(cat)}
+                      >
+                        <PlusIcon />
+                        Add
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEdit(cat)}>
+                        <PencilIcon />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={() => handleDeleteRequest(cat)}
+                      >
+                        <Trash2Icon />
+                        Delete
+                      </DropdownMenuItem>
+                    </>
+                  }
+                >
+                  {subs.length === 0 ? (
+                    <p className="px-2 py-1 text-xs text-muted-foreground">
+                      No subcategories.
+                    </p>
+                  ) : (
+                    <ItemGroup className="flex flex-col gap-1">
+                      {subs.map((sub) => (
+                        <Item key={sub.id} variant="muted" size="xs">
+                          <ItemContent>{sub.name}</ItemContent>
+                          <ItemActions>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Edit"
+                              onClick={() => handleEdit(sub)}
+                            >
+                              <PencilIcon className="size-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Delete"
+                              onClick={() => handleDeleteRequest(sub)}
+                            >
+                              <Trash2Icon className="size-3.5" />
+                            </Button>
+                          </ItemActions>
+                        </Item>
+                      ))}
+                    </ItemGroup>
+                  )}
+                </CollapsibleGroup>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
 
       <AddCategoryDialog
         open={addOpen}
@@ -169,6 +175,6 @@ export function CategoriesSection() {
         onOpenChange={setDeleteOpen}
         category={deleteTarget}
       />
-    </div>
+    </Card>
   );
 }

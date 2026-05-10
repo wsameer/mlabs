@@ -48,6 +48,11 @@ export {
   CategoryTotalsQuerySchema,
   CategoryTotalSchema,
   CategoryTotalsResponseSchema,
+  // Balance history
+  BalanceHistoryQuerySchema,
+  BalanceHistoryPointSchema,
+  BalanceHistoryItemSchema,
+  BalanceHistoryResponseSchema,
   // API response
   ApiResponseSchema,
   // Validation
@@ -102,6 +107,11 @@ export type {
   CategoryTotalsQuery,
   CategoryTotal,
   CategoryTotalsResponse,
+  // Balance history
+  BalanceHistoryQuery,
+  BalanceHistoryPoint,
+  BalanceHistoryItem,
+  BalanceHistoryResponse,
   // API response
   ApiResponse,
 } from "./schema.js";

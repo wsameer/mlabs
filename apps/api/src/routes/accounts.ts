@@ -7,6 +7,7 @@ import type {
 
 import type { ProfileEnv } from "../middleware/profile.js";
 import { accountsService } from "../services/accounts.service.js";
+import { balanceHistoryService } from "../services/balance-history.service.js";
 import {
   apiResponseSchema,
   ErrorResponseSchema,
@@ -108,6 +109,67 @@ accountsRoute.openapi(listAccountsRoute, async (c) => {
   const filters = c.req.valid("query") as unknown as AccountQuery;
   const accountList = await accountsService.listAccounts(profileId, filters);
   return c.json({ success: true as const, data: accountList });
+});
+
+// ---------------------------------------------------------------------------
+// GET /balance-history — daily balance points for every account in the profile
+// ---------------------------------------------------------------------------
+
+const BalanceHistoryQuerySchema = z.object({
+  days: z
+    .string()
+    .regex(/^\d+$/)
+    .transform((v) => Number(v))
+    .refine((v) => v >= 2 && v <= 365, {
+      message: "days must be between 2 and 365",
+    })
+    .optional(),
+});
+
+const BalanceHistoryPointSchema = z.object({
+  date: z.string().openapi({ example: "2026-04-01" }),
+  balance: z.string().openapi({ example: "1234.56" }),
+});
+
+const BalanceHistoryItemSchema = z.object({
+  accountId: z.string().uuid(),
+  points: z.array(BalanceHistoryPointSchema),
+});
+
+const BalanceHistoryDataSchema = z.object({
+  items: z.array(BalanceHistoryItemSchema),
+  days: z.number(),
+  asOf: z.string(),
+});
+
+const balanceHistoryRoute = createRoute({
+  method: "get",
+  path: "/balance-history",
+  tags: ["Accounts"],
+  summary: "Daily balance history for all accounts",
+  description:
+    "Returns per-day balance points for every account in the profile, walking transactions backward from the current balance.",
+  request: { query: BalanceHistoryQuerySchema },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(BalanceHistoryDataSchema),
+        },
+      },
+      description: "Balance history",
+    },
+  },
+});
+
+accountsRoute.openapi(balanceHistoryRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const { days } = c.req.valid("query");
+  const result = await balanceHistoryService.getBalanceHistory(
+    profileId,
+    days ?? 90
+  );
+  return c.json({ success: true as const, data: result });
 });
 
 // ---------------------------------------------------------------------------

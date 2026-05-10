@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { ChevronRightIcon, MoreVerticalIcon } from "lucide-react";
+import { ChevronRightIcon, EllipsisIcon } from "lucide-react";
 
 import {
   Collapsible,
@@ -47,31 +47,32 @@ export function CollapsibleGroup({
       <div className="flex w-full items-center gap-1">
         <CollapsibleTrigger
           className={cn(
-            "hover:bg-muted/40 group-data-[state=open]/cgroup:bg-muted/60",
-            "focus-visible:ring-ring/30 flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors outline-none focus-visible:ring-2"
+            "group-data-[state=open]/cgroup:bg-muted/60 hover:bg-muted/40",
+            "flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
           )}
           aria-label={label}
         >
           <ChevronRightIcon
-            className="text-muted-foreground size-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]/cgroup:rotate-90"
+            className="size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]/cgroup:rotate-90"
             aria-hidden
           />
           {Icon && (
             <Icon
-              className="text-muted-foreground size-3.5 shrink-0"
+              className="size-3.5 shrink-0 text-muted-foreground"
               aria-hidden
             />
           )}
-          <span className="text-foreground truncate text-sm font-medium">
+          <small className="truncate text-xs font-medium">{label}</small>
+          {/*<span className="truncate text-xs font-medium text-foreground">
             {label}
-          </span>
+          </span>*/}
           {typeof count === "number" && (
-            <span className="text-muted-foreground text-xs tabular-nums">
+            <span className="text-xs text-muted-foreground tabular-nums">
               {count}
             </span>
           )}
           {meta !== undefined && (
-            <span className="text-muted-foreground ml-auto text-xs tabular-nums">
+            <span className="ml-auto text-xs text-muted-foreground tabular-nums">
               {meta}
             </span>
           )}
@@ -84,13 +85,13 @@ export function CollapsibleGroup({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground size-7"
+                  className="size-7 text-muted-foreground hover:text-foreground"
                   aria-label={`${label} actions`}
                   onClick={(e) => e.stopPropagation()}
                 />
               }
             >
-              <MoreVerticalIcon className="size-3.5" />
+              <EllipsisIcon className="size-3.5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={4}>
               {actions}
@@ -100,7 +101,7 @@ export function CollapsibleGroup({
       </div>
 
       <CollapsibleContent>
-        <div className="border-muted ml-3 flex flex-col gap-1 border-l py-1 pl-3">
+        <div className="ml-3 flex flex-col gap-1 border-l border-muted py-1 pl-3">
           {children}
         </div>
       </CollapsibleContent>

@@ -489,6 +489,40 @@ export type CategoryTotalsResponse = z.infer<
 >;
 
 // ============================================================================
+// Account Balance History
+// ============================================================================
+
+export const BalanceHistoryQuerySchema = z.object({
+  days: z.number().int().min(2).max(365).default(90),
+});
+
+export type BalanceHistoryQuery = z.input<typeof BalanceHistoryQuerySchema>;
+
+export const BalanceHistoryPointSchema = z.object({
+  date: z.string(),
+  balance: z.string(),
+});
+
+export type BalanceHistoryPoint = z.infer<typeof BalanceHistoryPointSchema>;
+
+export const BalanceHistoryItemSchema = z.object({
+  accountId: z.uuid(),
+  points: z.array(BalanceHistoryPointSchema),
+});
+
+export type BalanceHistoryItem = z.infer<typeof BalanceHistoryItemSchema>;
+
+export const BalanceHistoryResponseSchema = z.object({
+  items: z.array(BalanceHistoryItemSchema),
+  days: z.number(),
+  asOf: z.string(),
+});
+
+export type BalanceHistoryResponse = z.infer<
+  typeof BalanceHistoryResponseSchema
+>;
+
+// ============================================================================
 // API Response Wrapper
 // ============================================================================
 

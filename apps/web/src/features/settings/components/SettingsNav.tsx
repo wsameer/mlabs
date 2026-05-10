@@ -3,6 +3,7 @@ import { ChevronRightIcon } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { SETTINGS_SECTIONS, type SettingsSectionId } from "../constants";
+import { Button } from "@workspace/ui/components/button";
 
 type SettingsNavProps = {
   activeSection: SettingsSectionId | undefined;
@@ -18,33 +19,33 @@ export function SettingsNav({
   const showChevron = variant === "list";
 
   return (
-    <nav className="flex flex-col gap-0.5">
+    <nav className="mt-2 flex flex-col gap-2">
       {SETTINGS_SECTIONS.map((section) => {
         const Icon = section.icon;
         const isActive = activeSection === section.id;
 
         return (
-          <button
+          <Button
+            size="lg"
+            variant="ghost"
             key={section.id}
-            type="button"
             onClick={() => onSelect(section.id)}
             aria-current={isActive ? "page" : undefined}
-            className={cn(
-              "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
-              "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-              "focus-visible:ring-ring/30 outline-none focus-visible:ring-2",
-              isActive && "bg-muted text-foreground"
-            )}
+            className={cn("text-left text-xs transition-colors", {
+              "bg-muted text-foreground": isActive,
+            })}
           >
             <Icon className="size-4 shrink-0" aria-hidden />
-            <span className="flex-1 truncate font-medium">{section.label}</span>
+            <span className="flex-1 truncate pl-1 font-medium">
+              {section.label}
+            </span>
             {showChevron && (
               <ChevronRightIcon
-                className="text-muted-foreground/60 size-4 shrink-0"
+                className="size-4 shrink-0 text-muted-foreground/60"
                 aria-hidden
               />
             )}
-          </button>
+          </Button>
         );
       })}
     </nav>

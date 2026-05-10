@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronUpIcon, PlusIcon } from "lucide-react";
 import {
   linkOptions,
@@ -49,7 +49,7 @@ export function AppBottombar() {
   return (
     <div
       ref={navRef}
-      className="justify-even fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 content-center items-end gap-4 transition-transform duration-200 ease-in-out md:hidden"
+      className="fixed bottom-8 left-0 z-50 flex w-full items-center justify-center gap-3 transition-transform duration-200 ease-in-out md:hidden"
       id="app-bottom-bar"
     >
       {/* Single nav bar that stretches upward when expanded */}
@@ -62,45 +62,43 @@ export function AppBottombar() {
           }
         )}
       >
-        {/* Expanded row - appears above, grows upward */}
+        {/* Expanded rows - appear above, wrap as needed */}
         {hasHiddenItems && (
           <div
             className={cn(
-              "flex w-full items-center justify-end gap-6 overflow-hidden transition-all duration-300 ease-in-out",
-              isExpanded ? "mb-1 max-h-16 opacity-100" : "max-h-0 opacity-0"
+              "grid grid-cols-4 gap-x-4 gap-y-2 overflow-hidden transition-all duration-300 ease-in-out",
+              isExpanded ? "mb-2 max-h-40 opacity-100" : "max-h-0 opacity-0"
             )}
           >
             {hiddenItems.map((item) => {
               const Icon = item.icon;
               return (
-                <React.Fragment key={item.path}>
-                  <NavItem
-                    icon={<Icon />}
-                    isActive={currentPath === item.path}
-                    label={item.title}
-                    onClick={() => handleNavigation(item.path)}
-                    disabled={!isBackendConnected}
-                  />
-                </React.Fragment>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Main row - always visible */}
-        <div className="flex items-center justify-between gap-6">
-          {visibleItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <React.Fragment key={item.path}>
                 <NavItem
+                  key={item.path}
                   icon={<Icon />}
                   isActive={currentPath === item.path}
                   label={item.title}
                   onClick={() => handleNavigation(item.path)}
                   disabled={!isBackendConnected}
                 />
-              </React.Fragment>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Main row - always visible */}
+        <div className="grid grid-cols-4 items-center gap-x-4">
+          {visibleItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavItem
+                key={item.path}
+                icon={<Icon />}
+                isActive={currentPath === item.path}
+                label={item.title}
+                onClick={() => handleNavigation(item.path)}
+                disabled={!isBackendConnected}
+              />
             );
           })}
 
