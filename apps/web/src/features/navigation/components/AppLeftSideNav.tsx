@@ -4,7 +4,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -14,12 +13,8 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar";
 
-import {
-  PRIMARY_NAVIGATION_OPTIONS,
-  SECONDARY_NAV_OPTIONS,
-} from "@/features/navigation/constants";
+import { PRIMARY_NAVIGATION_OPTIONS } from "@/features/navigation/constants";
 import { useBackendStatus } from "@/hooks/use-app";
-import { Badge } from "@workspace/ui/components/badge";
 
 export function AppLeftSideNav({
   ...props
@@ -34,7 +29,6 @@ export function AppLeftSideNav({
   const handleNavClick = (path: string) => {
     if (!isBackendConnected) return;
 
-    // Store return path when navigating to settings
     if (path.startsWith("/settings") && !currentPath.startsWith("/settings")) {
       sessionStorage.setItem("settings-return-path", currentPath);
     }
@@ -45,20 +39,19 @@ export function AppLeftSideNav({
   };
 
   return (
-    /* This is the first sidebar */
-    /* We disable collapsible and adjust width to icon. */
-    /* This will make the sidebar appear as icons. */
     <Sidebar
       collapsible="none"
       className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r py-1"
       {...props}
     >
       <SidebarHeader className="flex items-center justify-center py-2">
-        <img
-          src="/mlabs-icon.png"
-          alt="mlabs"
-          className="size-8 rounded-lg bg-accent"
-        />
+        <div className="grid size-8 place-items-center rounded-lg bg-secondary text-primary-foreground shadow-sm">
+          <img
+            src="/mlabs-icon.png"
+            alt="mlabs"
+            className="size-6 object-contain"
+          />
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -91,28 +84,6 @@ export function AppLeftSideNav({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenu className="gap-2">
-            {SECONDARY_NAV_OPTIONS.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  tooltip={{
-                    children: item.title,
-                    hidden: false,
-                  }}
-                  className="px-2.5 md:px-2"
-                  disabled={!isBackendConnected}
-                >
-                  <item.icon />
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   );
 }

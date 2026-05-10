@@ -10,11 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as NetWorthRouteImport } from './routes/net-worth'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as BudgetRouteImport } from './routes/budget'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +27,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubscriptionsRoute = SubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -39,14 +49,34 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NetWorthRoute = NetWorthRouteImport.update({
+  id: '/net-worth',
+  path: '/net-worth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoalsRoute = GoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetRoute = BudgetRouteImport.update({
+  id: '/budget',
+  path: '/budget',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
@@ -69,22 +99,32 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/budget': typeof BudgetRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
+  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
+  '/subscriptions': typeof SubscriptionsRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/budget': typeof BudgetRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
+  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
+  '/subscriptions': typeof SubscriptionsRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesById {
@@ -92,11 +132,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/accounts': typeof AccountsRoute
+  '/budget': typeof BudgetRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
+  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
+  '/subscriptions': typeof SubscriptionsRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRouteTypes {
@@ -105,33 +150,48 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/accounts'
+    | '/budget'
+    | '/categories'
     | '/dashboard'
+    | '/goals'
     | '/maintenance'
+    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
+    | '/subscriptions'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/404'
     | '/accounts'
+    | '/budget'
+    | '/categories'
     | '/dashboard'
+    | '/goals'
     | '/maintenance'
+    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
+    | '/subscriptions'
     | '/transactions'
   id:
     | '__root__'
     | '/'
     | '/404'
     | '/accounts'
+    | '/budget'
+    | '/categories'
     | '/dashboard'
+    | '/goals'
     | '/maintenance'
+    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
+    | '/subscriptions'
     | '/transactions'
   fileRoutesById: FileRoutesById
 }
@@ -139,11 +199,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   AccountsRoute: typeof AccountsRoute
+  BudgetRoute: typeof BudgetRoute
+  CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
+  GoalsRoute: typeof GoalsRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  NetWorthRoute: typeof NetWorthRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfilesRoute: typeof ProfilesRoute
   SettingsRoute: typeof SettingsRoute
+  SubscriptionsRoute: typeof SubscriptionsRoute
   TransactionsRoute: typeof TransactionsRoute
 }
 
@@ -154,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/transactions'
       preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscriptions': {
+      id: '/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof SubscriptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -177,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/net-worth': {
+      id: '/net-worth'
+      path: '/net-worth'
+      fullPath: '/net-worth'
+      preLoaderRoute: typeof NetWorthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/maintenance': {
       id: '/maintenance'
       path: '/maintenance'
@@ -184,11 +263,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/goals': {
+      id: '/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget': {
+      id: '/budget'
+      path: '/budget'
+      fullPath: '/budget'
+      preLoaderRoute: typeof BudgetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts': {
@@ -219,11 +319,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   AccountsRoute: AccountsRoute,
+  BudgetRoute: BudgetRoute,
+  CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
+  GoalsRoute: GoalsRoute,
   MaintenanceRoute: MaintenanceRoute,
+  NetWorthRoute: NetWorthRoute,
   OnboardingRoute: OnboardingRoute,
   ProfilesRoute: ProfilesRoute,
   SettingsRoute: SettingsRoute,
+  SubscriptionsRoute: SubscriptionsRoute,
   TransactionsRoute: TransactionsRoute,
 }
 export const routeTree = rootRouteImport

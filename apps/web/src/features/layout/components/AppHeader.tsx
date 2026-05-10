@@ -46,30 +46,30 @@ export const AppHeader = () => {
   };
 
   const renderDesktopHeader = () => (
-    <div className="hidden w-full md:flex md:items-center md:justify-between">
-      <div className="flex items-center">
+    <div className="hidden w-full md:flex md:items-center md:justify-between md:gap-3">
+      <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"
-          className="mt-1 mr-2 data-[orientation=vertical]:h-4"
+          className="data-[orientation=vertical]:h-4"
         />
 
         {breadcrumbs && breadcrumbs.length > 0 ? (
           <Breadcrumb>
-            <BreadcrumbList className="text-base">
+            <BreadcrumbList className="text-sm">
               {breadcrumbs.map((crumb, i) => {
                 const isLast = i === breadcrumbs.length - 1;
                 return (
                   <Fragment key={`${crumb.label}-${i}`}>
                     <BreadcrumbItem>
                       {isLast || !crumb.to ? (
-                        <BreadcrumbPage className="text-muted-foreground">
+                        <BreadcrumbPage className="font-medium text-foreground">
                           {crumb.label}
                         </BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink
                           render={<Link to={crumb.to} />}
-                          className="text-muted-foreground"
+                          className="text-muted-foreground hover:text-foreground"
                         >
                           {crumb.label}
                         </BreadcrumbLink>
@@ -82,22 +82,38 @@ export const AppHeader = () => {
             </BreadcrumbList>
           </Breadcrumb>
         ) : (
-          <p className="text-base text-muted-foreground">{pageTitle}</p>
+          <h1 className="truncate text-sm font-medium text-foreground">
+            {pageTitle}
+          </h1>
         )}
       </div>
+
       <div className="flex items-center gap-2">
-        <Button variant="default" size="sm" onClick={handleAddTransaction}>
-          <PlusIcon /> Add Transaction
-        </Button>
         {headerActions}
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
           size="sm"
+          aria-label="Search"
         >
           <SearchIcon data-icon="inline-start" />
           <p className="text-muted-foreground">⌘K</p>
         </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleAddTransaction}
+          disabled={!isBackendConnected}
+          className="gap-1.5"
+        >
+          <PlusIcon className="size-4" />
+          <span className="hidden lg:inline">Add Transaction</span>
+          <span className="lg:hidden">Add</span>
+        </Button>
+        <Separator
+          orientation="vertical"
+          className="data-[orientation=vertical]:h-6"
+        />
         <TeamSwitcher />
       </div>
     </div>
@@ -126,9 +142,10 @@ export const AppHeader = () => {
           onClick={() => setGlobalSearch(true)}
           variant="outline"
           size="sm"
+          aria-label="Search"
         >
-          <SearchIcon data-icon="inline-start" />
-          <p className="text-muted-foreground">⌘K</p>
+          <SearchIcon className="size-4" />
+          <span className="text-xs text-muted-foreground">⌘K</span>
         </Button>
       </div>
     </div>
