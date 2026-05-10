@@ -92,10 +92,7 @@ export function CategoriesSection() {
             <TabsTrigger value="INCOME">Income</TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button onClick={handleAddCategory}>
-          <PlusIcon className="size-3.5" />
-          Add
-        </Button>
+        <Button onClick={handleAddCategory}>Add</Button>
       </div>
       {/* Category list */}
       {isPending ? (

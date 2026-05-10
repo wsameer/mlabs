@@ -19,8 +19,7 @@ import {
   SECONDARY_NAV_OPTIONS,
 } from "@/features/navigation/constants";
 import { useBackendStatus } from "@/hooks/use-app";
-
-import { TeamSwitcher } from "./TeamSwitcher";
+import { Badge } from "@workspace/ui/components/badge";
 
 export function AppLeftSideNav({
   ...props
@@ -54,8 +53,12 @@ export function AppLeftSideNav({
       className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r py-1"
       {...props}
     >
-      <SidebarHeader>
-        <TeamSwitcher />
+      <SidebarHeader className="flex items-center justify-center py-2">
+        <img
+          src="/mlabs-icon.png"
+          alt="mlabs"
+          className="size-8 rounded-lg bg-accent"
+        />
       </SidebarHeader>
 
       <SidebarContent>

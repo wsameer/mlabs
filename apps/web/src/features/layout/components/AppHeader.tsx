@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
+import { TeamSwitcher } from "@/features/navigation/components/TeamSwitcher";
 import { Button } from "@workspace/ui/components/button";
 import {
   Breadcrumb,
@@ -52,6 +53,7 @@ export const AppHeader = () => {
           orientation="vertical"
           className="mt-1 mr-2 data-[orientation=vertical]:h-4"
         />
+
         {breadcrumbs && breadcrumbs.length > 0 ? (
           <Breadcrumb>
             <BreadcrumbList className="text-base">
@@ -87,6 +89,7 @@ export const AppHeader = () => {
         <Button variant="default" size="sm" onClick={handleAddTransaction}>
           <PlusIcon /> Add Transaction
         </Button>
+        {headerActions}
         <Button
           onClick={() => setGlobalSearch(true)}
           variant="outline"
@@ -95,7 +98,7 @@ export const AppHeader = () => {
           <SearchIcon data-icon="inline-start" />
           <p className="text-muted-foreground">⌘K</p>
         </Button>
-        {headerActions}
+        <TeamSwitcher />
       </div>
     </div>
   );

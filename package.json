@@ -26,7 +26,7 @@
     "desktop:sidecar": "pnpm --filter desktop sidecar",
     "desktop:smoke": "pnpm --filter desktop smoke",
     "desktop:test": "pnpm --filter desktop test",
-    "clean": "turbo clean && rm -rf node_modules .turbo",
+    "clean": "rm -rf node_modules .turbo",
     "clean:full": "turbo run clean && rm -rf node_modules .turbo",
     "db:setup": "pnpm --filter=@workspace/db db:setup",
     "db:setup:seed": "pnpm --filter=@workspace/db db:setup:seed",

@@ -42,7 +42,7 @@ export function DashboardPage() {
   const renderTransactionsSummary = () => (
     <ScrollArea className="h-[70svh] md:h-[80svh]">
       <Card className="m-0.5">
-        <CardContent className="p-6 md:p-8">
+        <CardContent>
           <CashflowPieChart
             data={data}
             colorMap={colorMap}

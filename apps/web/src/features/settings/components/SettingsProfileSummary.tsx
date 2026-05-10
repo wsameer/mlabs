@@ -25,7 +25,7 @@ export function SettingsProfileSummary({
         : "Up to date";
 
   return (
-    <Card className="overflow-hidden border-border/70 bg-gradient-to-br from-background via-background to-muted/40">
+    <Card className="overflow-hidden border-border/70">
       <CardContent className="flex items-center gap-4 p-4">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-2xl shadow-sm">
           {profile.icon || getInitials(profile.name)}

@@ -1,9 +1,4 @@
-import {
-  ChevronsUpDown,
-  PersonStandingIcon,
-  Plus,
-  WalletMinimalIcon,
-} from "lucide-react";
+import { PersonStandingIcon, Plus } from "lucide-react";
 
 import { useAppProfile, useAppProfiles } from "@/hooks/use-app";
 
@@ -22,6 +17,12 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallback,
+  AvatarImage,
+} from "@workspace/ui/components/avatar";
 
 export function TeamSwitcher() {
   const activeProfile = useAppProfile();
@@ -32,9 +33,13 @@ export function TeamSwitcher() {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg" className="md:h-8 md:p-0">
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              <WalletMinimalIcon className="size-4" />
-            </div>
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/evilrabbit.png"
+                alt="@evilrabbit"
+              />
+              <AvatarFallback>ER</AvatarFallback>
+            </Avatar>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -46,46 +51,40 @@ export function TeamSwitcher() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={<SidebarMenuButton size="lg" className="md:h-8 md:p-0" />}
+            render={<SidebarMenuButton size="sm" className="md:h-8 md:p-0" />}
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              <WalletMinimalIcon className="size-4" />
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">
-                {activeProfile?.name}
-              </span>
-            </div>
-            <ChevronsUpDown className="ml-auto" />
+            <Avatar size="sm">
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="min-w-56 rounded-lg"
             align="start"
             side={"bottom"}
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Other profiles
-              </DropdownMenuLabel>
+              <DropdownMenuLabel>Other profiles</DropdownMenuLabel>
+              {allProfiles.map((profile, index) => (
+                <DropdownMenuItem
+                  key={profile.id}
+                  className="gap-2 p-2"
+                  disabled={activeProfile.id === profile.id}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <PersonStandingIcon className="size-3.5 shrink-0" />
+                  </div>
+                  {profile.name}
+                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
 
-            {allProfiles.map((profile, index) => (
-              <DropdownMenuItem
-                key={profile.id}
-                className="gap-2 p-2"
-                disabled={activeProfile.id === profile.id}
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <PersonStandingIcon className="size-3.5 shrink-0" />
-                </div>
-                {profile.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+
+            <DropdownMenuItem className="gap-2 p-2" disabled>
+              <div className="flex size-6 items-center justify-center rounded-md border">
                 <Plus className="size-4" />
               </div>
               <div className="font-medium text-muted-foreground">Add team</div>
