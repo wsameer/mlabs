@@ -45,13 +45,11 @@ export function AppLeftSideNav({
       {...props}
     >
       <SidebarHeader className="flex items-center justify-center py-2">
-        <div className="grid size-8 place-items-center rounded-lg bg-secondary text-primary-foreground shadow-sm">
-          <img
-            src="/mlabs-icon.png"
-            alt="mlabs"
-            className="size-6 object-contain"
-          />
-        </div>
+        <img
+          src="/mlabs-icon.png"
+          alt="mlabs"
+          className="size-8 object-contain"
+        />
       </SidebarHeader>
 
       <SidebarContent>
