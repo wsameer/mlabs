@@ -26,7 +26,13 @@ describe("sidecar bundle layout (bun-compiled)", () => {
     expect(existsSync(path.join(resources, "web", "index.html"))).toBe(true);
     expect(
       existsSync(
-        path.join(resources, "node_modules", "@libsql", "darwin-arm64", "index.node")
+        path.join(
+          resources,
+          "node_modules",
+          "@libsql",
+          "darwin-arm64",
+          "index.node"
+        )
       )
     ).toBe(true);
   });

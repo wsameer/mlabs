@@ -1,4 +1,4 @@
-import { MinusIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 
 import type { Account } from "@workspace/types";
 

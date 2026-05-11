@@ -31,7 +31,7 @@ function preflightBun() {
   } catch {
     throw new Error(
       "bun is required but not on PATH. Install with:\n" +
-      "  curl -fsSL https://bun.sh/install | bash"
+        "  curl -fsSL https://bun.sh/install | bash"
     );
   }
 }
@@ -42,7 +42,6 @@ function clean() {
   mkdirSync(resources, { recursive: true });
   mkdirSync(bin, { recursive: true });
 }
-
 
 function stageWeb() {
   // Use `vite build` directly rather than the workspace `build` script, which
@@ -137,12 +136,7 @@ function stageLibsqlModules() {
     console.log(`Staged ${dep} from ${src}`);
   }
   // Sanity-check the native binding actually got copied.
-  const nodeBinding = path.join(
-    nmOut,
-    "@libsql",
-    "darwin-arm64",
-    "index.node"
-  );
+  const nodeBinding = path.join(nmOut, "@libsql", "darwin-arm64", "index.node");
   if (!existsSync(nodeBinding)) {
     throw new Error(
       `libsql native binding missing after staging: ${nodeBinding}`

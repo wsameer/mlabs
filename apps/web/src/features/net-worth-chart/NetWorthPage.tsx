@@ -19,10 +19,10 @@ export function NetWorthPage() {
   return (
     <div className="mx-auto w-full max-w-2xl p-6 md:p-8">
       <h2 className="text-lg font-semibold">Coming soon</h2>
-      <p className="text-muted-foreground mt-1 text-sm">
+      <p className="mt-1 text-sm text-muted-foreground">
         Possible features for this section:
       </p>
-      <ul className="text-muted-foreground mt-4 list-disc space-y-2 pl-5 text-sm">
+      <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
         {FEATURE_IDEAS.map((idea) => (
           <li key={idea}>{idea}</li>
         ))}

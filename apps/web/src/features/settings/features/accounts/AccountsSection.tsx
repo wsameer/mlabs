@@ -14,7 +14,7 @@ import { EditAccountDialog } from "./EditAccountDialog";
 import { DeleteAccountDialog } from "./DeleteAccountDialog";
 import { AccountGroupList } from "./AccountGroupList";
 import { useAccountsSection } from "./useAccountsSection";
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 
 export function AccountsSection() {
   const {

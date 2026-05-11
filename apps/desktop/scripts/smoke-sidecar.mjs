@@ -14,7 +14,10 @@ const bin = path.join(tauri, "bin");
 
 const SMOKE_PORT = 39099;
 
-async function waitForOk(url, { retries = 80, delayMs = 250, isChildAlive } = {}) {
+async function waitForOk(
+  url,
+  { retries = 80, delayMs = 250, isChildAlive } = {}
+) {
   for (let i = 0; i < retries; i++) {
     if (isChildAlive && !isChildAlive()) {
       throw new Error(`sidecar exited before ${url} became ready`);
@@ -90,13 +93,18 @@ async function main() {
     }
     // DB-touching probe: bootstrap is a public route that reads the profiles table.
     // If libsql native binding loaded correctly, this returns 200 with a JSON body.
-    const res = await waitForOk(`http://127.0.0.1:${SMOKE_PORT}/api/bootstrap`, {
-      isChildAlive: () => childAlive,
-      retries: 20,
-    });
+    const res = await waitForOk(
+      `http://127.0.0.1:${SMOKE_PORT}/api/bootstrap`,
+      {
+        isChildAlive: () => childAlive,
+        retries: 20,
+      }
+    );
     const body = await res.json();
     if (typeof body !== "object" || body === null) {
-      throw new Error(`/api/bootstrap returned unexpected body: ${JSON.stringify(body)}`);
+      throw new Error(
+        `/api/bootstrap returned unexpected body: ${JSON.stringify(body)}`
+      );
     }
     console.log("smoke: OK (health + bootstrap)");
   } finally {
