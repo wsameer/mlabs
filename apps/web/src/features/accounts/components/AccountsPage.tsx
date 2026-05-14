@@ -21,6 +21,7 @@ import { formatCurrency } from "../lib/format-utils";
 import { EmptyAccounts } from "./EmptyAccounts";
 import { AccountsView } from "./AccountsView";
 import { AccountKpis } from "./AccountKpis";
+import { AccountsRail } from "./AccountsRail";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -73,29 +74,35 @@ export function AccountsPage() {
   const { netWorth } = calculateAccountTotals(accounts);
 
   return (
-    <div className="flex flex-col gap-4">
-      <header>
-        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Net worth
-        </p>
-        <p className="mt-1 text-2xl text-foreground tabular-nums md:text-3xl">
-          {formatCurrency(netWorth, currency)}
-        </p>
-      </header>
+    <div className="flex w-full gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <header>
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Net worth
+          </p>
+          <p className="mt-1 text-2xl text-foreground tabular-nums md:text-3xl">
+            {formatCurrency(netWorth, currency)}
+          </p>
+        </header>
 
-      <div className="grid items-stretch gap-4 md:grid-cols-12">
-        <div className="flex flex-col md:col-span-7">
-          <NetWorthChart />
+        <div className="grid items-stretch gap-4 md:grid-cols-12">
+          <div className="flex flex-col md:col-span-7">
+            <NetWorthChart />
+          </div>
+          <div className="flex flex-col md:col-span-5">
+            <AccountKpis accounts={accounts} currency={currency} />
+          </div>
         </div>
-        <div className="flex flex-col md:col-span-5">
-          <AccountKpis accounts={accounts} currency={currency} />
-        </div>
+
+        <section>
+          <h2 className="mb-2 text-sm font-medium text-foreground">Accounts</h2>
+          <AccountsView accounts={accounts} />
+        </section>
       </div>
 
-      <section>
-        <h2 className="mb-2 text-sm font-medium text-foreground">Accounts</h2>
-        <AccountsView accounts={accounts} />
-      </section>
+      <aside className="hidden w-72 shrink-0 lg:block">
+        <AccountsRail accounts={accounts} currency={currency} />
+      </aside>
     </div>
   );
 }
