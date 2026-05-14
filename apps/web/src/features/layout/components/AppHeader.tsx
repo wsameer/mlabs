@@ -15,7 +15,7 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import { ArrowLeftIcon, SearchIcon } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export const AppHeader = () => {
     mobileBackPath,
     onMobileBack,
   } = useHeaderConfig();
-  const { setGlobalSearch } = useUiActions();
+  const { setGlobalSearch, setOpenCreateTransaction } = useUiActions();
   const backendStatus = useAppStore((s) => s.backendStatus);
   const isBackendConnected = backendStatus === "connected";
   const crumbs: BreadcrumbType[] =
@@ -34,6 +34,11 @@ export const AppHeader = () => {
       ? breadcrumbs
       : [{ label: pageTitle }];
   const showBackButton = Boolean(mobileBackPath || onMobileBack);
+
+  const handleAddTransaction = () => {
+    if (!isBackendConnected) return;
+    setOpenCreateTransaction(true);
+  };
 
   const handleBack = () => {
     if (onMobileBack) {
@@ -83,7 +88,18 @@ export const AppHeader = () => {
           aria-label="Search"
         >
           <SearchIcon className="size-4" />
-          <span className="text-xs text-muted-foreground" aria-hidden="true">⌘K</span>
+          <span className="text-xs text-muted-foreground" aria-hidden="true">
+            ⌘K
+          </span>
+        </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleAddTransaction}
+          disabled={!isBackendConnected}
+        >
+          <PlusIcon className="size-4" />
+          <span>Add transaction</span>
         </Button>
       </div>
     </div>
@@ -115,7 +131,9 @@ export const AppHeader = () => {
           aria-label="Search"
         >
           <SearchIcon className="size-4" />
-          <span className="text-xs text-muted-foreground" aria-hidden="true">⌘K</span>
+          <span className="text-xs text-muted-foreground" aria-hidden="true">
+            ⌘K
+          </span>
         </Button>
       </div>
     </div>
