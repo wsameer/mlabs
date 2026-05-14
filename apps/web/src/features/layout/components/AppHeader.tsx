@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { useHeaderConfig } from "@/hooks/use-layout";
 import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores";
 import type { Breadcrumb as BreadcrumbType } from "@/stores/slices/layout-slice";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -26,6 +27,8 @@ export const AppHeader = () => {
     onMobileBack,
   } = useHeaderConfig();
   const { setGlobalSearch } = useUiActions();
+  const backendStatus = useAppStore((s) => s.backendStatus);
+  const isBackendConnected = backendStatus === "connected";
   const crumbs: BreadcrumbType[] =
     breadcrumbs && breadcrumbs.length > 0
       ? breadcrumbs
@@ -41,7 +44,7 @@ export const AppHeader = () => {
   };
 
   const renderDesktopHeader = () => (
-    <div className="hidden md:flex md:items-center md:justify-between md:gap-2 md:px-4">
+    <div className="hidden md:flex md:w-full md:items-center md:justify-between md:gap-2 md:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator
@@ -69,6 +72,19 @@ export const AppHeader = () => {
             })}
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
+      <div className="flex items-center gap-2">
+        {headerActions}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setGlobalSearch(true)}
+          disabled={!isBackendConnected}
+          aria-label="Search"
+        >
+          <SearchIcon className="size-4" />
+          <span className="text-xs text-muted-foreground" aria-hidden="true">⌘K</span>
+        </Button>
       </div>
     </div>
   );
@@ -99,7 +115,7 @@ export const AppHeader = () => {
           aria-label="Search"
         >
           <SearchIcon className="size-4" />
-          <span className="text-xs text-muted-foreground">⌘K</span>
+          <span className="text-xs text-muted-foreground" aria-hidden="true">⌘K</span>
         </Button>
       </div>
     </div>
