@@ -59,30 +59,39 @@ export function DashboardPage() {
   return (
     <div className="flex w-full flex-col gap-2 pt-2 lg:max-w-md">
       <DateRangeFilter />
-      <Tabs
-        value={activeTab === "EXPENSE" ? "expense" : "income"}
-        onValueChange={(v) =>
-          setActiveTab(v === "income" ? "INCOME" : "EXPENSE")
-        }
-        className="w-full"
-      >
-        <TabsList className="w-full rounded-full p-1">
-          <TabsTrigger
-            value="income"
-            className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
+
+      <Card>
+        <CardContent>
+          <Tabs
+            value={activeTab === "EXPENSE" ? "expense" : "income"}
+            onValueChange={(v) =>
+              setActiveTab(v === "income" ? "INCOME" : "EXPENSE")
+            }
+            className="w-full"
           >
-            Income
-          </TabsTrigger>
-          <TabsTrigger
-            value="expense"
-            className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
-          >
-            Expense
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="income">{renderTransactionsSummary()}</TabsContent>
-        <TabsContent value="expense">{renderTransactionsSummary()}</TabsContent>
-      </Tabs>
+            <TabsList className="w-full rounded-full p-1">
+              <TabsTrigger
+                value="income"
+                className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
+              >
+                Income
+              </TabsTrigger>
+              <TabsTrigger
+                value="expense"
+                className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
+              >
+                Expense
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="income">
+              {renderTransactionsSummary()}
+            </TabsContent>
+            <TabsContent value="expense">
+              {renderTransactionsSummary()}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 }

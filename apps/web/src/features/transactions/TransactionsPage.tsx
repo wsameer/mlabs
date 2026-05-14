@@ -328,13 +328,13 @@ export function TransactionsPage() {
         />
       </div>
 
-      <aside className="hidden w-72 shrink-0 lg:block">
+      <div className="hidden w-72 shrink-0 lg:block">
         <TransactionsSummaryContent
           transactions={transactions}
           categoryMap={categoryMap}
           accountMap={accountMap}
         />
-      </aside>
+      </div>
     </div>
   );
 }

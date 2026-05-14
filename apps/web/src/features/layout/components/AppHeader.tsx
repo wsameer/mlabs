@@ -87,7 +87,7 @@ export const AppHeader = () => {
           disabled={!isBackendConnected}
           aria-label="Search"
         >
-          <SearchIcon className="size-4" />
+          <SearchIcon className="size-3" />
           <span className="text-xs text-muted-foreground" aria-hidden="true">
             ⌘K
           </span>
@@ -98,7 +98,7 @@ export const AppHeader = () => {
           onClick={handleAddTransaction}
           disabled={!isBackendConnected}
         >
-          <PlusIcon className="size-4" />
+          <PlusIcon className="size-3" />
           <span>Add transaction</span>
         </Button>
       </div>
@@ -140,7 +140,7 @@ export const AppHeader = () => {
   );
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+    <header className="flex h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       {renderDesktopHeader()}
       {renderMobileHeader()}
     </header>
