@@ -1,7 +1,8 @@
+import { Fragment } from "react";
 import { useHeaderConfig } from "@/hooks/use-layout";
 import { useUiActions } from "@/hooks/use-ui-store";
-import { useAppStore } from "@/stores";
-import { useNavigate } from "@tanstack/react-router";
+import type { Breadcrumb as BreadcrumbType } from "@/stores/slices/layout-slice";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,15 +25,12 @@ export const AppHeader = () => {
     mobileBackPath,
     onMobileBack,
   } = useHeaderConfig();
-  const { setGlobalSearch, setOpenCreateTransaction } = useUiActions();
+  const { setGlobalSearch } = useUiActions();
+  const crumbs: BreadcrumbType[] =
+    breadcrumbs && breadcrumbs.length > 0
+      ? breadcrumbs
+      : [{ label: pageTitle }];
   const showBackButton = Boolean(mobileBackPath || onMobileBack);
-  const backendStatus = useAppStore((s) => s.backendStatus);
-  const isBackendConnected = backendStatus === "connected";
-
-  const handleAddTransaction = () => {
-    if (!isBackendConnected) return;
-    setOpenCreateTransaction(true);
-  };
 
   const handleBack = () => {
     if (onMobileBack) {
@@ -52,13 +50,23 @@ export const AppHeader = () => {
         />
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
+            {crumbs.map((c, i) => {
+              const isLast = i === crumbs.length - 1;
+              return (
+                <Fragment key={`${c.label}-${i}`}>
+                  <BreadcrumbItem>
+                    {isLast || !c.to ? (
+                      <BreadcrumbPage>{c.label}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink render={<Link to={c.to} />}>
+                        {c.label}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && <BreadcrumbSeparator />}
+                </Fragment>
+              );
+            })}
           </BreadcrumbList>
         </Breadcrumb>
       </div>
