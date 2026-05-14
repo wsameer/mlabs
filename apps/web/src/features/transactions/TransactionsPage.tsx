@@ -17,10 +17,7 @@ import { EmptyTransactions } from "./components/EmptyTransactions";
 import { FilteredEmpty } from "./components/FilteredEmpty";
 import { EditTransactionDialog } from "./edit-transaction";
 import { DeleteTransactionDialog } from "./delete-transaction";
-import {
-  TransactionsSummaryContent,
-  TransactionsSummaryMobile,
-} from "./summary";
+import { TransactionsSummaryMobile } from "./summary";
 import {
   Item,
   ItemActions,
@@ -105,18 +102,6 @@ export function TransactionsPage() {
 
   const transactions = useMemo(() => data?.transactions ?? [], [data]);
 
-  const sidebarContent = useMemo(
-    () =>
-      transactions.length > 0 ? (
-        <TransactionsSummaryContent
-          transactions={transactions}
-          categoryMap={categoryMap}
-          accountMap={accountMap}
-        />
-      ) : null,
-    [transactions, categoryMap, accountMap]
-  );
-
   const isAccountScoped = (filterState.accountIds?.length ?? 0) > 0;
 
   const handleMobileBack = useCallback(() => {
@@ -130,7 +115,6 @@ export function TransactionsPage() {
   useLayoutConfig({
     pageTitle: "Transactions",
     actions: <TimeGrainSelect />,
-    leftSidebarContent: sidebarContent,
     breadcrumbs: isAccountScoped
       ? [{ label: "Accounts", to: ACCOUNTS_ROUTE }, { label: "Transactions" }]
       : null,

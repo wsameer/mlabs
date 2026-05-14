@@ -6,7 +6,6 @@ import {
   breadcrumbsSelector,
   mobileBackPathSelector,
   onMobileBackSelector,
-  sidebarLeftContentSelector,
 } from "@/stores/selectors/layout-selectors";
 
 // Individual atomic selectors (use these by default)
@@ -15,8 +14,6 @@ export const useHeaderActions = () => useAppStore(headerActionsSelector);
 export const useBreadcrumbs = () => useAppStore(breadcrumbsSelector);
 export const useMobileBackPath = () => useAppStore(mobileBackPathSelector);
 export const useOnMobileBack = () => useAppStore(onMobileBackSelector);
-export const useSidebarLeftContent = () =>
-  useAppStore(sidebarLeftContentSelector);
 
 // Grouped selectors (use only when consuming multiple values together)
 export const useHeaderConfig = () =>
@@ -39,7 +36,6 @@ export const useLayoutActions = () =>
       setBreadcrumbs: state.setBreadcrumbs,
       setMobileBackPath: state.setMobileBackPath,
       setOnMobileBack: state.setOnMobileBack,
-      setSidebarLeftContent: state.setSidebarLeftContent,
       resetLayout: state.resetLayout,
     }))
   );

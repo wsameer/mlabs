@@ -9,7 +9,6 @@ type LayoutConfig = {
   breadcrumbs?: Breadcrumb[] | null;
   mobileBackPath?: string | null;
   onMobileBack?: (() => void) | null;
-  leftSidebarContent?: React.ReactNode;
 };
 
 export function useLayoutConfig(config: LayoutConfig) {
@@ -19,7 +18,6 @@ export function useLayoutConfig(config: LayoutConfig) {
     setBreadcrumbs,
     setMobileBackPath,
     setOnMobileBack,
-    setSidebarLeftContent: setLeftSidebarContent,
     resetLayout,
   } = useLayoutActions();
 
@@ -43,11 +41,6 @@ export function useLayoutConfig(config: LayoutConfig) {
   useEffect(() => {
     if (config.onMobileBack !== undefined) setOnMobileBack(config.onMobileBack);
   }, [config.onMobileBack, setOnMobileBack]);
-
-  useEffect(() => {
-    if (config.leftSidebarContent !== undefined)
-      setLeftSidebarContent(config.leftSidebarContent);
-  }, [config.leftSidebarContent, setLeftSidebarContent]);
 
   useEffect(() => {
     return () => {

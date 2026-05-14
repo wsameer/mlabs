@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { AlertCircleIcon } from "lucide-react";
 
 import { useLayoutConfig } from "@/features/layout";
@@ -21,7 +21,6 @@ import { formatCurrency } from "../lib/format-utils";
 import { EmptyAccounts } from "./EmptyAccounts";
 import { AccountsView } from "./AccountsView";
 import { AccountKpis } from "./AccountKpis";
-import { AccountsRail } from "./AccountsRail";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -30,17 +29,8 @@ export function AccountsPage() {
 
   const currency = accounts?.[0]?.currency ?? "CAD";
 
-  const railContent = useMemo(
-    () =>
-      hasAccounts && accounts ? (
-        <AccountsRail accounts={accounts} currency={currency} />
-      ) : null,
-    [hasAccounts, accounts, currency]
-  );
-
   useLayoutConfig({
     pageTitle: "Accounts",
-    leftSidebarContent: railContent,
     actions: <AddAccount size="sm" />,
   });
 
