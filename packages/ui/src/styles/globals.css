@@ -19,6 +19,13 @@
     --color-sidebar-primary: var(--sidebar-primary);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar: var(--sidebar);
+    --color-expense: var(--expense);
+    --color-income: var(--income);
+    --color-chart-10: var(--chart-10);
+    --color-chart-9: var(--chart-9);
+    --color-chart-8: var(--chart-8);
+    --color-chart-7: var(--chart-7);
+    --color-chart-6: var(--chart-6);
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -73,11 +80,21 @@
     --border: oklch(0.93 0.007 106.5);
     --input: oklch(0.93 0.007 106.5);
     --ring: oklch(0.737 0.021 106.9);
-    --chart-1: oklch(0.88 0.011 106.6);
-    --chart-2: oklch(0.58 0.031 107.3);
-    --chart-3: oklch(0.466 0.025 107.3);
-    --chart-4: oklch(0.394 0.023 107.4);
-    --chart-5: oklch(0.286 0.016 107.4);
+    /* Chart palette: Dusty Editorial — muted multi-hue at L 0.50–0.66.
+       Contract: keep all chart hues at L ≤ 0.72 so white text passes
+       WCAG AA on chart fills (see CategoryStatList badge). */
+    --chart-1: oklch(0.62 0.10 200);
+    --chart-2: oklch(0.66 0.10 80);
+    --chart-3: oklch(0.58 0.10 25);
+    --chart-4: oklch(0.55 0.09 320);
+    --chart-5: oklch(0.62 0.09 145);
+    --chart-6: oklch(0.60 0.10 260);
+    --chart-7: oklch(0.66 0.10 50);
+    --chart-8: oklch(0.58 0.10 350);
+    --chart-9: oklch(0.55 0.09 175);
+    --chart-10: oklch(0.50 0.08 290);
+    --income: oklch(0.55 0.10 150);
+    --expense: oklch(0.55 0.13 25);
     --radius: 0.625rem;
     --sidebar: oklch(0.988 0.003 106.5);
     --sidebar-foreground: oklch(0.153 0.006 107.1);
@@ -108,11 +125,19 @@
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.58 0.031 107.3);
-    --chart-1: oklch(0.88 0.011 106.6);
-    --chart-2: oklch(0.58 0.031 107.3);
-    --chart-3: oklch(0.466 0.025 107.3);
-    --chart-4: oklch(0.394 0.023 107.4);
-    --chart-5: oklch(0.286 0.016 107.4);
+    /* Dark mode: same hue/chroma as light, +0.04 lift for contrast on dark card. */
+    --chart-1: oklch(0.66 0.10 200);
+    --chart-2: oklch(0.70 0.10 80);
+    --chart-3: oklch(0.62 0.10 25);
+    --chart-4: oklch(0.60 0.09 320);
+    --chart-5: oklch(0.66 0.09 145);
+    --chart-6: oklch(0.64 0.10 260);
+    --chart-7: oklch(0.70 0.10 50);
+    --chart-8: oklch(0.62 0.10 350);
+    --chart-9: oklch(0.60 0.09 175);
+    --chart-10: oklch(0.55 0.08 290);
+    --income: oklch(0.62 0.10 150);
+    --expense: oklch(0.62 0.13 25);
     --sidebar: oklch(0.228 0.013 107.4);
     --sidebar-foreground: oklch(0.988 0.003 106.5);
     --sidebar-primary: oklch(0.488 0.243 264.376);

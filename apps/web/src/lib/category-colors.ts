@@ -7,6 +7,10 @@ const CHART_PALETTE = [
   "var(--chart-4)",
   "var(--chart-5)",
   "var(--chart-6)",
+  "var(--chart-7)",
+  "var(--chart-8)",
+  "var(--chart-9)",
+  "var(--chart-10)",
 ];
 
 export type CategoryColorMap = Record<string, string>;
