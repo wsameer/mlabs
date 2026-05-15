@@ -64,7 +64,9 @@ export const AppHeader = () => {
                 <Fragment key={`${c.label}-${i}`}>
                   <BreadcrumbItem>
                     {isLast || !c.to ? (
-                      <BreadcrumbPage>{c.label}</BreadcrumbPage>
+                      <BreadcrumbPage className="text-sm">
+                        {c.label}
+                      </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink render={<Link to={c.to} />}>
                         {c.label}

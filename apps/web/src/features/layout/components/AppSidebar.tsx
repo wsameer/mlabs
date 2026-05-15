@@ -13,7 +13,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navRef = React.useRef(null);
 
   return (
-    <Sidebar collapsible="icon" ref={navRef} {...props}>
+    <Sidebar variant="inset" collapsible="icon" ref={navRef} {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>

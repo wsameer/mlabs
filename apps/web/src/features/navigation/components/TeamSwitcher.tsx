@@ -23,6 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
+import { Command } from "@workspace/ui/components/command";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -77,7 +78,7 @@ export function TeamSwitcher() {
               />
             }
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-black text-sidebar-primary-foreground dark:bg-white">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-olive-800 text-sidebar-primary-foreground">
               <img
                 src="/mlabs-icon.png"
                 alt="mlabs"
