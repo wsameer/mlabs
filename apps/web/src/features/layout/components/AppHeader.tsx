@@ -90,7 +90,7 @@ export const AppHeader = () => {
           aria-label="Search"
         >
           <SearchIcon className="size-3" />
-          <span className="text-xs text-muted-foreground" aria-hidden="true">
+          <span className="text-xs" aria-hidden="true">
             ⌘K
           </span>
         </Button>

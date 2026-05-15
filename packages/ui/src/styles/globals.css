@@ -63,6 +63,7 @@
 
 :root {
   --background: oklch(0.961 0.003 106.5);
+  --accent-glow: oklch(0.95 0.06 145);
   --foreground: oklch(0.153 0.006 107.1);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.153 0.006 107.1);
@@ -149,9 +150,21 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
+    /* We use bg-background for the fallback/base color */
     @apply bg-background text-foreground;
+
+    /* Apply the mesh gradient effect */
+    background-image:
+      radial-gradient(at 0% 0%, var(--accent-glow) 0%, transparent 50%),
+      radial-gradient(at 100% 0%, oklch(0.98 0.01 200) 0%, transparent 40%);
+
+    /* Ensures the gradient stays fixed as you scroll */
+    background-attachment: fixed;
+    min-height: 100vh;
   }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
