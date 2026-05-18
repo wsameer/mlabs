@@ -1,4 +1,10 @@
-import { accounts, profiles, seedCategoriesForProfile } from "@workspace/db";
+import {
+  accounts,
+  categories,
+  profiles,
+  seedCategoriesForProfile,
+  transactions,
+} from "@workspace/db";
 import type {
   CreateOnboardingProfile,
   Profile,
@@ -7,11 +13,16 @@ import type {
 
 import { db, eq, sql } from "../libs/db.js";
 import {
+  BadRequestError,
   ConflictError,
   InternalServerError,
   NotFoundError,
 } from "../libs/errors.js";
 import { serializeProfile } from "./profile-serializer.js";
+
+function namesMatch(a: string, b: string) {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
 
 export class ProfilesService {
   private normalizeNotes(notes: string | undefined) {
@@ -146,6 +157,112 @@ export class ProfilesService {
     }
 
     return serializeProfile(updatedProfile);
+  }
+
+  async deleteProfile(id: string, confirmName: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      const [profile] = await tx
+        .select()
+        .from(profiles)
+        .where(eq(profiles.id, id))
+        .limit(1);
+
+      if (!profile) {
+        throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+      }
+
+      if (!namesMatch(profile.name, confirmName)) {
+        throw new BadRequestError(
+          "Workspace name does not match",
+          "NAME_MISMATCH"
+        );
+      }
+
+      // FK cascades remove accounts, categories, and transactions.
+      const deleted = await tx
+        .delete(profiles)
+        .where(eq(profiles.id, id))
+        .returning({ id: profiles.id });
+
+      if (deleted.length === 0) {
+        throw new InternalServerError(
+          "Failed to delete profile",
+          "PROFILE_DELETE_FAILED"
+        );
+      }
+
+      // Promote another profile to default if one exists, so bootstrap can
+      // resolve to "ready" or "pick" instead of nothing.
+      if (profile.isDefault) {
+        const [next] = await tx
+          .select({ id: profiles.id })
+          .from(profiles)
+          .where(eq(profiles.isActive, true))
+          .limit(1);
+
+        if (next) {
+          await tx
+            .update(profiles)
+            .set({ isDefault: true, updatedAt: new Date() })
+            .where(eq(profiles.id, next.id));
+        }
+      }
+    });
+  }
+
+  async clearTransactions(id: string, confirmName: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      const [profile] = await tx
+        .select()
+        .from(profiles)
+        .where(eq(profiles.id, id))
+        .limit(1);
+
+      if (!profile) {
+        throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+      }
+
+      if (!namesMatch(profile.name, confirmName)) {
+        throw new BadRequestError(
+          "Workspace name does not match",
+          "NAME_MISMATCH"
+        );
+      }
+
+      await tx.delete(transactions).where(eq(transactions.profileId, id));
+
+      await tx
+        .update(accounts)
+        .set({ balance: "0", updatedAt: new Date() })
+        .where(eq(accounts.profileId, id));
+    });
+  }
+
+  async factoryReset(id: string, confirmName: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      const [profile] = await tx
+        .select()
+        .from(profiles)
+        .where(eq(profiles.id, id))
+        .limit(1);
+
+      if (!profile) {
+        throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+      }
+
+      if (!namesMatch(profile.name, confirmName)) {
+        throw new BadRequestError(
+          "Workspace name does not match",
+          "NAME_MISMATCH"
+        );
+      }
+
+      await tx.delete(transactions).where(eq(transactions.profileId, id));
+      await tx.delete(accounts).where(eq(accounts.profileId, id));
+      await tx.delete(categories).where(eq(categories.profileId, id));
+
+      await seedCategoriesForProfile(tx, id);
+    });
   }
 }
 

@@ -55,6 +55,10 @@ const CheckNameQuerySchema = z.object({
   name: z.string().min(1),
 });
 
+const ConfirmNameBodySchema = z.object({
+  confirmName: z.string().min(1),
+});
+
 // ---------------------------------------------------------------------------
 // POST / — Create onboarding profile
 // ---------------------------------------------------------------------------
@@ -185,6 +189,134 @@ profilesRoute.openapi(updateProfileRoute, async (c) => {
   const payload = c.req.valid("json") as unknown as UpdateProfile;
   const updatedProfile = await profilesService.updateProfile(id, payload);
   return c.json({ success: true as const, data: updatedProfile }, 200);
+});
+
+// ---------------------------------------------------------------------------
+// DELETE /:id — Delete profile (workspace) with name confirmation
+// ---------------------------------------------------------------------------
+
+const OkSchema = z.object({ ok: z.literal(true) });
+
+const deleteProfileRoute = createRoute({
+  method: "delete",
+  path: "/{id}",
+  tags: ["Profiles"],
+  summary: "Delete profile and all its data",
+  description:
+    "Permanently deletes the profile, its accounts, categories, and transactions. Requires the workspace name as confirmation.",
+  request: {
+    params: IdParamSchema,
+    body: {
+      content: {
+        "application/json": { schema: ConfirmNameBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(OkSchema) } },
+      description: "Profile deleted",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Workspace name did not match",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Profile not found",
+    },
+  },
+});
+
+profilesRoute.openapi(deleteProfileRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  const { confirmName } = c.req.valid("json");
+  await profilesService.deleteProfile(id, confirmName);
+  return c.json({ success: true as const, data: { ok: true as const } }, 200);
+});
+
+// ---------------------------------------------------------------------------
+// POST /:id/clear-transactions — Delete all transactions, reset balances
+// ---------------------------------------------------------------------------
+
+const clearTransactionsRoute = createRoute({
+  method: "post",
+  path: "/{id}/clear-transactions",
+  tags: ["Profiles"],
+  summary: "Delete all transactions and reset account balances",
+  description:
+    "Removes every transaction in the workspace and resets each account's balance to 0. Accounts, categories, and preferences are preserved. Requires the workspace name as confirmation.",
+  request: {
+    params: IdParamSchema,
+    body: {
+      content: {
+        "application/json": { schema: ConfirmNameBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(OkSchema) } },
+      description: "Transactions cleared",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Workspace name did not match",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Profile not found",
+    },
+  },
+});
+
+profilesRoute.openapi(clearTransactionsRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  const { confirmName } = c.req.valid("json");
+  await profilesService.clearTransactions(id, confirmName);
+  return c.json({ success: true as const, data: { ok: true as const } }, 200);
+});
+
+// ---------------------------------------------------------------------------
+// POST /:id/factory-reset — Delete accounts, categories, transactions; reseed
+// ---------------------------------------------------------------------------
+
+const factoryResetRoute = createRoute({
+  method: "post",
+  path: "/{id}/factory-reset",
+  tags: ["Profiles"],
+  summary: "Factory reset workspace data",
+  description:
+    "Deletes all accounts, categories, and transactions for the workspace, then re-seeds the default categories. The profile and its preferences are preserved. Requires the workspace name as confirmation.",
+  request: {
+    params: IdParamSchema,
+    body: {
+      content: {
+        "application/json": { schema: ConfirmNameBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: apiResponseSchema(OkSchema) } },
+      description: "Workspace reset",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Workspace name did not match",
+    },
+    404: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Profile not found",
+    },
+  },
+});
+
+profilesRoute.openapi(factoryResetRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  const { confirmName } = c.req.valid("json");
+  await profilesService.factoryReset(id, confirmName);
+  return c.json({ success: true as const, data: { ok: true as const } }, 200);
 });
 
 export default profilesRoute;
