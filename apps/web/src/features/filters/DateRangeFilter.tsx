@@ -153,7 +153,6 @@ export const DateRangeFilter = () => {
   return (
     <div className="flex content-center items-center justify-between">
       <Button
-        variant="default"
         size="icon"
         aria-label="Previous date range"
         disabled={prevDisabled}
