@@ -1,1 +1,1 @@
-export { AddTransactionPopover } from "./AddTransactionPopover";
+export { CreateTransactionDialog } from "./CreateTransactionDialog";

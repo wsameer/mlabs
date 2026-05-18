@@ -24,6 +24,7 @@ import { CategoriesSection } from "./features/category-management";
 import { AccountsSection } from "./features/accounts";
 import { BackupSection } from "./features/backup";
 import { ImportSection } from "./features/import-transactions";
+import { DangerZoneSection } from "./features/danger-zone";
 
 export function SettingsPage() {
   const isMobile = useIsMobile();
@@ -126,6 +127,7 @@ export function SettingsPage() {
         {resolvedSection === "accounts" && <AccountsSection />}
         {resolvedSection === "import" && <ImportSection />}
         {resolvedSection === "backup" && <BackupSection />}
+        {resolvedSection === "danger" && <DangerZoneSection />}
       </div>
     </div>
   );

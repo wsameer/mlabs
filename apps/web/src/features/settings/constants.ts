@@ -5,6 +5,7 @@ import {
   ImportIcon,
   SlidersHorizontalIcon,
   TagsIcon,
+  TriangleAlertIcon,
   UserIcon,
   WalletCardsIcon,
 } from "lucide-react";
@@ -17,7 +18,8 @@ export type SettingsSectionId =
   | "categories"
   | "accounts"
   | "import"
-  | "backup";
+  | "backup"
+  | "danger";
 
 export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
   "profile",
@@ -27,6 +29,7 @@ export const SETTINGS_SECTION_IDS: SettingsSectionId[] = [
   "accounts",
   "import",
   "backup",
+  "danger",
 ];
 
 export const SettingsSearchSchema = z.object({
@@ -84,5 +87,11 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     label: "Backup",
     description: "Export data and restore backups",
     icon: DatabaseBackupIcon,
+  },
+  {
+    id: "danger",
+    label: "Danger zone",
+    description: "Reset or delete your workspace",
+    icon: TriangleAlertIcon,
   },
 ];

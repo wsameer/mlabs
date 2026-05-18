@@ -3,13 +3,7 @@ import { format } from "date-fns";
 import { CashflowPieChart } from "@/components/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import {
   Tabs,
   TabsContent,

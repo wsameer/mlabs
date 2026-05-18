@@ -100,7 +100,7 @@ export function AccountsPage() {
         </section>
       </div>
 
-      <aside className="hidden w-72 shrink-0 lg:block">
+      <aside className="w-72">
         <AccountsRail accounts={accounts} currency={currency} />
       </aside>
     </div>

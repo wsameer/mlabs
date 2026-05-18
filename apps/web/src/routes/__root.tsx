@@ -22,7 +22,7 @@ import {
 import { AppHeader, AppSidebar } from "@/features/layout";
 import { SearchDialog } from "@/components/SearchDialog";
 import { useUiActions } from "@/hooks/use-ui-store";
-import { AddTransactionPopover } from "@/features/transactions";
+import { CreateTransactionDialog } from "@/features/transactions";
 import { CreateAccountDialog } from "@/features/add-accounts/CreateAccountDialog";
 
 import { NotFoundComponent } from "./404";
@@ -83,7 +83,7 @@ function RootComponent() {
         </div>
         <AppBottombar />
         <SearchDialog />
-        <AddTransactionPopover />
+        <CreateTransactionDialog />
         <CreateAccountDialog />
       </SidebarInset>
     </SidebarProvider>

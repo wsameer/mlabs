@@ -26,7 +26,7 @@ import { Button } from "@workspace/ui/components/button";
 
 import { TransactionsWrapper } from "./components/TransactionsWrapper";
 
-export function AddTransactionPopover() {
+export function CreateTransactionDialog() {
   const isOpen = useOpenCreateTransaction();
   const selectedTransactionType = useTransactionType();
   const isDesktop = useMediaQuery("(min-width: 768px)");
