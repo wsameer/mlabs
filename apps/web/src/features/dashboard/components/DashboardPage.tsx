@@ -3,7 +3,13 @@ import { format } from "date-fns";
 import { CashflowPieChart } from "@/components/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import {
   Tabs,
   TabsContent,
@@ -69,19 +75,9 @@ export function DashboardPage() {
             }
             className="w-full"
           >
-            <TabsList className="w-full rounded-full p-1">
-              <TabsTrigger
-                value="income"
-                className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
-              >
-                Income
-              </TabsTrigger>
-              <TabsTrigger
-                value="expense"
-                className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm"
-              >
-                Expense
-              </TabsTrigger>
+            <TabsList className="w-full">
+              <TabsTrigger value="income">Income</TabsTrigger>
+              <TabsTrigger value="expense">Expense</TabsTrigger>
             </TabsList>
             <TabsContent value="income">
               {renderTransactionsSummary()}
