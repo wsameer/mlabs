@@ -68,8 +68,11 @@ export function DashboardPage() {
   );
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      <div className="flex w-full flex-col gap-2 lg:max-w-md">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div
+        id="left-dashboard"
+        className="flex w-full flex-col gap-2 lg:max-w-md"
+      >
         <DateRangeFilter />
         <Card>
           <CardContent>
@@ -94,10 +97,10 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-      <div className="col-span-2">
-        <div className="flex gap-2">
+      <div className="col-span-2" id="right-dashboard">
+        <div className="flex flex-wrap gap-2 *:min-w-[18rem] *:flex-1">
           <Card className="flex-1">
-            <CardContent></CardContent>
+            <CardContent>Contribution chart</CardContent>
           </Card>
           <FinancialHealthCard
             income={incomeTotal}
