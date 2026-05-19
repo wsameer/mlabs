@@ -76,48 +76,52 @@ export function FinancialHealthCard({
   const hasData = income !== null && expenses !== null && income > 0;
   const savings = hasData ? income - expenses : 0;
   const savingsRate = hasData ? Math.max(0, savings / income) : 0;
+  const savingsPct = Math.round(savingsRate * 100);
   const stageIndex = hasData ? getStageIndex(savingsRate) : 0;
   const stage = STAGES[stageIndex];
+  const showGauge = hasData && !isLoading;
 
   return (
-    <Card className="flex-1">
+    <Card className="relative min-h-56 flex-1">
       <CardHeader>
         <CardTitle>Financial health</CardTitle>
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 items-center gap-4 sm:grid-cols-[1fr_auto]">
-        <div className="flex flex-col gap-3">
-          {isLoading || !hasData ? (
-            <>
-              <Skeleton className="h-5 w-20 rounded-full" />
-              <Skeleton className="h-9 w-40" />
-            </>
-          ) : (
-            <>
-              <span
-                className={`inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${stage.pillClassName}`}
-              >
-                {stage.label}
-              </span>
-              <p className="font-heading text-3xl tracking-tight tabular-nums">
-                {formatCurrency(savings, currency)}
-              </p>
-            </>
-          )}
-
-          <p className="pt-2 text-xs text-muted-foreground">
-            Based on income and expenses for the selected period.
-          </p>
-        </div>
-
-        <div className="flex items-center justify-center">
-          <HealthGauge
-            savingsPct={Math.round(savingsRate * 100)}
-            stageIndex={stageIndex}
-            disabled={!hasData || Boolean(isLoading)}
-          />
-        </div>
+      <CardContent className="relative z-10 flex h-full max-w-[55%] flex-col gap-3">
+        {isLoading || !hasData ? (
+          <>
+            <Skeleton className="h-5 w-20 rounded-full" />
+            <Skeleton className="h-9 w-40" />
+          </>
+        ) : (
+          <>
+            <span
+              className={`inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${stage.pillClassName}`}
+            >
+              {stage.label}
+            </span>
+            <p className="font-heading text-3xl tracking-tight tabular-nums">
+              {formatCurrency(savings, currency)}
+            </p>
+          </>
+        )}
+        <p className="mt-auto pt-4 text-xs text-muted-foreground">
+          Based on income and expenses for the selected period.
+        </p>
       </CardContent>
+
+      <HealthGauge
+        savingsPct={savingsPct}
+        stageIndex={stageIndex}
+        disabled={!showGauge}
+      />
+
+      {showGauge && (
+        <div className="pointer-events-none absolute right-10 bottom-18 z-10 text-center">
+          <p className="font-heading text-2xl tabular-nums">{savingsPct}%</p>
+          <p className="text-xs text-muted-foreground">Of income saved</p>
+        </div>
+      )}
     </Card>
   );
 }
@@ -131,28 +135,28 @@ function HealthGauge({
   stageIndex: StageIndex;
   disabled: boolean;
 }) {
-  // Three-quarter arc from 135° sweeping clockwise to 45° (270° total).
-  // Each stage's arc length is proportional to its percentage range, so
-  // Poor (0–20) is short, Decent/Good (30 each) are wider, Excellent (80–100) is short.
-  const size = 180;
+  const size = 400;
+  const dimens = 260;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 70;
-  const strokeWidth = 12;
-  const startAngle = 135;
-  const totalSweep = 270;
-  const gapDeg = 3;
+  const r = 190;
+  const strokeWidth = 16;
+  const gapDeg = 6;
+
+  const arcStart = 150;
+  const arcEnd = 300;
+  const arcSweep = arcEnd - arcStart;
 
   const pctToAngle = (pct: number) =>
-    startAngle + (Math.min(100, Math.max(0, pct)) / 100) * totalSweep;
+    arcStart + (Math.min(100, Math.max(0, pct)) / 100) * arcSweep;
 
   const segments = STAGES.map((s, i) => {
     const segStart = pctToAngle(s.startPct) + (i === 0 ? 0 : gapDeg / 2);
-    const segEnd = pctToAngle(s.endPct) - (i === STAGES.length - 1 ? 0 : gapDeg / 2);
+    const segEnd =
+      pctToAngle(s.endPct) - (i === STAGES.length - 1 ? 0 : gapDeg / 2);
     return {
       ...s,
       d: arcPath(cx, cy, r, segStart, segEnd),
-      active: i <= stageIndex,
     };
   });
 
@@ -161,9 +165,10 @@ function HealthGauge({
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
-      width={size}
-      height={size}
-      className="shrink-0"
+      width={dimens}
+      height={dimens}
+      className="pointer-events-none absolute"
+      style={{ right: -58, bottom: -58 }}
       role="img"
       aria-label={
         disabled
@@ -171,6 +176,8 @@ function HealthGauge({
           : `Financial health: ${savingsPct}% saved`
       }
     >
+      <circle cx={cx} cy={cy} r={r - strokeWidth} className="fill-muted/30" />
+
       {segments.map((seg, i) => (
         <path
           key={i}
@@ -178,7 +185,7 @@ function HealthGauge({
           fill="none"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          className={disabled || !seg.active ? "stroke-muted" : seg.arcClassName}
+          className={disabled ? "stroke-muted" : seg.arcClassName}
         />
       ))}
 
@@ -187,7 +194,7 @@ function HealthGauge({
           <circle
             cx={knob.x}
             cy={knob.y}
-            r={strokeWidth / 2 + 4}
+            r={strokeWidth / 2 + 5}
             className="fill-background"
           />
           <circle
@@ -201,23 +208,6 @@ function HealthGauge({
           />
         </>
       )}
-
-      <text
-        x={cx}
-        y={cy + 4}
-        textAnchor="middle"
-        className="fill-foreground font-heading text-[20px]"
-      >
-        {disabled ? "—" : `${savingsPct}%`}
-      </text>
-      <text
-        x={cx}
-        y={cy + 22}
-        textAnchor="middle"
-        className="fill-muted-foreground text-[9px]"
-      >
-        of income saved
-      </text>
     </svg>
   );
 }
