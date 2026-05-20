@@ -3,7 +3,12 @@ import { format } from "date-fns";
 import { CashflowPieChart } from "@/components/CashflowPieChart";
 import { useLayoutConfig } from "@/features/layout/hooks/use-layout-config";
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import {
   Tabs,
   TabsContent,
@@ -97,10 +102,14 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
       <div className="col-span-2" id="right-dashboard">
         <div className="flex flex-wrap gap-2 *:min-w-[18rem] *:flex-1">
           <Card className="flex-1">
-            <CardContent>Contribution chart</CardContent>
+            <CardHeader>
+              <CardTitle>Contribution chart</CardTitle>
+            </CardHeader>
+            <CardContent>TDB</CardContent>
           </Card>
           <FinancialHealthCard
             income={incomeTotal}

@@ -71,7 +71,7 @@ export function HealthGauge({
             cx={knob.x}
             cy={knob.y}
             r={strokeWidth / 2 + 5}
-            className="fill-background"
+            className="fill-white"
           />
           <circle
             cx={knob.x}

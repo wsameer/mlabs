@@ -36,7 +36,7 @@ export function FinancialHealthCard({
         <CardTitle>Financial health</CardTitle>
       </CardHeader>
 
-      <CardContent className="relative z-10 flex h-full flex-col gap-2 @[400px]:max-w-[55%]">
+      <CardContent className="relative z-10 flex h-full flex-col gap-2 @[350px]:max-w-[55%]">
         {isLoading || !hasData ? (
           <>
             <Skeleton className="h-5 w-20 rounded-full" />
@@ -49,7 +49,7 @@ export function FinancialHealthCard({
             >
               {stage.label}
             </span>
-            <p className="font-heading text-3xl tracking-normal tabular-nums">
+            <p className="font-heading text-2xl tracking-normal tabular-nums">
               {formatCurrency(savings, currency)}
             </p>
           </>
@@ -59,7 +59,7 @@ export function FinancialHealthCard({
         </p>
       </CardContent>
 
-      <div className="hidden @[400px]:block">
+      <div className="hidden @[350px]:block">
         <HealthGauge
           savingsPct={savingsPct}
           stageIndex={stageIndex}
@@ -75,7 +75,7 @@ export function FinancialHealthCard({
       </div>
 
       {showGauge && (
-        <p className="px-4 text-xs text-muted-foreground @[400px]:hidden">
+        <p className="px-4 text-xs text-muted-foreground @[350px]:hidden">
           {savingsPct}% of income saved
         </p>
       )}

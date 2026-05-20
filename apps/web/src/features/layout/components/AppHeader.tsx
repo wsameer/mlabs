@@ -87,7 +87,7 @@ export const AppHeader = () => {
           size="sm"
           onClick={() => setGlobalSearch(true)}
           disabled={!isBackendConnected}
-          aria-label="Search"
+          aria-label="Global search"
         >
           <SearchIcon className="size-3" />
           <span className="text-xs" aria-hidden="true">

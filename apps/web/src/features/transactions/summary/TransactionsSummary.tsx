@@ -146,30 +146,70 @@ function SummaryContent({
   accounts: AccountBreakdown[];
 }) {
   return (
-    <div className="flex flex-col gap-5 pb-5">
-      {/* Totals */}
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
-            Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col justify-end">
-          <Item variant="muted" className="flex-col items-stretch">
-            <ItemContent className="gap-3">
-              <SummaryRow label="Income" value={income} variant="income" />
-              <SummaryRow label="Expenses" value={expenses} variant="expense" />
-              <Separator />
-              <SummaryRow label="Net" value={net} variant="net" />
-            </ItemContent>
-          </Item>
-        </CardContent>
-      </Card>
-
-      {/* Spending by Category */}
-      {categories.length > 0 && (
-        <Card size="sm" className="mx-auto w-full max-w-sm">
+    <div className="grid grid-cols-1 gap-5 pb-5 lg:grid-cols-2">
+      {/* Left column: Totals + By Account */}
+      <div className="flex flex-col gap-5">
+        {/* Totals */}
+        <Card size="sm" className="mx-auto mt-1 w-full max-w-md lg:max-w-none">
           <CardHeader>
+            <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+              Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-1 flex-col justify-end">
+            <Item variant="muted" className="flex-col items-stretch">
+              <ItemContent className="gap-3">
+                <SummaryRow label="Income" value={income} variant="income" />
+                <SummaryRow
+                  label="Expenses"
+                  value={expenses}
+                  variant="expense"
+                />
+                <Separator />
+                <SummaryRow label="Net" value={net} variant="net" />
+              </ItemContent>
+            </Item>
+          </CardContent>
+        </Card>
+
+        {/* By Account */}
+        {accounts.length > 0 && (
+          <Card size="sm" className="mx-auto w-full max-w-md lg:max-w-none">
+            <CardHeader>
+              <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+                By Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-52">
+                <ItemGroup>
+                  {accounts.map((acct) => (
+                    <Item key={acct.id} variant="muted" size={"xs"}>
+                      <ItemContent className="truncate">
+                        <p className="truncate">{acct.name}</p>
+                      </ItemContent>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <Badge variant="outline">{acct.percentage}%</Badge>
+                        <span className="font-medium tabular-nums">
+                          {formatCurrency(acct.total)}
+                        </span>
+                      </div>
+                    </Item>
+                  ))}
+                </ItemGroup>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Right column: Spending by Category */}
+      {categories.length > 0 && (
+        <Card
+          size="sm"
+          className="mx-auto flex w-full max-w-md flex-col lg:sticky lg:top-5 lg:mt-1 lg:h-[calc(100vh-var(--spacing)*10)] lg:max-w-none"
+        >
+          <CardHeader className="shrink-0">
             <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
               Spending by Category
             </CardTitle>
@@ -186,14 +226,14 @@ function SummaryContent({
               </Button>
             </CardAction>
           </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-52">
+          <CardContent className="flex min-h-0 flex-1 flex-col">
+            <ScrollArea className="h-[60svh] flex-1">
               <ItemGroup>
                 {categories.map((cat) => (
                   <Item
                     key={cat.id}
                     variant="muted"
-                    size={"xs"}
+                    size="xs"
                     className="flex-col items-stretch"
                   >
                     <ItemContent className="gap-3">
@@ -214,36 +254,6 @@ function SummaryContent({
                         {cat.percentage}% of total
                       </span>
                     </ItemFooter>
-                  </Item>
-                ))}
-              </ItemGroup>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* By Account */}
-      {accounts.length > 0 && (
-        <Card size="sm">
-          <CardHeader>
-            <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
-              By Account
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-52">
-              <ItemGroup>
-                {accounts.map((acct) => (
-                  <Item key={acct.id} variant="muted" size={"xs"}>
-                    <ItemContent className="truncate">
-                      <p className="truncate">{acct.name}</p>
-                    </ItemContent>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <Badge variant="outline">{acct.percentage}%</Badge>
-                      <span className="font-medium tabular-nums">
-                        {formatCurrency(acct.total)}
-                      </span>
-                    </div>
                   </Item>
                 ))}
               </ItemGroup>
@@ -333,7 +343,7 @@ export function TransactionsSummaryMobile({
       <Drawer>
         <DrawerTrigger asChild>
           <Button
-            variant="secondary"
+            variant="outline"
             className="lg:hidden"
             title="View summary"
             data-testid="tx-summary-mobile-trigger"

@@ -198,7 +198,7 @@ export function TransactionsPage() {
         ) : (
           <Card className="p-0">
             <CardContent className="p-0">
-              <ScrollArea className="h-[75svh]">
+              <ScrollArea className="h-[70svh]">
                 <div className="pb-12 sm:pb-0">
                   {sortedDates.map((date) => {
                     const groupedTransactions = grouped[date];
@@ -328,7 +328,7 @@ export function TransactionsPage() {
         />
       </div>
 
-      <div className="hidden w-72 shrink-0 lg:block">
+      <div className="hidden shrink-0 lg:block">
         <TransactionsSummaryContent
           transactions={transactions}
           categoryMap={categoryMap}
