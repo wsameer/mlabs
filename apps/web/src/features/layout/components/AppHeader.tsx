@@ -1,9 +1,9 @@
 import { Fragment } from "react";
-import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { useHeaderConfig } from "@/hooks/use-layout";
+import { useUiActions } from "@/hooks/use-ui-store";
+import { useAppStore } from "@/stores";
+import type { Breadcrumb as BreadcrumbType } from "@/stores/slices/layout-slice";
 import { Link, useNavigate } from "@tanstack/react-router";
-
-import { TeamSwitcher } from "@/features/navigation/components/TeamSwitcher";
-import { Button } from "@workspace/ui/components/button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,11 +12,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb";
+import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import { useHeaderConfig } from "@/hooks/use-layout";
-import { useUiActions } from "@/hooks/use-ui-store";
-import { useAppStore } from "@/stores";
+import { ArrowLeftIcon, PlusIcon, SearchIcon } from "lucide-react";
 
 export const AppHeader = () => {
   const navigate = useNavigate();
@@ -28,9 +27,13 @@ export const AppHeader = () => {
     onMobileBack,
   } = useHeaderConfig();
   const { setGlobalSearch, setOpenCreateTransaction } = useUiActions();
-  const showBackButton = Boolean(mobileBackPath || onMobileBack);
   const backendStatus = useAppStore((s) => s.backendStatus);
   const isBackendConnected = backendStatus === "connected";
+  const crumbs: BreadcrumbType[] =
+    breadcrumbs && breadcrumbs.length > 0
+      ? breadcrumbs
+      : [{ label: pageTitle }];
+  const showBackButton = Boolean(mobileBackPath || onMobileBack);
 
   const handleAddTransaction = () => {
     if (!isBackendConnected) return;
@@ -46,81 +49,66 @@ export const AppHeader = () => {
   };
 
   const renderDesktopHeader = () => (
-    <div className="hidden w-full md:flex md:items-center md:justify-between md:gap-3">
+    <div className="hidden md:flex md:w-full md:items-center md:justify-between md:gap-2 md:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"
-          className="data-[orientation=vertical]:h-4"
+          className="mt-1 mr-2 data-[orientation=vertical]:h-4"
         />
-
-        {breadcrumbs && breadcrumbs.length > 0 ? (
-          <Breadcrumb>
-            <BreadcrumbList className="text-sm">
-              {breadcrumbs.map((crumb, i) => {
-                const isLast = i === breadcrumbs.length - 1;
-                return (
-                  <Fragment key={`${crumb.label}-${i}`}>
-                    <BreadcrumbItem>
-                      {isLast || !crumb.to ? (
-                        <BreadcrumbPage className="font-medium text-foreground">
-                          {crumb.label}
-                        </BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink
-                          render={<Link to={crumb.to} />}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          {crumb.label}
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-                    {!isLast && <BreadcrumbSeparator />}
-                  </Fragment>
-                );
-              })}
-            </BreadcrumbList>
-          </Breadcrumb>
-        ) : (
-          <h1 className="truncate text-sm font-medium text-foreground">
-            {pageTitle}
-          </h1>
-        )}
+        <Breadcrumb>
+          <BreadcrumbList>
+            {crumbs.map((c, i) => {
+              const isLast = i === crumbs.length - 1;
+              return (
+                <Fragment key={`${c.label}-${i}`}>
+                  <BreadcrumbItem>
+                    {isLast || !c.to ? (
+                      <BreadcrumbPage className="text-sm">
+                        {c.label}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink render={<Link to={c.to} />}>
+                        {c.label}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && <BreadcrumbSeparator />}
+                </Fragment>
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
-
       <div className="flex items-center gap-2">
         {headerActions}
         <Button
-          onClick={() => setGlobalSearch(true)}
           variant="outline"
           size="sm"
+          onClick={() => setGlobalSearch(true)}
+          disabled={!isBackendConnected}
           aria-label="Search"
         >
-          <SearchIcon data-icon="inline-start" />
-          <p className="text-muted-foreground">⌘K</p>
+          <SearchIcon className="size-3" />
+          <span className="text-xs" aria-hidden="true">
+            ⌘K
+          </span>
         </Button>
         <Button
           variant="default"
           size="sm"
           onClick={handleAddTransaction}
           disabled={!isBackendConnected}
-          className="gap-1.5"
         >
-          <PlusIcon className="size-4" />
-          <span className="hidden lg:inline">Add Transaction</span>
-          <span className="lg:hidden">Add</span>
+          <PlusIcon className="size-3" />
+          <span>Add transaction</span>
         </Button>
-        <Separator
-          orientation="vertical"
-          className="data-[orientation=vertical]:h-6"
-        />
-        <TeamSwitcher />
       </div>
     </div>
   );
 
   const renderMobileHeader = () => (
-    <div className="flex w-full items-center justify-between gap-3 md:hidden">
+    <div className="flex w-full items-center justify-between gap-3 px-3 md:hidden">
       <div className="flex gap-1">
         {showBackButton && (
           <Button
@@ -145,14 +133,16 @@ export const AppHeader = () => {
           aria-label="Search"
         >
           <SearchIcon className="size-4" />
-          <span className="text-xs text-muted-foreground">⌘K</span>
+          <span className="text-xs text-muted-foreground" aria-hidden="true">
+            ⌘K
+          </span>
         </Button>
       </div>
     </div>
   );
 
   return (
-    <header className="sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b bg-background p-3">
+    <header className="flex h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       {renderDesktopHeader()}
       {renderMobileHeader()}
     </header>

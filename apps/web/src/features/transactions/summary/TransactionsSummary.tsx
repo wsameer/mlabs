@@ -148,7 +148,7 @@ function SummaryContent({
   return (
     <div className="flex flex-col gap-5 pb-5">
       {/* Totals */}
-      <Card size="sm" className="mt-1">
+      <Card size="sm">
         <CardHeader>
           <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
             Summary
@@ -303,15 +303,13 @@ export function TransactionsSummaryContent({
   );
 
   return (
-    <div className="px-0.5 py-2">
-      <SummaryContent
-        income={income}
-        expenses={expenses}
-        net={net}
-        categories={categories}
-        accounts={accounts}
-      />
-    </div>
+    <SummaryContent
+      income={income}
+      expenses={expenses}
+      net={net}
+      categories={categories}
+      accounts={accounts}
+    />
   );
 }
 

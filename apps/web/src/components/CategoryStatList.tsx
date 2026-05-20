@@ -31,7 +31,7 @@ export const CategoryStatList = ({
               <button type="button" className="w-full">
                 <ItemMedia>
                   <Badge
-                    className="w-10 text-background"
+                    className="w-10 text-white"
                     style={{ backgroundColor: color }}
                   >
                     {Math.round(item.percentage)}%

@@ -9,7 +9,3 @@ export const mobileBackPathSelector = (state: AppStoreState) =>
   state.mobileBackPath;
 export const onMobileBackSelector = (state: AppStoreState) =>
   state.onMobileBack;
-
-// Sidebar Selectors
-export const sidebarLeftContentSelector = (state: AppStoreState) =>
-  state.sidebarLeftContent;

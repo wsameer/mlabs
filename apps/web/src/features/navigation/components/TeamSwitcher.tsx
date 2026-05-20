@@ -1,4 +1,4 @@
-import { CheckIcon, PlusIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppProfile, useAppProfiles } from "@/hooks/use-app";
@@ -15,8 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@workspace/ui/components/sidebar";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -59,64 +65,78 @@ export function TeamSwitcher() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <button
-            type="button"
-            className="cursor-pointer"
-            aria-label={`Workspace: ${activeProfile.name}`}
-          />
-        }
-      >
-        <ProfileAvatar profile={activeProfile} size="sm" />
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        className="min-w-60 rounded-lg"
-        align="end"
-        side="bottom"
-        sideOffset={6}
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-            Workspaces
-          </DropdownMenuLabel>
-          {allProfiles.map((profile) => {
-            const isActive = profile.id === activeProfile.id;
-            return (
-              <DropdownMenuItem
-                key={profile.id}
-                className="gap-2.5 p-2"
-                onClick={() => void handleSwitch(profile.id)}
-              >
-                <ProfileAvatar profile={profile} size="sm" />
-                <span className="flex-1 truncate text-sm">{profile.name}</span>
-                {isActive && (
-                  <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                )}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuGroup>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem
-          className="gap-2.5 p-2"
-          onClick={() => void navigate({ to: PROFILES_ROUTE })}
-        >
-          <span
-            aria-hidden
-            className="grid size-6 place-items-center rounded-md border bg-background"
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                aria-label={`Workspace: ${activeProfile.name}`}
+              />
+            }
           >
-            <PlusIcon className="size-3.5" />
-          </span>
-          <span className="text-sm font-medium text-muted-foreground">
-            Manage workspaces
-          </span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-sidebar-primary-foreground">
+              <img
+                src="/mlabs-icon.png"
+                alt="mlabs"
+                className="size-6 object-contain"
+              />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">mLabs</span>
+              <span className="truncate text-xs">{activeProfile.name}</span>
+            </div>
+            <ChevronsUpDownIcon className="ml-auto" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="min-w-56 rounded-lg"
+            align="start"
+            side="right"
+            sideOffset={4}
+          >
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Workspaces
+              </DropdownMenuLabel>
+              {allProfiles.map((profile) => (
+                <DropdownMenuItem
+                  key={profile.id}
+                  className="gap-2.5 p-2"
+                  onClick={() => void handleSwitch(profile.id)}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <ProfileAvatar profile={profile} size="sm" />
+                  </div>
+                  <span className="flex-1 truncate text-xs">
+                    {profile.name}
+                  </span>
+                  {profile.id === activeProfile.id && (
+                    <DropdownMenuShortcut>
+                      <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                    </DropdownMenuShortcut>
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              className="gap-2 p-2"
+              onClick={() => void navigate({ to: PROFILES_ROUTE })}
+            >
+              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                <PlusIcon className="size-4" />
+              </div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Add workspace
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

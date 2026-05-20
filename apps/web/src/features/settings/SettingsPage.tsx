@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { ChevronRightIcon } from "lucide-react";
 import { Route } from "@/routes/settings";
 
@@ -24,6 +24,7 @@ import { CategoriesSection } from "./features/category-management";
 import { AccountsSection } from "./features/accounts";
 import { BackupSection } from "./features/backup";
 import { ImportSection } from "./features/import-transactions";
+import { DangerZoneSection } from "./features/danger-zone";
 
 export function SettingsPage() {
   const isMobile = useIsMobile();
@@ -55,22 +56,9 @@ export function SettingsPage() {
   // On desktop, default to "profile" when nothing selected
   const resolvedSection = activeSection ?? (isMobile ? undefined : "profile");
 
-  // Desktop: show nav in left sidebar
-  const sidebarContent = useMemo(() => {
-    if (isMobile) return null;
-    return (
-      <SettingsNav
-        activeSection={resolvedSection}
-        onSelect={handleSelectSection}
-        variant="sidebar"
-      />
-    );
-  }, [isMobile, resolvedSection, handleSelectSection]);
-
   useLayoutConfig({
     pageTitle: isMobile && activeSectionLabel ? activeSectionLabel : "Settings",
     onMobileBack: isMobile && activeSection ? handleBack : null,
-    leftSidebarContent: sidebarContent,
   });
 
   // Loading state
@@ -121,16 +109,26 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-8">
-      {resolvedSection === "profile" && <ProfileSection {...sectionProps} />}
-      {resolvedSection === "preferences" && (
-        <PreferencesSection {...sectionProps} />
-      )}
-      {resolvedSection === "notifications" && <NotificationsSection />}
-      {resolvedSection === "categories" && <CategoriesSection />}
-      {resolvedSection === "accounts" && <AccountsSection />}
-      {resolvedSection === "import" && <ImportSection />}
-      {resolvedSection === "backup" && <BackupSection />}
+    <div className="mx-auto flex w-full max-w-5xl gap-6 pb-8">
+      <aside className="hidden w-56 shrink-0 md:block">
+        <SettingsNav
+          activeSection={resolvedSection}
+          onSelect={handleSelectSection}
+          variant="sidebar"
+        />
+      </aside>
+      <div className="flex w-full max-w-2xl flex-col gap-4">
+        {resolvedSection === "profile" && <ProfileSection {...sectionProps} />}
+        {resolvedSection === "preferences" && (
+          <PreferencesSection {...sectionProps} />
+        )}
+        {resolvedSection === "notifications" && <NotificationsSection />}
+        {resolvedSection === "categories" && <CategoriesSection />}
+        {resolvedSection === "accounts" && <AccountsSection />}
+        {resolvedSection === "import" && <ImportSection />}
+        {resolvedSection === "backup" && <BackupSection />}
+        {resolvedSection === "danger" && <DangerZoneSection />}
+      </div>
     </div>
   );
 }
