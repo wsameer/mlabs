@@ -50,7 +50,7 @@ export function TransactionFilters({ disabled }: { disabled?: boolean }) {
             setFilters({ q: next.length > 0 ? next : undefined })
           }
           disabled={disabled}
-          className="min-w-55 flex-1"
+          className="min-w-30 flex-1"
         />
 
         <AmountRangeInputs

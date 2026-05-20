@@ -50,7 +50,7 @@ export function TransactionFiltersDrawer({ disabled }: { disabled?: boolean }) {
       <DrawerTrigger asChild>
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           disabled={disabled}
           className="gap-1"
           data-testid="tx-filters-drawer-trigger"
