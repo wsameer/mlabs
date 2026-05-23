@@ -33,33 +33,6 @@ type FinancialHealthState =
       stage: HealthStage;
     };
 
-export function FinancialHealthCard({
-  income,
-  expenses,
-  currency,
-  isLoading = false,
-}: FinancialHealthCardProps) {
-  const state = getFinancialHealthState({ income, expenses, isLoading });
-
-  return (
-    <Card className="@container relative min-h-56 min-w-[18rem] flex-1 overflow-hidden py-0 pt-4">
-      <CardHeader>
-        <CardTitle>Financial health</CardTitle>
-      </CardHeader>
-
-      <CardContent className="relative z-10 flex h-full flex-col gap-3 @[350px]:max-w-[55%]">
-        <FinancialHealthBody state={state} currency={currency} />
-
-        <p className="mt-auto pt-4 text-xs text-muted-foreground">
-          Based on income and expenses for the selected period.
-        </p>
-      </CardContent>
-
-      <FinancialHealthVisual state={state} />
-    </Card>
-  );
-}
-
 function getFinancialHealthState({
   income,
   expenses,
@@ -103,7 +76,7 @@ function FinancialHealthBody({
       <div className="flex flex-col gap-3">
         <Skeleton className="h-5 w-24 rounded-full" />
         <Skeleton className="h-9 w-36" />
-        <Skeleton className="h-4 w-28 @[350px]:hidden" />
+        <Skeleton className="h-4 w-28 @[300px]:hidden" />
       </div>
     );
   }
@@ -136,7 +109,7 @@ function FinancialHealthBody({
 function FinancialHealthVisual({ state }: { state: FinancialHealthState }) {
   if (state.kind === "loading") {
     return (
-      <div className="hidden @[350px]:block">
+      <div className="hidden @[300px]:block">
         <div className="absolute -right-14.5 -bottom-14.5">
           <Skeleton className="size-65 rounded-full" />
         </div>
@@ -152,7 +125,7 @@ function FinancialHealthVisual({ state }: { state: FinancialHealthState }) {
 
   return (
     <>
-      <div className="hidden @[350px]:block">
+      <div className="hidden @[300px]:block">
         <HealthGauge
           savingsPct={showGaugeLabel ? state.savingsPct : 0}
           stageIndex={showGaugeLabel ? state.stageIndex : 0}
@@ -170,10 +143,40 @@ function FinancialHealthVisual({ state }: { state: FinancialHealthState }) {
       </div>
 
       {showGaugeLabel ? (
-        <p className="px-4 text-xs text-muted-foreground @[350px]:hidden">
+        <p className="px-3 text-xs text-muted-foreground @[300px]:hidden @[300px]:px-4">
           {state.savingsPct}% of income saved
         </p>
       ) : null}
     </>
+  );
+}
+
+export function FinancialHealthCard({
+  income,
+  expenses,
+  currency,
+  isLoading = false,
+}: FinancialHealthCardProps) {
+  const state = getFinancialHealthState({ income, expenses, isLoading });
+
+  return (
+    <Card
+      size="sm"
+      className="@container relative min-h-56 min-w-[18rem] flex-1 overflow-hidden py-0 pt-4"
+    >
+      <CardHeader>
+        <CardTitle>Financial health</CardTitle>
+      </CardHeader>
+
+      <CardContent className="relative z-10 flex h-full flex-col gap-3 @[300px]:max-w-[40%]">
+        <FinancialHealthBody state={state} currency={currency} />
+
+        <p className="mt-auto pt-4 text-xs text-muted-foreground">
+          Based on income and expenses for the selected period.
+        </p>
+      </CardContent>
+
+      <FinancialHealthVisual state={state} />
+    </Card>
   );
 }

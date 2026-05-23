@@ -77,7 +77,7 @@ export function TeamSwitcher() {
               />
             }
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-sidebar-primary-foreground">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-olive-700 text-sidebar-primary-foreground">
               <img
                 src="/mlabs-icon.png"
                 alt="mlabs"
