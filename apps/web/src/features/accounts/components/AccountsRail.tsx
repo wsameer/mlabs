@@ -46,7 +46,7 @@ export function AccountsRail({ accounts, currency }: AccountsRailProps) {
             const Icon = meta.icon;
 
             return (
-              <Item variant={"muted"} size="xs">
+              <Item variant={"muted"} size="xs" key={group}>
                 <ItemMedia variant="icon">
                   <Icon
                     className="size-3.5 shrink-0 text-muted-foreground"
