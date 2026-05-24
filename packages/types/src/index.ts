@@ -29,6 +29,7 @@ export {
   UpdateTransactionSchema,
   UpdateIncomeExpenseSchema,
   UpdateTransferSchema,
+  ChangeTransactionTypePayloadSchema,
   UpdateProfileSchema,
   CreateOnboardingProfileSchema,
   // Bulk import
@@ -98,6 +99,7 @@ export type {
   UpdateTransaction,
   UpdateIncomeExpense,
   UpdateTransfer,
+  ChangeTransactionTypePayload,
   UpdateProfile,
   CreateOnboardingProfile,
   OnboardingAccount,

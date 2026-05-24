@@ -467,9 +467,11 @@ export type ApplyTransferMergesResult = z.infer<
   typeof ApplyTransferMergesResultSchema
 >;
 
-// Update payloads — type cannot be changed
+// Update payloads — `type` may be present when the caller wants to change the
+// transaction's type. When omitted, the existing type is preserved.
 export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
   {
+    type: z.enum(["INCOME", "EXPENSE"]).optional(),
     accountId: z.uuid().optional(),
     categoryId: z.uuid().optional(),
     subcategoryId: z.uuid().nullable().optional(),
@@ -477,18 +479,33 @@ export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
 );
 
 export const UpdateTransferSchema = TransactionBaseSchema.partial().extend({
+  type: z.literal("TRANSFER").optional(),
   fromAccountId: z.uuid().optional(),
   toAccountId: z.uuid().optional(),
 });
 
+export const ChangeTransactionTypePayloadSchema =
+  TransactionBaseSchema.partial().extend({
+    type: TransactionTypeSchema,
+    accountId: z.uuid().optional(),
+    categoryId: z.uuid().optional(),
+    subcategoryId: z.uuid().nullable().optional(),
+    fromAccountId: z.uuid().optional(),
+    toAccountId: z.uuid().optional(),
+  });
+
 export const UpdateTransactionSchema = z.union([
   UpdateIncomeExpenseSchema,
   UpdateTransferSchema,
+  ChangeTransactionTypePayloadSchema,
 ]);
 
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
 export type UpdateIncomeExpense = z.infer<typeof UpdateIncomeExpenseSchema>;
 export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>;
+export type ChangeTransactionTypePayload = z.infer<
+  typeof ChangeTransactionTypePayloadSchema
+>;
 
 // ============================================================================
 // Query Schemas (API endpoint parameters)

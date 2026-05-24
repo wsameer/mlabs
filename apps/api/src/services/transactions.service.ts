@@ -4,6 +4,7 @@ import type {
   TransactionQuery,
   BulkCreateIncomeExpense,
   BulkImportResult,
+  ChangeTransactionTypePayload,
   CreateIncomeExpense,
   CreateTransfer,
   DetectedTransferRow,
@@ -1098,6 +1099,329 @@ export class TransactionsService {
         .where(eq(accounts.id, newToAccountId));
 
       return serializeTransactions([updatedOutflow, updatedInflow]);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // CHANGE TRANSACTION TYPE
+  // Atomically transitions a transaction between INCOME / EXPENSE / TRANSFER
+  // by reversing old balance effects, deleting/inserting rows as required, and
+  // applying the new effects. Returns one row for income/expense, two for
+  // transfer (outflow then inflow).
+  // ---------------------------------------------------------------------------
+  async changeTransactionType(
+    profileId: string,
+    id: string,
+    payload: ChangeTransactionTypePayload
+  ): Promise<Transaction | Transaction[]> {
+    return db.transaction(async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(transactions)
+        .where(
+          and(eq(transactions.id, id), eq(transactions.profileId, profileId))
+        )
+        .limit(1);
+
+      if (!existing) {
+        throw new NotFoundError(
+          "Transaction not found",
+          "TRANSACTION_NOT_FOUND"
+        );
+      }
+
+      // Gather every row affected by the existing transaction so we can reverse
+      // balances cleanly. For a transfer, that's both legs.
+      const existingRows =
+        existing.type === "TRANSFER" && existing.transferId
+          ? await tx
+              .select()
+              .from(transactions)
+              .where(
+                and(
+                  eq(transactions.transferId, existing.transferId),
+                  eq(transactions.profileId, profileId)
+                )
+              )
+          : [existing];
+
+      // Reverse balance effects of the existing rows.
+      for (const row of existingRows) {
+        const [account] = await tx
+          .select()
+          .from(accounts)
+          .where(eq(accounts.id, row.accountId))
+          .limit(1);
+        if (!account) {
+          throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
+        }
+
+        let reversal = 0;
+        if (row.type === "INCOME") {
+          reversal = -Number(row.amount);
+        } else if (row.type === "EXPENSE") {
+          reversal = Number(row.amount);
+        } else if (row.type === "TRANSFER") {
+          // The earliest-created leg is the outflow; reverse accordingly.
+          const minCreated = Math.min(
+            ...existingRows.map((r) => r.createdAt.getTime())
+          );
+          const isOutflow = row.createdAt.getTime() === minCreated;
+          reversal = isOutflow ? Number(row.amount) : -Number(row.amount);
+        }
+
+        if (reversal !== 0) {
+          await tx
+            .update(accounts)
+            .set({
+              balance: String(Number(account.balance) + reversal),
+              updatedAt: new Date(),
+            })
+            .where(eq(accounts.id, row.accountId));
+        }
+      }
+
+      const newAmount = payload.amount ?? existing.amount;
+      const newDate = payload.date ?? existing.date;
+      const newDescription =
+        payload.description !== undefined
+          ? payload.description
+          : (existing.description ?? undefined);
+      const newNotes =
+        payload.notes !== undefined
+          ? payload.notes
+          : (existing.notes ?? undefined);
+      const newIsCleared = payload.isCleared ?? existing.isCleared;
+
+      if (payload.type === "INCOME" || payload.type === "EXPENSE") {
+        if (!payload.accountId) {
+          throw new BadRequestError(
+            "Account is required",
+            "ACCOUNT_REQUIRED"
+          );
+        }
+        if (!payload.categoryId) {
+          throw new BadRequestError(
+            "Category is required",
+            "CATEGORY_REQUIRED"
+          );
+        }
+
+        const [account] = await tx
+          .select()
+          .from(accounts)
+          .where(
+            and(
+              eq(accounts.id, payload.accountId),
+              eq(accounts.profileId, profileId)
+            )
+          )
+          .limit(1);
+        if (!account) {
+          throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
+        }
+
+        // Delete every existing row tied to this transaction (both legs of a
+        // transfer, or the single income/expense row).
+        await tx
+          .delete(transactions)
+          .where(
+            and(
+              inArray(
+                transactions.id,
+                existingRows.map((r) => r.id)
+              ),
+              eq(transactions.profileId, profileId)
+            )
+          );
+
+        const [inserted] = await tx
+          .insert(transactions)
+          .values({
+            profileId,
+            accountId: payload.accountId,
+            categoryId: payload.subcategoryId ?? payload.categoryId,
+            type: payload.type,
+            amount: newAmount,
+            description: newDescription,
+            notes: newNotes,
+            date: newDate,
+            isCleared: newIsCleared,
+          })
+          .returning();
+
+        if (!inserted) {
+          throw new InternalServerError(
+            "Failed to update transaction",
+            "TRANSACTION_UPDATE_FAILED"
+          );
+        }
+
+        // Re-fetch the account in case it was just touched by the reversal
+        // step above (e.g. the new account is the same as the old one).
+        const [refreshed] = await tx
+          .select()
+          .from(accounts)
+          .where(eq(accounts.id, payload.accountId))
+          .limit(1);
+
+        const balanceDelta =
+          payload.type === "INCOME" ? Number(newAmount) : -Number(newAmount);
+
+        await tx
+          .update(accounts)
+          .set({
+            balance: String(
+              Number(refreshed?.balance ?? account.balance) + balanceDelta
+            ),
+            updatedAt: new Date(),
+          })
+          .where(eq(accounts.id, payload.accountId));
+
+        const categoryParentMap = await loadCategoryParentMap(profileId);
+        return serializeTransaction(inserted, { categoryParentMap });
+      }
+
+      if (payload.type === "TRANSFER") {
+        if (!payload.fromAccountId || !payload.toAccountId) {
+          throw new BadRequestError(
+            "From and to accounts are required",
+            "TRANSFER_ACCOUNTS_REQUIRED"
+          );
+        }
+        if (payload.fromAccountId === payload.toAccountId) {
+          throw new BadRequestError(
+            "From and to accounts must be different",
+            "SAME_ACCOUNT_TRANSFER"
+          );
+        }
+
+        const [fromAccount] = await tx
+          .select()
+          .from(accounts)
+          .where(
+            and(
+              eq(accounts.id, payload.fromAccountId),
+              eq(accounts.profileId, profileId)
+            )
+          )
+          .limit(1);
+        if (!fromAccount) {
+          throw new NotFoundError(
+            "Source account not found",
+            "ACCOUNT_NOT_FOUND"
+          );
+        }
+
+        const [toAccount] = await tx
+          .select()
+          .from(accounts)
+          .where(
+            and(
+              eq(accounts.id, payload.toAccountId),
+              eq(accounts.profileId, profileId)
+            )
+          )
+          .limit(1);
+        if (!toAccount) {
+          throw new NotFoundError(
+            "Destination account not found",
+            "ACCOUNT_NOT_FOUND"
+          );
+        }
+
+        await tx
+          .delete(transactions)
+          .where(
+            and(
+              inArray(
+                transactions.id,
+                existingRows.map((r) => r.id)
+              ),
+              eq(transactions.profileId, profileId)
+            )
+          );
+
+        const transferId = crypto.randomUUID();
+
+        const [outflow] = await tx
+          .insert(transactions)
+          .values({
+            profileId,
+            accountId: payload.fromAccountId,
+            type: "TRANSFER",
+            amount: newAmount,
+            description: newDescription,
+            notes: newNotes,
+            date: newDate,
+            isCleared: newIsCleared,
+            transferId,
+          })
+          .returning();
+
+        const [inflow] = await tx
+          .insert(transactions)
+          .values({
+            profileId,
+            accountId: payload.toAccountId,
+            type: "TRANSFER",
+            amount: newAmount,
+            description: newDescription,
+            notes: newNotes,
+            date: newDate,
+            isCleared: newIsCleared,
+            transferId,
+          })
+          .returning();
+
+        if (!outflow || !inflow) {
+          throw new InternalServerError(
+            "Failed to update transaction",
+            "TRANSACTION_UPDATE_FAILED"
+          );
+        }
+
+        const amount = Number(newAmount);
+
+        const [refreshedFrom] = await tx
+          .select()
+          .from(accounts)
+          .where(eq(accounts.id, payload.fromAccountId))
+          .limit(1);
+
+        await tx
+          .update(accounts)
+          .set({
+            balance: String(
+              Number(refreshedFrom?.balance ?? fromAccount.balance) - amount
+            ),
+            updatedAt: new Date(),
+          })
+          .where(eq(accounts.id, payload.fromAccountId));
+
+        const [refreshedTo] = await tx
+          .select()
+          .from(accounts)
+          .where(eq(accounts.id, payload.toAccountId))
+          .limit(1);
+
+        await tx
+          .update(accounts)
+          .set({
+            balance: String(
+              Number(refreshedTo?.balance ?? toAccount.balance) + amount
+            ),
+            updatedAt: new Date(),
+          })
+          .where(eq(accounts.id, payload.toAccountId));
+
+        return serializeTransactions([outflow, inflow]);
+      }
+
+      throw new BadRequestError(
+        "Invalid transaction type",
+        "INVALID_TRANSACTION_TYPE"
+      );
     });
   }
 

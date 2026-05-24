@@ -2,6 +2,7 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import type {
   TransactionQuery,
   BulkCreateTransactions,
+  ChangeTransactionTypePayload,
   CreateIncomeExpense,
   CreateTransfer,
   ApplyTransferMergesRequest,
@@ -102,6 +103,7 @@ const BulkCreateBodySchema = z.object({
 });
 
 const UpdateTransactionBodySchema = z.object({
+  type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]).optional(),
   amount: z.string().optional(),
   description: z.string().max(200).optional(),
   notes: z.string().optional(),
@@ -451,6 +453,18 @@ transactionsRoute.openapi(updateRoute, async (c) => {
   const { id } = c.req.valid("param");
   const existing = await transactionsService.getTransactionById(profileId, id);
   const body = c.req.valid("json");
+
+  // If the caller is requesting a type change, dispatch to the type-aware
+  // service path. When `type` matches the existing type we still use the
+  // simpler same-type update paths to preserve row identity and createdAt.
+  if (body.type && body.type !== existing.type) {
+    const updated = await transactionsService.changeTransactionType(
+      profileId,
+      id,
+      body as unknown as ChangeTransactionTypePayload
+    );
+    return c.json({ success: true as const, data: updated }, 200);
+  }
 
   if (existing.type === "TRANSFER") {
     const updated = await transactionsService.updateTransfer(
