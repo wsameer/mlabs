@@ -1,6 +1,6 @@
 import { useSearch } from "@tanstack/react-router";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
-import type { TransactionFilterState } from "../filters";
+import type { TransactionFilterState } from "../../filters";
 
 /**
  * Returns the account id the transactions page is currently scoped to,

@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import type { Transaction } from "@workspace/types";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
-import { useDeleteTransaction } from "../api/use-transactions";
+import { useDeleteTransaction } from "../../api/use-transactions";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { Button } from "@workspace/ui/components/button";

@@ -122,22 +122,52 @@ function useSummaryData(
 }
 
 // ---------------------------------------------------------------------------
-// Shared content
+// Shared row
 // ---------------------------------------------------------------------------
 
-function SummaryContent({
-  income,
-  expenses,
-  net,
-  categories,
-  accounts,
+function SummaryRow({
+  label,
+  value,
+  variant,
 }: {
-  income: number;
-  expenses: number;
-  net: number;
-  categories: CategoryBreakdown[];
-  accounts: AccountBreakdown[];
+  label: string;
+  value: number;
+  variant: "income" | "expense" | "net";
 }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span
+        className={cn(
+          "text-xs font-medium tabular-nums",
+          variant === "income" && "text-emerald-600 dark:text-emerald-400",
+          variant === "expense" && "text-red-600 dark:text-red-400",
+          variant === "net" && value >= 0
+            ? "text-emerald-600 dark:text-emerald-400"
+            : variant === "net" && "text-red-600 dark:text-red-400"
+        )}
+      >
+        {formatCurrency(value)}
+      </span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar content
+// ---------------------------------------------------------------------------
+
+export function TransactionsSummaryContent({
+  transactions,
+  categoryMap,
+  accountMap,
+}: TransactionsSummaryProps) {
+  const { income, expenses, net, categories, accounts } = useSummaryData(
+    transactions,
+    categoryMap,
+    accountMap
+  );
+
   return (
     <div className="grid grid-cols-1 gap-5 pb-5 lg:grid-cols-2">
       {/* Left column: Totals + By Account */}
@@ -255,63 +285,5 @@ function SummaryContent({
         </Card>
       )}
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared row
-// ---------------------------------------------------------------------------
-
-function SummaryRow({
-  label,
-  value,
-  variant,
-}: {
-  label: string;
-  value: number;
-  variant: "income" | "expense" | "net";
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span
-        className={cn(
-          "text-xs font-medium tabular-nums",
-          variant === "income" && "text-emerald-600 dark:text-emerald-400",
-          variant === "expense" && "text-red-600 dark:text-red-400",
-          variant === "net" && value >= 0
-            ? "text-emerald-600 dark:text-emerald-400"
-            : variant === "net" && "text-red-600 dark:text-red-400"
-        )}
-      >
-        {formatCurrency(value)}
-      </span>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sidebar content
-// ---------------------------------------------------------------------------
-
-export function TransactionsSummaryContent({
-  transactions,
-  categoryMap,
-  accountMap,
-}: TransactionsSummaryProps) {
-  const { income, expenses, net, categories, accounts } = useSummaryData(
-    transactions,
-    categoryMap,
-    accountMap
-  );
-
-  return (
-    <SummaryContent
-      income={income}
-      expenses={expenses}
-      net={net}
-      categories={categories}
-      accounts={accounts}
-    />
   );
 }

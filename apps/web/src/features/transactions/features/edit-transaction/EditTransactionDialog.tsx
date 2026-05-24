@@ -7,7 +7,7 @@ import type { Transaction } from "@workspace/types";
 
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
-import { useUpdateTransaction } from "../api/use-transactions";
+import { useUpdateTransaction } from "../../api/use-transactions";
 
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";

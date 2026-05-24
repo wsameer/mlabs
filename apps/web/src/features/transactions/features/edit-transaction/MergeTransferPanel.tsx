@@ -5,7 +5,7 @@ import type { Transaction, Account } from "@workspace/types";
 import {
   useMergeAsTransfer,
   useTransferCounterLeg,
-} from "../api/use-transactions";
+} from "../../api/use-transactions";
 
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";

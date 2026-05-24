@@ -1,2 +1,2 @@
 export { TransactionsPage } from "./TransactionsPage";
-export { CreateTransactionDialog } from "./create-transaction";
+export { CreateTransactionDialog } from "./features";
