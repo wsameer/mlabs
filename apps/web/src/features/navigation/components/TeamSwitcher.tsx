@@ -1,4 +1,9 @@
-import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  FlaskConicalIcon,
+  PlusIcon,
+} from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppProfile, useAppProfiles } from "@/hooks/use-app";
@@ -77,12 +82,8 @@ export function TeamSwitcher() {
               />
             }
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-olive-700 text-sidebar-primary-foreground">
-              <img
-                src="/mlabs-icon.png"
-                alt="mlabs"
-                className="size-6 object-contain"
-              />
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-foreground text-background">
+              <FlaskConicalIcon className="size-4" aria-hidden="true" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">mLabs</span>

@@ -42,10 +42,10 @@ export function MainGoals() {
               </ItemDescription>
               <div className="flex items-center-safe justify-between">
                 <div className="flex gap-1">
-                  <span className="text-sm font-normal tabular-nums">
+                  <span className="text-sm font-light tabular-nums">
                     $273,000 of
                   </span>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-sm font-medium tabular-nums">
                     $420,000
                   </span>
                 </div>
@@ -63,10 +63,10 @@ export function MainGoals() {
               </ItemDescription>
               <div className="flex items-center-safe justify-between">
                 <div className="flex gap-1">
-                  <span className="text-sm font-normal tabular-nums">
+                  <span className="text-sm font-light tabular-nums">
                     $27,000 of
                   </span>
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-sm font-medium tabular-nums">
                     $83,000
                   </span>
                 </div>
