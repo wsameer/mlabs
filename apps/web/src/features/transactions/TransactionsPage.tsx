@@ -117,8 +117,9 @@ export function TransactionsPage() {
     );
   }
 
+  const hasNoTransaction = transactions.length === 0;
   const hasActiveFilters = activeFilterCount > 0;
-  const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
+  const filtersDisabled = hasNoTransaction && !hasActiveFilters;
 
   return (
     <>
@@ -140,15 +141,19 @@ export function TransactionsPage() {
               accountIds={filterState.accountIds}
               onClear={() => setFilters({ accountIds: undefined })}
             />
-            {transactions.length === 0 ? (
-              <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-3">
-                {hasActiveFilters ? (
-                  <FilteredEmpty onReset={resetFilters} />
-                ) : (
-                  <EmptyTransactions
-                    openCreateTransaction={setOpenCreateTransaction}
-                  />
-                )}
+            {hasNoTransaction ? (
+              <div className="flex w-full min-w-0 flex-col gap-3">
+                <Card>
+                  <CardContent>
+                    {hasActiveFilters ? (
+                      <FilteredEmpty onReset={resetFilters} />
+                    ) : (
+                      <EmptyTransactions
+                        openCreateTransaction={setOpenCreateTransaction}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             ) : (
               <TransactionList

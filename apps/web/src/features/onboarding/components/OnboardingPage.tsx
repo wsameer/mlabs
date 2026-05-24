@@ -1,9 +1,11 @@
-import { Building2Icon, CheckIcon, InboxIcon } from "lucide-react";
+import { CheckIcon, FlaskConicalIcon, InboxIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
+  CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
 import {
@@ -67,69 +69,69 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-4xl">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div className="space-y-4 text-center md:text-left">
-                <div className="flex flex-col items-center gap-1 md:items-start">
-                  <div className="flex size-8 items-center justify-center rounded-2xl md:justify-start">
-                    <Building2Icon className="size-6" />
-                  </div>
-                  <CardTitle className="text-xl md:text-lg">
-                    Welcome to mLabs
-                  </CardTitle>
-                  <CardDescription className="hidden md:block">
-                    Each step is driven from a shared config, so we can add or
-                    reorder onboarding screens without reworking the page shell.
-                  </CardDescription>
+      <Card className="w-full max-w-sm md:max-w-4xl">
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="space-y-4 text-center md:text-left">
+              <div className="flex flex-col items-center gap-1 md:items-start">
+                <div className="mb-2 flex aspect-square size-8 items-center justify-center rounded-lg bg-foreground text-background">
+                  <FlaskConicalIcon className="size-4" aria-hidden="true" />
                 </div>
-
-                <Separator className="m-0 block md:hidden" />
-
-                <ItemGroup className="hidden md:flex">
-                  {steps.map((item) => {
-                    const isActive = item.id === step;
-                    const isComplete = completionState[item.id];
-                    const isUnlocked =
-                      canAccessStep(item.id, completionState) &&
-                      !(createdProfile && item.id < 3);
-
-                    return (
-                      <Item
-                        key={item.id}
-                        variant="muted"
-                        className={cn({
-                          "border-2 border-primary": isActive,
-                          "opacity-50": !isUnlocked,
-                        })}
-                        render={
-                          <button
-                            type="button"
-                            onClick={() => isUnlocked && goToStep(item.id)}
-                            disabled={!isUnlocked}
-                          />
-                        }
-                      >
-                        <ItemMedia variant="icon">
-                          {isComplete ? (
-                            <CheckIcon className="size-4" />
-                          ) : (
-                            <InboxIcon className="size-4" />
-                          )}
-                        </ItemMedia>
-                        <ItemContent>
-                          <ItemTitle>{item.title}</ItemTitle>
-                          <ItemDescription>{item.description}</ItemDescription>
-                        </ItemContent>
-                      </Item>
-                    );
-                  })}
-                </ItemGroup>
+                <CardTitle className="text-xl md:text-lg">
+                  Welcome to mLabs
+                </CardTitle>
+                <CardDescription className="hidden md:block">
+                  Each step is driven from a shared config, so we can add or
+                  reorder onboarding screens without reworking the page shell.
+                </CardDescription>
               </div>
 
-              <div className="space-y-4 md:col-span-2">
-                <div className="space-y-2 md:hidden">
+              <Separator className="m-0 block md:hidden" />
+
+              <ItemGroup className="hidden md:flex">
+                {steps.map((item) => {
+                  const isActive = item.id === step;
+                  const isComplete = completionState[item.id];
+                  const isUnlocked =
+                    canAccessStep(item.id, completionState) &&
+                    !(createdProfile && item.id < 3);
+
+                  return (
+                    <Item
+                      key={item.id}
+                      variant="muted"
+                      className={cn({
+                        "border-2 border-primary": isActive,
+                        "opacity-50": !isUnlocked,
+                      })}
+                      render={
+                        <button
+                          type="button"
+                          onClick={() => isUnlocked && goToStep(item.id)}
+                          disabled={!isUnlocked}
+                        />
+                      }
+                    >
+                      <ItemMedia variant="icon">
+                        {isComplete ? (
+                          <CheckIcon className="size-4" />
+                        ) : (
+                          <InboxIcon className="size-4" />
+                        )}
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemTitle>{item.title}</ItemTitle>
+                        <ItemDescription>{item.description}</ItemDescription>
+                      </ItemContent>
+                    </Item>
+                  );
+                })}
+              </ItemGroup>
+            </div>
+
+            <Card className="flex flex-col md:col-span-2">
+              <CardHeader>
+                <div className="md:hidden">
                   <Progress value={progressValue} className="w-full max-w-sm">
                     <ProgressLabel>
                       Step {step} of {steps.length}
@@ -138,15 +140,10 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   </Progress>
                 </div>
 
-                <div className="space-y-2 text-left">
-                  <h3 className="text-base font-medium md:text-base">
-                    {currentStep.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {currentStep.description}
-                  </p>
-                </div>
-
+                <CardTitle>{currentStep.title}</CardTitle>
+                <CardDescription> {currentStep.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
                 <CurrentStepComponent
                   step={step}
                   stepDefinition={currentStep}
@@ -160,49 +157,48 @@ export function OnboardingPage({ step, onStepChange }: OnboardingPageProps) {
                   updateFirstAccount={updateFirstAccount}
                   setStepCompletion={setStepCompletion}
                 />
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={goToPreviousStep}
+                  disabled={!previousStep || isSubmitting}
+                >
+                  Previous
+                </Button>
 
-                <div className="flex items-center justify-between gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={goToPreviousStep}
-                    disabled={!previousStep || isSubmitting}
-                  >
-                    Previous
-                  </Button>
-
-                  <div className="flex items-center gap-2">
-                    {step === 3 ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => void skipOptionalAccountStep()}
-                        disabled={isSubmitting}
-                      >
-                        Skip for now
-                      </Button>
-                    ) : null}
-
+                <div className="flex items-center gap-2">
+                  {step === 3 ? (
                     <Button
-                      onClick={() =>
-                        nextStep
-                          ? void goToNextStep()
-                          : void submitOptionalAccountStep()
-                      }
-                      disabled={
-                        nextStep
-                          ? !canGoNext || isSubmitting
-                          : !canSubmitOptionalAccount || isSubmitting
-                      }
+                      type="button"
+                      variant="outline"
+                      onClick={() => void skipOptionalAccountStep()}
+                      disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Creating..." : currentStep.actionLabel}
+                      Skip for now
                     </Button>
-                  </div>
+                  ) : null}
+
+                  <Button
+                    onClick={() =>
+                      nextStep
+                        ? void goToNextStep()
+                        : void submitOptionalAccountStep()
+                    }
+                    disabled={
+                      nextStep
+                        ? !canGoNext || isSubmitting
+                        : !canSubmitOptionalAccount || isSubmitting
+                    }
+                  >
+                    {isSubmitting ? "Creating..." : currentStep.actionLabel}
+                  </Button>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </CardFooter>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
