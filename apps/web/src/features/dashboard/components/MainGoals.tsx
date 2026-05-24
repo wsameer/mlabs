@@ -23,7 +23,7 @@ export function MainGoals() {
   return (
     <Card size="sm">
       <CardHeader>
-        <CardTitle>Main Goals</CardTitle>
+        <CardTitle>Main Goals (Mock data)</CardTitle>
         <CardAction>
           <Link
             className="rounded-md bg-primary px-2 py-1 text-[10px] text-primary-foreground hover:bg-primary/80"

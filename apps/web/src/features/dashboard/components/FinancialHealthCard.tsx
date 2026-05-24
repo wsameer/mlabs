@@ -15,7 +15,7 @@ import {
   getStageIndex,
   type HealthStage,
   type StageIndex,
-} from "./health-stages";
+} from "../utils/health-stages";
 
 interface FinancialHealthCardProps {
   income: number | null;
