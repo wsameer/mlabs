@@ -3,6 +3,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
@@ -203,19 +204,13 @@ export function FinancialHealthCard({
           currency={currency}
           density={density}
         />
-
-        <p
-          className={cn(
-            "mt-auto text-xs text-muted-foreground",
-            isCompact ? "pt-2" : "pt-4"
-          )}
-        >
-          {disclaimer ??
-            `Based on income and expenses for the selected period.`}
-        </p>
       </CardContent>
 
       {isCompact ? null : <FinancialHealthVisual state={state} />}
+
+      <CardFooter className="mt-auto w-2/5 text-xs text-muted-foreground">
+        {disclaimer ?? `Based on income and expenses for the selected period.`}
+      </CardFooter>
     </Card>
   );
 }

@@ -98,9 +98,9 @@ export function TransactionList({
   }, [transactions]);
 
   return (
-    <Card className="p-0">
-      <CardContent className="p-0">
-        <ScrollArea className="h-[70svh]">
+    <Card className="min-h-0 min-w-0 flex-1 p-0">
+      <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+        <ScrollArea className="h-full">
           <div>
             {sortedDates.map((date) => {
               const groupedTransactions = grouped[date];

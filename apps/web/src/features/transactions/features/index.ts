@@ -5,7 +5,6 @@ export { TransactionList } from "./list/TransactionList";
 export {
   AccountActivityCard,
   SpendingByCategoryCard,
-  TransactionFinancialHealthCard,
   TransactionTotals,
   useTransactionSummaryData,
 } from "./summary";

@@ -19,14 +19,14 @@ export function AccountActivityCard({
   if (accounts.length === 0) return null;
 
   return (
-    <Card size="sm" className="min-w-0">
+    <Card size="sm" className="min-h-0 min-w-0 flex-1">
       <CardHeader>
         <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
           By Account
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-52">
+      <CardContent className="min-h-0 flex-1">
+        <ScrollArea className="h-full">
           <ItemGroup>
             {accounts.map((account) => (
               <Item key={account.id} variant="muted" size="xs">

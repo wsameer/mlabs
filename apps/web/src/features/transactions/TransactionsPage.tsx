@@ -17,7 +17,6 @@ import {
   DeleteTransactionDialog,
   EditTransactionDialog,
   SpendingByCategoryCard,
-  TransactionFinancialHealthCard,
   TransactionTotals,
   useTransactionSummaryData,
 } from "./features";
@@ -33,6 +32,7 @@ import {
   useTransactionFilters,
 } from "./filters";
 import { TransactionList } from "./features/list/TransactionList";
+import { FinancialHealthCard } from "../dashboard/components/FinancialHealthCard";
 
 export function TransactionsPage() {
   const { to, from } = useDateRange();
@@ -121,77 +121,86 @@ export function TransactionsPage() {
   const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
 
   return (
-    <div className="flex w-full gap-4">
-      <div className="flex w-full max-w-2xl flex-col gap-4 md:max-w-xl">
-        {/* Row 1: global date range */}
-        <DateRangeFilter />
-
-        <Card>
-          <CardContent>
-            {/* Row 2: desktop filters */}
-            <TransactionFilters disabled={filtersDisabled} />
-          </CardContent>
-        </Card>
-
-        <AccountScopeBanner
-          accountIds={filterState.accountIds}
-          onClear={() => setFilters({ accountIds: undefined })}
-        />
-
-        {transactions.length === 0 ? (
-          <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
-            {hasActiveFilters ? (
-              <FilteredEmpty onReset={resetFilters} />
-            ) : (
-              <EmptyTransactions
-                openCreateTransaction={setOpenCreateTransaction}
-              />
-            )}
+    <>
+      <div className="grid h-[calc(100svh-4.5rem)] w-full min-w-0 grid-cols-3 gap-4 overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-col gap-4 p-0.5">
+          <div className="shrink-0">
+            {/* Row 1: global date range */}
+            <DateRangeFilter />
           </div>
-        ) : (
-          <TransactionList
-            transactions={transactions}
-            categoryMap={categoryMap}
-            accountMap={accountMap}
-            onEditTransaction={setEditTx}
+
+          <Card className="min-w-0 shrink-0">
+            <CardContent>
+              {/* Row 2: desktop filters */}
+              <TransactionFilters disabled={filtersDisabled} />
+            </CardContent>
+          </Card>
+
+          <AccountScopeBanner
+            accountIds={filterState.accountIds}
+            onClear={() => setFilters({ accountIds: undefined })}
           />
-        )}
 
-        <EditTransactionDialog
-          open={!!editTx}
-          onOpenChange={(open) => {
-            if (!open) setEditTx(null);
-          }}
-          transaction={editTx}
-          onDelete={(tx) => {
-            setEditTx(null);
-            setDeleteTx(tx);
-          }}
-        />
+          {transactions.length === 0 ? (
+            <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-3">
+              {hasActiveFilters ? (
+                <FilteredEmpty onReset={resetFilters} />
+              ) : (
+                <EmptyTransactions
+                  openCreateTransaction={setOpenCreateTransaction}
+                />
+              )}
+            </div>
+          ) : (
+            <TransactionList
+              transactions={transactions}
+              categoryMap={categoryMap}
+              accountMap={accountMap}
+              onEditTransaction={setEditTx}
+            />
+          )}
+        </div>
 
-        <DeleteTransactionDialog
-          open={!!deleteTx}
-          onOpenChange={(open) => {
-            if (!open) setDeleteTx(null);
-          }}
-          transaction={deleteTx}
-        />
+        <div className="flex min-h-0 min-w-0 flex-col gap-4 overflow-hidden p-0.5">
+          <TransactionTotals
+            income={summary.income}
+            expenses={summary.expenses}
+            net={summary.net}
+          />
+          <SpendingByCategoryCard categories={summary.categories} />
+        </div>
+
+        <div className="flex max-h-[calc(100svh-4.5rem-1rem)] w-full min-w-0 flex-col gap-4 self-start overflow-y-auto p-0.5">
+          <FinancialHealthCard
+            income={summary.income}
+            expenses={summary.expenses}
+            currency={currency}
+            className="min-w-0 shrink-0"
+            disclaimer="Based on income and expenses in this transaction view."
+          />
+          <AccountActivityCard accounts={summary.accounts} />
+        </div>
       </div>
 
-      <div className="grid min-w-80 flex-1 grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] items-start gap-4">
-        <TransactionTotals
-          income={summary.income}
-          expenses={summary.expenses}
-          net={summary.net}
-        />
-        <TransactionFinancialHealthCard
-          income={summary.income}
-          expenses={summary.expenses}
-          currency={currency}
-        />
-        <AccountActivityCard accounts={summary.accounts} />
-        <SpendingByCategoryCard categories={summary.categories} />
-      </div>
-    </div>
+      <EditTransactionDialog
+        open={!!editTx}
+        onOpenChange={(open) => {
+          if (!open) setEditTx(null);
+        }}
+        transaction={editTx}
+        onDelete={(tx) => {
+          setEditTx(null);
+          setDeleteTx(tx);
+        }}
+      />
+
+      <DeleteTransactionDialog
+        open={!!deleteTx}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTx(null);
+        }}
+        transaction={deleteTx}
+      />
+    </>
   );
 }

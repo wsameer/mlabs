@@ -29,7 +29,7 @@ export function SpendingByCategoryCard({
   if (categories.length === 0) return null;
 
   return (
-    <Card size="sm" className="flex min-h-80 min-w-0 flex-col">
+    <Card size="sm" className="flex min-h-0 min-w-0 flex-1 flex-col">
       <CardHeader className="shrink-0">
         <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
           Spending by Category
@@ -48,13 +48,13 @@ export function SpendingByCategoryCard({
         </CardAction>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col">
-        <ScrollArea className="h-80 flex-1">
+        <ScrollArea className="h-full">
           <ItemGroup>
             {categories.map((category) => (
               <Item
                 key={category.id}
                 variant="muted"
-                size="xs"
+                size="sm"
                 className="flex-col items-stretch"
               >
                 <ItemContent className="gap-3">
@@ -62,17 +62,16 @@ export function SpendingByCategoryCard({
                     {category.icon ? `${category.icon} ` : ""}
                     {category.name}
                   </ItemDescription>
-                  <span className="text-sm font-medium tabular-nums">
-                    {formatCurrency(category.total)}
-                  </span>
-                  <Progress value={100} />
+                  <div className="flex flex-row justify-between">
+                    <span className="text-sm font-medium tabular-nums">
+                      {formatCurrency(category.total)}
+                    </span>
+                    <span className="text-xs font-medium tabular-nums">
+                      {category.percentage}% of total
+                    </span>
+                  </div>
+                  <Progress value={category.percentage} />
                 </ItemContent>
-                <ItemFooter>
-                  <span className="text-xs text-muted-foreground">100%</span>
-                  <span className="text-xs font-medium tabular-nums">
-                    {category.percentage}% of total
-                  </span>
-                </ItemFooter>
               </Item>
             ))}
           </ItemGroup>
