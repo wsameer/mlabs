@@ -66,7 +66,7 @@ export function SpendingByCategoryCard({
                     <span className="text-sm font-medium tabular-nums">
                       {formatCurrency(category.total)}
                     </span>
-                    <span className="text-xs font-medium tabular-nums">
+                    <span className="text-xs text-muted-foreground tabular-nums">
                       {category.percentage}% of total
                     </span>
                   </div>

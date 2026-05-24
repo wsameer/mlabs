@@ -98,7 +98,7 @@ export function TransactionList({
   }, [transactions]);
 
   return (
-    <Card className="min-h-0 min-w-0 flex-1 p-0">
+    <Card className="m-0.5 min-h-0 min-w-0 flex-1 p-0">
       <CardContent className="flex min-h-0 flex-1 flex-col p-0">
         <ScrollArea className="h-full">
           <div>

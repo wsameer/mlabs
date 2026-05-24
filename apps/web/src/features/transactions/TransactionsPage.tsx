@@ -122,55 +122,57 @@ export function TransactionsPage() {
 
   return (
     <>
-      <div className="grid h-[calc(100svh-4.5rem)] w-full min-w-0 grid-cols-3 gap-4 overflow-hidden">
-        <div className="flex min-h-0 min-w-0 flex-col gap-4 p-0.5">
-          <div className="shrink-0">
-            {/* Row 1: global date range */}
-            <DateRangeFilter />
+      {/* Root: 2-column grid. Left takes 2/3, right takes 1/3 */}
+      <div className="grid h-[calc(100svh-4.5rem)] w-full min-w-0 grid-cols-[2fr_1fr] gap-3 overflow-hidden p-0.5">
+        {/* LEFT: inner 60/40 grid */}
+        <div className="grid min-h-0 grid-cols-[3fr_2fr] gap-3 overflow-hidden">
+          {/* LEFT-LEFT: 60% — filters + transaction list */}
+          <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+            <div className="shrink-0">
+              <DateRangeFilter />
+            </div>
+            <Card className="min-w-0 shrink-0">
+              <CardContent>
+                <TransactionFilters disabled={filtersDisabled} />
+              </CardContent>
+            </Card>
+            <AccountScopeBanner
+              accountIds={filterState.accountIds}
+              onClear={() => setFilters({ accountIds: undefined })}
+            />
+            {transactions.length === 0 ? (
+              <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-3">
+                {hasActiveFilters ? (
+                  <FilteredEmpty onReset={resetFilters} />
+                ) : (
+                  <EmptyTransactions
+                    openCreateTransaction={setOpenCreateTransaction}
+                  />
+                )}
+              </div>
+            ) : (
+              <TransactionList
+                transactions={transactions}
+                categoryMap={categoryMap}
+                accountMap={accountMap}
+                onEditTransaction={setEditTx}
+              />
+            )}
           </div>
 
-          <Card className="min-w-0 shrink-0">
-            <CardContent>
-              {/* Row 2: desktop filters */}
-              <TransactionFilters disabled={filtersDisabled} />
-            </CardContent>
-          </Card>
-
-          <AccountScopeBanner
-            accountIds={filterState.accountIds}
-            onClear={() => setFilters({ accountIds: undefined })}
-          />
-
-          {transactions.length === 0 ? (
-            <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-3">
-              {hasActiveFilters ? (
-                <FilteredEmpty onReset={resetFilters} />
-              ) : (
-                <EmptyTransactions
-                  openCreateTransaction={setOpenCreateTransaction}
-                />
-              )}
-            </div>
-          ) : (
-            <TransactionList
-              transactions={transactions}
-              categoryMap={categoryMap}
-              accountMap={accountMap}
-              onEditTransaction={setEditTx}
+          {/* LEFT-RIGHT: 40% — totals + spending */}
+          <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+            <TransactionTotals
+              income={summary.income}
+              expenses={summary.expenses}
+              net={summary.net}
             />
-          )}
+            <SpendingByCategoryCard categories={summary.categories} />
+          </div>
         </div>
 
-        <div className="flex min-h-0 min-w-0 flex-col gap-4 overflow-hidden p-0.5">
-          <TransactionTotals
-            income={summary.income}
-            expenses={summary.expenses}
-            net={summary.net}
-          />
-          <SpendingByCategoryCard categories={summary.categories} />
-        </div>
-
-        <div className="flex max-h-[calc(100svh-4.5rem-1rem)] w-full min-w-0 flex-col gap-4 self-start overflow-y-auto p-0.5">
+        {/* RIGHT: 1fr — financial health + account activity, content-sized with scroll cap */}
+        <div className="flex max-h-[calc(100svh-4.5rem-1rem)] w-full min-w-0 flex-col gap-3 self-start overflow-y-auto p-0.5">
           <FinancialHealthCard
             income={summary.income}
             expenses={summary.expenses}

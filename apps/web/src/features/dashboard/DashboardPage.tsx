@@ -97,14 +97,19 @@ export function DashboardPage() {
   return (
     <div className="flex flex-1 flex-col gap-4 pt-0">
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <header>
-          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Net worth
-          </p>
-          <p className="mt-1 text-2xl text-foreground tabular-nums md:text-3xl">
-            {formatCurrency(netWorth, currency)}
-          </p>
-        </header>
+        <Card>
+          <CardHeader>
+            <header>
+              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Net worth
+              </p>
+              <p className="mt-1 text-2xl text-foreground tabular-nums md:text-3xl">
+                {formatCurrency(netWorth, currency)}
+              </p>
+            </header>
+          </CardHeader>
+          <CardContent></CardContent>
+        </Card>
         <MainGoals />
         <FinancialHealthCard
           income={incomeTotal}
