@@ -13,12 +13,17 @@ import { TListLoader } from "./components/TListLoader";
 import { EmptyTransactions } from "./components/EmptyTransactions";
 import { FilteredEmpty } from "./components/FilteredEmpty";
 import {
+  AccountActivityCard,
   DeleteTransactionDialog,
   EditTransactionDialog,
-  TransactionsSummaryContent,
+  SpendingByCategoryCard,
+  TransactionFinancialHealthCard,
+  TransactionTotals,
+  useTransactionSummaryData,
 } from "./features";
 import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
+import { useAppProfile } from "@/hooks/use-app";
 import { useDateRange } from "@/hooks/use-filters";
 import { toDateString } from "@/lib/timezone";
 import {
@@ -51,6 +56,8 @@ export function TransactionsPage() {
   const { data, isLoading } = useTransactions(queryFilters);
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
+  const profile = useAppProfile();
+  const currency = profile?.currency ?? "CAD";
 
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTx, setDeleteTx] = useState<Transaction | null>(null);
@@ -86,6 +93,11 @@ export function TransactionsPage() {
   }, [categories]);
 
   const transactions = useMemo(() => data?.transactions ?? [], [data]);
+  const summary = useTransactionSummaryData({
+    transactions,
+    categoryMap,
+    accountMap,
+  });
 
   const isAccountScoped = (filterState.accountIds?.length ?? 0) > 0;
 
@@ -166,12 +178,19 @@ export function TransactionsPage() {
         />
       </div>
 
-      <div className="shrink-0">
-        <TransactionsSummaryContent
-          transactions={transactions}
-          categoryMap={categoryMap}
-          accountMap={accountMap}
+      <div className="grid min-w-80 flex-1 grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] items-start gap-4">
+        <TransactionTotals
+          income={summary.income}
+          expenses={summary.expenses}
+          net={summary.net}
         />
+        <TransactionFinancialHealthCard
+          income={summary.income}
+          expenses={summary.expenses}
+          currency={currency}
+        />
+        <AccountActivityCard accounts={summary.accounts} />
+        <SpendingByCategoryCard categories={summary.categories} />
       </div>
     </div>
   );
