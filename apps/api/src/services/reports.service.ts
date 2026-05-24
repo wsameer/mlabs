@@ -14,9 +14,15 @@ export class ReportsService {
     const conditions = [
       eq(transactions.profileId, profileId),
       eq(transactions.type, filters.type),
-      gte(transactions.date, filters.startDate),
-      lte(transactions.date, filters.endDate),
     ];
+
+    if (filters.startDate) {
+      conditions.push(gte(transactions.date, filters.startDate));
+    }
+
+    if (filters.endDate) {
+      conditions.push(lte(transactions.date, filters.endDate));
+    }
 
     if (filters.accountId) {
       conditions.push(eq(transactions.accountId, filters.accountId));

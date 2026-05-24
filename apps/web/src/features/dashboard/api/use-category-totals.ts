@@ -3,8 +3,8 @@ import { apiClient } from "@/lib/api-client";
 import type { CategoryTotalsResponse } from "@workspace/types";
 
 type CategoryTotalsParams = {
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   type: "INCOME" | "EXPENSE";
   accountId?: string;
 };

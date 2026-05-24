@@ -32,8 +32,7 @@ import { useAppProfile } from "@/hooks/use-app";
 import { useEffect } from "react";
 import { MainGoals } from "./components/MainGoals";
 import { useCategoryTotals } from "./api/use-category-totals";
-import { format } from "date-fns";
-import { useDateRange } from "@/hooks/use-filters";
+import { FinancialHealthCard } from "./components/FinancialHealthCard";
 
 export function DashboardPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -47,21 +46,21 @@ export function DashboardPage() {
   const profile = useAppProfile();
   const currency = profile?.currency ?? "CAD";
 
-  const dateRange = useDateRange();
-  console.log("🚀 dateRange ~ :", dateRange);
-  const rangeParams = {
-    startDate: format(dateRange.from, "yyyy-MM-dd"),
-    endDate: format(dateRange.to, "yyyy-MM-dd"),
-  };
-
-  const incomeQuery = useCategoryTotals({ ...rangeParams, type: "INCOME" });
-  const expenseQuery = useCategoryTotals({ ...rangeParams, type: "EXPENSE" });
+  const incomeQuery = useCategoryTotals({ type: "INCOME" });
+  const expenseQuery = useCategoryTotals({ type: "EXPENSE" });
 
   useEffect(() => {
     if (accounts) {
       setHasAccount(accounts.length > 0);
     }
   }, [accounts, setHasAccount]);
+
+  const incomeTotal = incomeQuery.data
+    ? Number(incomeQuery.data.grandTotal)
+    : null;
+  const expenseTotal = expenseQuery.data
+    ? Number(expenseQuery.data.grandTotal)
+    : null;
 
   if (isPending) {
     return (
@@ -107,12 +106,13 @@ export function DashboardPage() {
           </p>
         </header>
         <MainGoals />
-        {/*<FinancialHealthCard
+        <FinancialHealthCard
           income={incomeTotal}
           expenses={expenseTotal}
           currency={currency}
           isLoading={incomeQuery.isLoading || expenseQuery.isLoading}
-        />*/}
+          disclaimer="Based on income and expenses for lifetime"
+        />
       </div>
       <Card className="min-h-screen flex-1 rounded-xl md:min-h-min">
         <CardHeader>

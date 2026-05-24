@@ -9,8 +9,8 @@ const reportsRoute = new OpenAPIHono<ProfileEnv>();
 // ---------------------------------------------------------------------------
 
 const CategoryTotalsQuerySchema = z.object({
-  startDate: z.string().openapi({ example: "2026-01-01" }),
-  endDate: z.string().openapi({ example: "2026-03-31" }),
+  startDate: z.string().optional().openapi({ example: "2026-01-01" }),
+  endDate: z.string().optional().openapi({ example: "2026-03-31" }),
   type: z.enum(["INCOME", "EXPENSE"]).openapi({ example: "EXPENSE" }),
   accountId: z.string().uuid().optional().openapi({ example: undefined }),
 });
@@ -43,7 +43,7 @@ const categoryTotalsRoute = createRoute({
   tags: ["Reports"],
   summary: "Get category-wise totals",
   description:
-    "Returns aggregated totals grouped by category for a given date range and transaction type. Useful for pie charts and summary tables.",
+    "Returns aggregated totals grouped by category for an optional date range and transaction type. Useful for pie charts and summary tables.",
   request: {
     query: CategoryTotalsQuerySchema,
   },

@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { cn } from "@workspace/ui/lib/utils";
 import { HealthGauge } from "./HealthGauge";
 import {
   STAGES,
@@ -20,6 +21,9 @@ interface FinancialHealthCardProps {
   expenses: number | null;
   currency: string;
   isLoading?: boolean;
+  disclaimer?: string;
+  density?: "default" | "compact";
+  className?: string;
 }
 
 type FinancialHealthState =
@@ -67,9 +71,11 @@ function getFinancialHealthState({
 function FinancialHealthBody({
   state,
   currency,
+  density,
 }: {
   state: FinancialHealthState;
   currency: string;
+  density: FinancialHealthCardProps["density"];
 }) {
   if (state.kind === "loading") {
     return (
@@ -87,7 +93,12 @@ function FinancialHealthBody({
         <Badge variant="secondary" className="w-fit">
           No data
         </Badge>
-        <p className="font-heading text-xl tracking-tight text-foreground">
+        <p
+          className={cn(
+            "font-heading tracking-tight text-foreground",
+            density === "compact" ? "text-lg" : "text-xl"
+          )}
+        >
           No data available
         </p>
       </div>
@@ -99,7 +110,12 @@ function FinancialHealthBody({
       <Badge className={`w-fit ${state.stage.pillClassName}`}>
         {state.stage.label}
       </Badge>
-      <p className="font-heading text-2xl tracking-tight tabular-nums">
+      <p
+        className={cn(
+          "font-heading tracking-tight tabular-nums",
+          density === "compact" ? "text-xl" : "text-2xl"
+        )}
+      >
         {formatCurrency(state.savings, currency)}
       </p>
     </div>
@@ -156,27 +172,50 @@ export function FinancialHealthCard({
   expenses,
   currency,
   isLoading = false,
+  disclaimer,
+  density = "default",
+  className,
 }: FinancialHealthCardProps) {
   const state = getFinancialHealthState({ income, expenses, isLoading });
+  const isCompact = density === "compact";
 
   return (
     <Card
       size="sm"
-      className="@container relative min-h-56 min-w-[18rem] flex-1 overflow-hidden py-0 pt-4"
+      className={cn(
+        "@container relative min-w-[18rem] flex-1 overflow-hidden py-0",
+        isCompact ? "min-h-36 min-w-0 pt-3" : "min-h-56 pt-4",
+        className
+      )}
     >
-      <CardHeader>
+      <CardHeader className={isCompact ? "px-3" : undefined}>
         <CardTitle>Financial health</CardTitle>
       </CardHeader>
 
-      <CardContent className="relative z-10 flex h-full flex-col gap-3 @[300px]:max-w-[40%]">
-        <FinancialHealthBody state={state} currency={currency} />
+      <CardContent
+        className={cn(
+          "relative z-10 flex h-full flex-col gap-3",
+          isCompact ? "px-3" : "@[300px]:max-w-[40%]"
+        )}
+      >
+        <FinancialHealthBody
+          state={state}
+          currency={currency}
+          density={density}
+        />
 
-        <p className="mt-auto pt-4 text-xs text-muted-foreground">
-          Based on income and expenses for the selected period.
+        <p
+          className={cn(
+            "mt-auto text-xs text-muted-foreground",
+            isCompact ? "pt-2" : "pt-4"
+          )}
+        >
+          {disclaimer ??
+            `Based on income and expenses for the selected period.`}
         </p>
       </CardContent>
 
-      <FinancialHealthVisual state={state} />
+      {isCompact ? null : <FinancialHealthVisual state={state} />}
     </Card>
   );
 }

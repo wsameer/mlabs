@@ -459,8 +459,8 @@ export type TransactionQuery = z.input<typeof TransactionQuerySchema>;
 // ============================================================================
 
 export const CategoryTotalsQuerySchema = z.object({
-  startDate: z.string(),
-  endDate: z.string(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
   type: z.enum(["INCOME", "EXPENSE"]),
   accountId: z.uuid().optional(),
 });
