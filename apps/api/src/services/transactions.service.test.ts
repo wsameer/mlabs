@@ -511,3 +511,223 @@ describe("mergeAsTransfer — errors", () => {
     ).rejects.toMatchObject({ code: "SAME_ACCOUNT_TRANSFER" });
   });
 });
+
+describe("bulkCreateIncomeExpense — transfer auto-merge sweep", () => {
+  const ACCT_X = "00000000-0000-0000-0000-0000000000f1";
+  const ACCT_Y = "00000000-0000-0000-0000-0000000000f2";
+
+  beforeAll(async () => {
+    await dbMod.db.insert(schemaMod.accounts).values([
+      {
+        id: ACCT_X,
+        profileId: PROFILE_ID,
+        name: "Bulk-X",
+        group: "chequing",
+        currency: "CAD",
+        balance: "0",
+      },
+      {
+        id: ACCT_Y,
+        profileId: PROFILE_ID,
+        name: "Bulk-Y",
+        group: "chequing",
+        currency: "CAD",
+        balance: "0",
+      },
+    ]);
+  });
+
+  it("upgrades both legs to TYPE=TRANSFER when both are imported in one batch", async () => {
+    const xid = "XFER-BULK-SAME-BATCH";
+    const result = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "100.00",
+        date: "2026-05-01",
+        isCleared: false,
+        transferId: xid,
+      },
+      {
+        type: "INCOME",
+        accountId: ACCT_Y,
+        amount: "100.00",
+        date: "2026-05-01",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+
+    expect(result.imported).toBe(2);
+    expect(result.failed).toBe(0);
+    expect(result.mergedTransfers).toBe(1);
+
+    const rows = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(eq(schemaMod.transactions.transferId, xid));
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r) => r.type === "TRANSFER")).toBe(true);
+    expect(rows.every((r) => r.categoryId === null)).toBe(true);
+  });
+
+  it("auto-merges across batches when the counter leg already exists", async () => {
+    const xid = "XFER-BULK-CROSS-BATCH";
+
+    const first = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "50.00",
+        date: "2026-05-02",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+    expect(first.mergedTransfers).toBe(0);
+
+    const second = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "INCOME",
+        accountId: ACCT_Y,
+        amount: "50.00",
+        date: "2026-05-02",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+    expect(second.mergedTransfers).toBe(1);
+
+    const rows = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(eq(schemaMod.transactions.transferId, xid));
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r) => r.type === "TRANSFER")).toBe(true);
+  });
+
+  it("leaves a single leg as pending (transferId set but type !== TRANSFER)", async () => {
+    const xid = "XFER-BULK-SOLO";
+    const result = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "25.00",
+        date: "2026-05-03",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+    expect(result.mergedTransfers).toBe(0);
+
+    const [row] = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(eq(schemaMod.transactions.transferId, xid));
+    expect(row?.type).toBe("EXPENSE");
+    expect(row?.transferId).toBe(xid);
+  });
+
+  it("does not merge ambiguous groups (3+ rows share transferId)", async () => {
+    const xid = "XFER-BULK-AMBIG";
+    const result = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "10.00",
+        date: "2026-05-04",
+        isCleared: false,
+        transferId: xid,
+      },
+      {
+        type: "INCOME",
+        accountId: ACCT_Y,
+        amount: "10.00",
+        date: "2026-05-04",
+        isCleared: false,
+        transferId: xid,
+      },
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "10.00",
+        date: "2026-05-04",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+    expect(result.mergedTransfers).toBe(0);
+
+    const rows = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(eq(schemaMod.transactions.transferId, xid));
+    expect(rows).toHaveLength(3);
+    expect(rows.every((r) => r.type !== "TRANSFER")).toBe(true);
+  });
+
+  it("does not merge when both legs land on the same account", async () => {
+    const xid = "XFER-BULK-SAME-ACCT";
+    const result = await service.bulkCreateIncomeExpense(PROFILE_ID, [
+      {
+        type: "EXPENSE",
+        accountId: ACCT_X,
+        amount: "30.00",
+        date: "2026-05-05",
+        isCleared: false,
+        transferId: xid,
+      },
+      {
+        type: "INCOME",
+        accountId: ACCT_X,
+        amount: "30.00",
+        date: "2026-05-05",
+        isCleared: false,
+        transferId: xid,
+      },
+    ]);
+    expect(result.mergedTransfers).toBe(0);
+
+    const rows = await dbMod.db
+      .select()
+      .from(schemaMod.transactions)
+      .where(eq(schemaMod.transactions.transferId, xid));
+    expect(rows.every((r) => r.type !== "TRANSFER")).toBe(true);
+  });
+});
+
+describe("listTransactions — pendingTransfersOnly", () => {
+  const ACCT_P = "00000000-0000-0000-0000-0000000000f3";
+  const PENDING_TX = "30000000-0000-0000-0000-0000000000a1";
+
+  beforeAll(async () => {
+    await dbMod.db.insert(schemaMod.accounts).values({
+      id: ACCT_P,
+      profileId: PROFILE_ID,
+      name: "Pending-Acct",
+      group: "chequing",
+      currency: "CAD",
+      balance: "0",
+    });
+    await dbMod.db.insert(schemaMod.transactions).values({
+      id: PENDING_TX,
+      profileId: PROFILE_ID,
+      accountId: ACCT_P,
+      type: "EXPENSE",
+      amount: "12.34",
+      description: "pending solo",
+      date: "2026-05-10",
+      transferId: "XFER-PENDING-FILTER",
+    });
+  });
+
+  it("returns only rows with transferId set and type != TRANSFER", async () => {
+    const { transactions: rows } = await service.listTransactions(PROFILE_ID, {
+      pendingTransfersOnly: true,
+    });
+    const descs = rows.map((r) => r.description);
+    expect(descs).toContain("pending solo");
+    expect(rows.every((r) => r.type !== "TRANSFER")).toBe(true);
+    expect(rows.every((r) => r.transferId != null)).toBe(true);
+  });
+});

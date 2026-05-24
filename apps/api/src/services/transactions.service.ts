@@ -6,6 +6,10 @@ import type {
   BulkImportResult,
   CreateIncomeExpense,
   CreateTransfer,
+  DetectedTransferRow,
+  DetectTransfersResult,
+  ApplyTransferMergesRequest,
+  ApplyTransferMergesResult,
   UpdateIncomeExpense,
   UpdateTransfer,
 } from "@workspace/types";
@@ -24,6 +28,7 @@ import {
   serializeTransactionsWithContext,
   type CategoryParentMap,
 } from "./transaction-serializer.js";
+import { matchTransfers, type MatcherCandidate } from "./transfer-matcher.js";
 
 async function loadCategoryParentMap(
   profileId: string
@@ -54,6 +59,13 @@ export class TransactionsService {
       conditions.push(ne(transactions.type, "TRANSFER"));
     } else if (filters?.categoryIds && filters.categoryIds.length > 0) {
       conditions.push(inArray(transactions.categoryId, filters.categoryIds));
+    }
+    // pendingTransfersOnly: rows tagged with a transferId that have not yet
+    // been upgraded to TYPE=TRANSFER (e.g. a bank export of one account where
+    // the counter leg hasn't been imported yet).
+    if (filters?.pendingTransfersOnly) {
+      conditions.push(sql`${transactions.transferId} is not null`);
+      conditions.push(ne(transactions.type, "TRANSFER"));
     }
     if (filters?.type) {
       conditions.push(eq(transactions.type, filters.type));
@@ -281,6 +293,8 @@ export class TransactionsService {
   ): Promise<BulkImportResult> {
     let imported = 0;
     const errors: { index: number; message: string }[] = [];
+    const importedTransferIds = new Set<string>();
+    const importedIds: string[] = [];
 
     // Pre-validate: collect unique account IDs and verify they belong to profile
     const uniqueAccountIds = [...new Set(items.map((i) => i.accountId))];
@@ -318,18 +332,22 @@ export class TransactionsService {
             throw new Error("Account not found");
           }
 
-          await tx.insert(transactions).values({
-            profileId,
-            accountId: item.accountId,
-            categoryId: item.subcategoryId ?? item.categoryId ?? null,
-            type: item.type,
-            amount: item.amount,
-            description: item.description,
-            notes: item.notes,
-            date: item.date,
-            isCleared: item.isCleared,
-            transferId: item.transferId ?? null,
-          });
+          const [inserted] = await tx
+            .insert(transactions)
+            .values({
+              profileId,
+              accountId: item.accountId,
+              categoryId: item.subcategoryId ?? item.categoryId ?? null,
+              type: item.type,
+              amount: item.amount,
+              description: item.description,
+              notes: item.notes,
+              date: item.date,
+              isCleared: item.isCleared,
+              transferId: item.transferId ?? null,
+            })
+            .returning({ id: transactions.id });
+          if (inserted) importedIds.push(inserted.id);
 
           const balanceDelta =
             item.type === "INCOME" ? Number(item.amount) : -Number(item.amount);
@@ -344,6 +362,7 @@ export class TransactionsService {
         });
 
         imported++;
+        if (item.transferId) importedTransferIds.add(item.transferId);
       } catch (err) {
         errors.push({
           index: i,
@@ -352,7 +371,296 @@ export class TransactionsService {
       }
     }
 
-    return { imported, failed: errors.length, errors };
+    const mergedTransfers = await this.sweepPendingTransferPairs(
+      profileId,
+      importedTransferIds
+    );
+
+    return {
+      imported,
+      failed: errors.length,
+      mergedTransfers,
+      importedIds,
+      errors,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // SWEEP PENDING TRANSFER PAIRS
+  // For each transferId touched by a bulk import, look across the whole profile
+  // for a counter leg. When exactly two pending rows exist on different
+  // accounts, upgrade both to TYPE=TRANSFER. Skip groups with 1 (still
+  // pending) or 3+ (ambiguous — user resolves manually).
+  // ---------------------------------------------------------------------------
+  private async sweepPendingTransferPairs(
+    profileId: string,
+    transferIds: Set<string>
+  ): Promise<number> {
+    if (transferIds.size === 0) return 0;
+
+    let merged = 0;
+
+    for (const transferId of transferIds) {
+      try {
+        const upgraded = await db.transaction(async (tx) => {
+          const group = await tx
+            .select()
+            .from(transactions)
+            .where(
+              and(
+                eq(transactions.transferId, transferId),
+                eq(transactions.profileId, profileId)
+              )
+            );
+
+          if (group.length !== 2) return false;
+          if (group.some((r) => r.type === "TRANSFER")) return false;
+          if (group[0]!.accountId === group[1]!.accountId) return false;
+
+          await tx
+            .update(transactions)
+            .set({
+              type: "TRANSFER",
+              categoryId: null,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                inArray(
+                  transactions.id,
+                  group.map((r) => r.id)
+                ),
+                eq(transactions.profileId, profileId)
+              )
+            );
+
+          return true;
+        });
+
+        if (upgraded) merged++;
+      } catch {
+        // Swallow per-group failures; the rows remain pending and the user
+        // can merge them manually from the UI.
+      }
+    }
+
+    return merged;
+  }
+
+  // ---------------------------------------------------------------------------
+  // DETECT TRANSFER PAIRS (auto-detect heuristic for CSV import)
+  // ---------------------------------------------------------------------------
+  async detectTransferPairs(
+    profileId: string,
+    options: {
+      scope: "all" | "ids";
+      ids?: string[];
+      dateToleranceDays?: number;
+    }
+  ): Promise<DetectTransfersResult> {
+    const tolerance = options.dateToleranceDays ?? 1;
+
+    // Load all non-TRANSFER rows for the profile — they're the candidate pool.
+    // (Even when scope === "ids", a focal row's counter can be any older row,
+    // so we still load the whole non-TRANSFER set.)
+    const allRows = await db
+      .select({
+        id: transactions.id,
+        accountId: transactions.accountId,
+        type: transactions.type,
+        amount: transactions.amount,
+        date: transactions.date,
+        description: transactions.description,
+        transferId: transactions.transferId,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.profileId, profileId),
+          ne(transactions.type, "TRANSFER")
+        )
+      );
+
+    const candidates: MatcherCandidate[] = allRows.map((r) => ({
+      id: r.id,
+      accountId: r.accountId,
+      type: r.type as "INCOME" | "EXPENSE",
+      amount: r.amount,
+      date: r.date,
+      description: r.description ?? undefined,
+      transferId: r.transferId ?? undefined,
+    }));
+
+    const { pairs, ambiguous } = matchTransfers(candidates, {
+      dateToleranceDays: tolerance,
+    });
+
+    // When scope === "ids", restrict the output to pairs/ambiguities involving
+    // the focal rows. (We still match against the whole pool above so cross-
+    // import counters get found.)
+    const focal =
+      options.scope === "ids" && options.ids
+        ? new Set(options.ids)
+        : null;
+
+    const filteredPairs = focal
+      ? pairs.filter((p) => p.rowIds.some((id) => focal.has(id)))
+      : pairs;
+    const filteredAmbig = focal
+      ? ambiguous.filter((a) => focal.has(a.rowId))
+      : ambiguous;
+
+    // Hydrate row summaries (account name + description).
+    const accountIds = new Set<string>();
+    for (const p of filteredPairs)
+      for (const id of p.rowIds) {
+        const row = candidates.find((c) => c.id === id);
+        if (row) accountIds.add(row.accountId);
+      }
+    for (const a of filteredAmbig) {
+      const focalRow = candidates.find((c) => c.id === a.rowId);
+      if (focalRow) accountIds.add(focalRow.accountId);
+      for (const cid of a.candidateIds) {
+        const row = candidates.find((c) => c.id === cid);
+        if (row) accountIds.add(row.accountId);
+      }
+    }
+
+    const accountRows =
+      accountIds.size === 0
+        ? []
+        : await db
+            .select({ id: accounts.id, name: accounts.name })
+            .from(accounts)
+            .where(
+              and(
+                eq(accounts.profileId, profileId),
+                inArray(accounts.id, [...accountIds])
+              )
+            );
+    const accountNameById = new Map(
+      accountRows.map((a) => [a.id, a.name])
+    );
+
+    const hydrate = (id: string): DetectedTransferRow | null => {
+      const c = candidates.find((row) => row.id === id);
+      if (!c) return null;
+      return {
+        id: c.id,
+        accountId: c.accountId,
+        accountName: accountNameById.get(c.accountId) ?? "Unknown account",
+        type: c.type as "INCOME" | "EXPENSE",
+        amount: c.amount,
+        date: c.date,
+        description: c.description ?? null,
+      };
+    };
+
+    const hydratedPairs = filteredPairs.flatMap((p) => {
+      const left = hydrate(p.rowIds[0]);
+      const right = hydrate(p.rowIds[1]);
+      if (!left || !right) return [];
+      return [
+        {
+          id: p.id,
+          confidence: p.confidence,
+          rows: [left, right] as [DetectedTransferRow, DetectedTransferRow],
+        },
+      ];
+    });
+
+    const hydratedAmbig = filteredAmbig.flatMap((a) => {
+      const focalRow = hydrate(a.rowId);
+      if (!focalRow) return [];
+      const cands = a.candidateIds
+        .map(hydrate)
+        .filter((c): c is DetectedTransferRow => c !== null);
+      if (cands.length === 0) return [];
+      return [{ id: a.id, row: focalRow, candidates: cands }];
+    });
+
+    return {
+      pairs: hydratedPairs,
+      ambiguous: hydratedAmbig,
+      scanned: candidates.length,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // APPLY TRANSFER MERGES (user-confirmed pairs from auto-detect)
+  // ---------------------------------------------------------------------------
+  async applyTransferMerges(
+    profileId: string,
+    payload: ApplyTransferMergesRequest
+  ): Promise<ApplyTransferMergesResult> {
+    let merged = 0;
+    const errors: { pairIndex: number; message: string }[] = [];
+
+    for (const [index, pair] of payload.pairs.entries()) {
+      try {
+        const upgraded = await db.transaction(async (tx) => {
+          const rows = await tx
+            .select()
+            .from(transactions)
+            .where(
+              and(
+                eq(transactions.profileId, profileId),
+                inArray(transactions.id, [pair.leftId, pair.rightId])
+              )
+            );
+
+          if (rows.length !== 2) {
+            throw new BadRequestError(
+              "Pair rows not found",
+              "PAIR_NOT_FOUND"
+            );
+          }
+          if (rows.some((r) => r.type === "TRANSFER")) {
+            throw new BadRequestError(
+              "One or both rows are already a transfer",
+              "ALREADY_TRANSFER"
+            );
+          }
+          if (rows[0]!.accountId === rows[1]!.accountId) {
+            throw new BadRequestError(
+              "Both rows are on the same account",
+              "SAME_ACCOUNT_TRANSFER"
+            );
+          }
+
+          const sharedTransferId =
+            rows[0]!.transferId ??
+            rows[1]!.transferId ??
+            crypto.randomUUID();
+
+          await tx
+            .update(transactions)
+            .set({
+              type: "TRANSFER",
+              categoryId: null,
+              transferId: sharedTransferId,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(transactions.profileId, profileId),
+                inArray(transactions.id, [rows[0]!.id, rows[1]!.id])
+              )
+            );
+
+          return true;
+        });
+
+        if (upgraded) merged++;
+      } catch (err) {
+        errors.push({
+          pairIndex: index,
+          message: err instanceof Error ? err.message : "Unknown error",
+        });
+      }
+    }
+
+    return { merged, errors };
   }
 
   // ---------------------------------------------------------------------------

@@ -35,6 +35,14 @@ export {
   BulkCreateIncomeExpenseSchema,
   BulkCreateTransactionsSchema,
   BulkImportResultSchema,
+  // Transfer auto-detect
+  DetectedTransferRowSchema,
+  DetectedTransferPairSchema,
+  AmbiguousTransferMatchSchema,
+  DetectTransfersRequestSchema,
+  DetectTransfersResultSchema,
+  ApplyTransferMergesRequestSchema,
+  ApplyTransferMergesResultSchema,
   // Query schemas
   AccountQuerySchema,
   CategoryQuerySchema,
@@ -97,6 +105,14 @@ export type {
   BulkCreateIncomeExpense,
   BulkCreateTransactions,
   BulkImportResult,
+  // Transfer auto-detect types
+  DetectedTransferRow,
+  DetectedTransferPair,
+  AmbiguousTransferMatch,
+  DetectTransfersRequest,
+  DetectTransfersResult,
+  ApplyTransferMergesRequest,
+  ApplyTransferMergesResult,
   // Query types
   AccountQuery,
   CategoryQuery,

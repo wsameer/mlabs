@@ -26,13 +26,19 @@ export function toApiQuery(
 
   if (state.preset === "uncategorized") {
     base.uncategorizedOnly = true;
+  } else if (state.preset === "pending-transfer") {
+    base.pendingTransfersOnly = true;
   } else if (state.preset === "income") {
     base.type = "INCOME";
   } else if (state.preset === "expenses") {
     base.type = "EXPENSE";
   }
 
-  if (state.preset !== "uncategorized" && state.categoryIds?.length) {
+  if (
+    state.preset !== "uncategorized" &&
+    state.preset !== "pending-transfer" &&
+    state.categoryIds?.length
+  ) {
     base.categoryIds = state.categoryIds;
   }
 

@@ -4,6 +4,7 @@ import type {
   BulkCreateTransactions,
   CreateIncomeExpense,
   CreateTransfer,
+  ApplyTransferMergesRequest,
   UpdateIncomeExpense,
   UpdateTransfer,
 } from "@workspace/types";
@@ -32,6 +33,10 @@ const TransactionQueryRouteSchema = z.object({
     .pipe(z.array(z.string().uuid()))
     .optional(),
   uncategorizedOnly: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
+  pendingTransfersOnly: z
     .enum(["true", "false"])
     .transform((v) => v === "true")
     .optional(),
@@ -112,6 +117,8 @@ const UpdateTransactionBodySchema = z.object({
 const BulkImportResultSchema = z.object({
   imported: z.number(),
   failed: z.number(),
+  mergedTransfers: z.number().default(0),
+  importedIds: z.array(z.string().uuid()).default([]),
   errors: z.array(z.object({ index: z.number(), message: z.string() })),
 });
 
@@ -221,6 +228,138 @@ transactionsRoute.openapi(bulkRoute, async (c) => {
     payload.transactions
   );
   return c.json({ success: true as const, data: result }, 201);
+});
+
+// ---------------------------------------------------------------------------
+// POST /detect-transfers — auto-detect transfer pairs (heuristic)
+// ---------------------------------------------------------------------------
+
+const DetectedTransferRowSchema = z.object({
+  id: z.string().uuid(),
+  accountId: z.string().uuid(),
+  accountName: z.string(),
+  type: z.enum(["INCOME", "EXPENSE"]),
+  amount: z.string(),
+  date: z.string(),
+  description: z.string().nullable().optional(),
+});
+
+const DetectTransfersBodySchema = z.object({
+  scope: z.enum(["all", "ids"]),
+  ids: z.array(z.string().uuid()).optional(),
+  dateToleranceDays: z.number().int().min(0).max(7).default(1),
+});
+
+const DetectTransfersResultSchema = z.object({
+  pairs: z.array(
+    z.object({
+      id: z.string(),
+      confidence: z.enum(["explicit", "high"]),
+      rows: z.tuple([DetectedTransferRowSchema, DetectedTransferRowSchema]),
+    })
+  ),
+  ambiguous: z.array(
+    z.object({
+      id: z.string(),
+      row: DetectedTransferRowSchema,
+      candidates: z.array(DetectedTransferRowSchema),
+    })
+  ),
+  scanned: z.number(),
+});
+
+const detectRoute = createRoute({
+  method: "post",
+  path: "/detect-transfers",
+  tags: ["Transactions"],
+  summary: "Detect transfer pairs",
+  description:
+    "Heuristic match: rows with the same amount, opposite direction, on different accounts, within ±dateToleranceDays. Use scope='ids' to focus on a recent import; scope='all' to scan the whole profile.",
+  request: {
+    body: {
+      content: { "application/json": { schema: DetectTransfersBodySchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(DetectTransfersResultSchema),
+        },
+      },
+      description: "Detected pairs and ambiguous matches",
+    },
+  },
+});
+
+transactionsRoute.openapi(detectRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const body = c.req.valid("json");
+  const result = await transactionsService.detectTransferPairs(profileId, {
+    scope: body.scope,
+    ids: body.ids,
+    dateToleranceDays: body.dateToleranceDays,
+  });
+  return c.json({ success: true as const, data: result }, 200);
+});
+
+// ---------------------------------------------------------------------------
+// POST /apply-transfer-merges — apply user-confirmed pairs
+// ---------------------------------------------------------------------------
+
+const ApplyTransferMergesBodySchema = z.object({
+  pairs: z
+    .array(
+      z.object({
+        leftId: z.string().uuid(),
+        rightId: z.string().uuid(),
+      })
+    )
+    .min(1)
+    .max(500),
+});
+
+const ApplyTransferMergesResultSchema = z.object({
+  merged: z.number(),
+  errors: z.array(
+    z.object({ pairIndex: z.number(), message: z.string() })
+  ),
+});
+
+const applyMergesRoute = createRoute({
+  method: "post",
+  path: "/apply-transfer-merges",
+  tags: ["Transactions"],
+  summary: "Apply confirmed transfer merges",
+  description:
+    "Upgrades each (leftId, rightId) pair to TYPE=TRANSFER. Both rows must be income/expense and on different accounts.",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: ApplyTransferMergesBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: apiResponseSchema(ApplyTransferMergesResultSchema),
+        },
+      },
+      description: "Merge result",
+    },
+  },
+});
+
+transactionsRoute.openapi(applyMergesRoute, async (c) => {
+  const profileId = c.get("profileId");
+  const body = c.req.valid("json") as unknown as ApplyTransferMergesRequest;
+  const result = await transactionsService.applyTransferMerges(
+    profileId,
+    body
+  );
+  return c.json({ success: true as const, data: result }, 200);
 });
 
 // ---------------------------------------------------------------------------

@@ -51,8 +51,8 @@ export function UploadStep({
         <AlertCircleIcon className="size-4" />
         <AlertDescription>
           Maximum 500 transactions per import. Only CSV files are supported.
-          Transfers cannot be imported — import them as income/expense and
-          convert manually.
+          Bank CSVs work as-is — after import, we&apos;ll suggest possible
+          transfer pairs across your accounts for you to confirm.
         </AlertDescription>
       </Alert>
 
