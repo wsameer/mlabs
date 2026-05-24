@@ -1,1 +1,1 @@
-export * from "./components/ProfilePickerPage";
+export * from "./ProfilePickerPage";

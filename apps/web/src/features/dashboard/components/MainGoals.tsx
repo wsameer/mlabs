@@ -23,10 +23,12 @@ export function MainGoals() {
   return (
     <Card size="sm">
       <CardHeader>
-        <CardTitle>Main Goals (Mock data)</CardTitle>
+        <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+          Main Goals (Mock data)
+        </CardTitle>
         <CardAction>
           <Link
-            className="rounded-md bg-primary px-2 py-1 text-[10px] text-primary-foreground hover:bg-primary/80"
+            className="rounded-md border px-2 py-1 text-primary hover:bg-secondary/80"
             to={"/goals"}
           >
             New goal

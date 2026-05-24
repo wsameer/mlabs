@@ -9,7 +9,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAppProfile, useAppProfiles } from "@/hooks/use-app";
 import { setProfileId } from "@/lib/api-client";
 import { useAppStore } from "@/stores";
-import { DASHBOARD_ROUTE, PROFILES_ROUTE } from "@/constants";
+import { DASHBOARD_ROUTE } from "@/constants";
 import type { Profile } from "@workspace/types";
 
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
@@ -124,10 +124,7 @@ export function TeamSwitcher() {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              className="gap-2 p-2"
-              onClick={() => void navigate({ to: PROFILES_ROUTE })}
-            >
+            <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <PlusIcon className="size-4" />
               </div>

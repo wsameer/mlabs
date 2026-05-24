@@ -190,7 +190,9 @@ export function FinancialHealthCard({
       )}
     >
       <CardHeader className={isCompact ? "px-3" : undefined}>
-        <CardTitle>Financial health</CardTitle>
+        <CardTitle className="text-xs text-muted-foreground uppercase tabular-nums">
+          Financial health
+        </CardTitle>
       </CardHeader>
 
       <CardContent
