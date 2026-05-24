@@ -35,7 +35,7 @@ export function MainGoals() {
       </CardHeader>
       <CardContent>
         <ItemGroup className="gap-3">
-          <Item size="sm" variant="muted" className="flex-col items-stretch">
+          <Item size="xs" variant="muted" className="flex-col items-stretch">
             <ItemContent className="gap-3">
               <ItemDescription className="cn-font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase">
                 Retirement
@@ -56,7 +56,7 @@ export function MainGoals() {
               <Progress value={65} />
             </ItemContent>
           </Item>
-          <Item size="sm" variant="muted" className="flex-col items-stretch">
+          <Item size="xs" variant="muted" className="flex-col items-stretch">
             <ItemContent className="gap-3">
               <ItemDescription className="cn-font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase">
                 Real Estate
