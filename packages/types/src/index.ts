@@ -48,6 +48,8 @@ export {
   CategoryTotalsQuerySchema,
   CategoryTotalSchema,
   CategoryTotalsResponseSchema,
+  CashflowMonthlyItemSchema,
+  CashflowMonthlyResponseSchema,
   // Balance history
   BalanceHistoryQuerySchema,
   BalanceHistoryPointSchema,
@@ -107,6 +109,8 @@ export type {
   CategoryTotalsQuery,
   CategoryTotal,
   CategoryTotalsResponse,
+  CashflowMonthlyItem,
+  CashflowMonthlyResponse,
   // Balance history
   BalanceHistoryQuery,
   BalanceHistoryPoint,

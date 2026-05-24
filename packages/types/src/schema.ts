@@ -488,6 +488,22 @@ export type CategoryTotalsResponse = z.infer<
   typeof CategoryTotalsResponseSchema
 >;
 
+export const CashflowMonthlyItemSchema = z.object({
+  month: z.string(), // "YYYY-MM"
+  income: z.string(),
+  expense: z.string(),
+});
+
+export type CashflowMonthlyItem = z.infer<typeof CashflowMonthlyItemSchema>;
+
+export const CashflowMonthlyResponseSchema = z.object({
+  items: z.array(CashflowMonthlyItemSchema),
+});
+
+export type CashflowMonthlyResponse = z.infer<
+  typeof CashflowMonthlyResponseSchema
+>;
+
 // ============================================================================
 // Account Balance History
 // ============================================================================
