@@ -8,7 +8,6 @@ import type { Transaction } from "@workspace/types";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
 import { useUpdateTransaction } from "../api/use-transactions";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -36,15 +35,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@workspace/ui/components/sheet";
 import { DollarSignIcon } from "lucide-react";
 
 import { CategoryPicker } from "../create-transaction/components/category-picker";
@@ -104,8 +94,6 @@ export function EditTransactionDialog({
   transaction,
   onDelete,
 }: Props) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
   const title = "Edit transaction";
   const description = transaction
     ? `Editing ${transaction.type.toLowerCase()} transaction. Type cannot be changed.`
@@ -130,56 +118,18 @@ export function EditTransactionDialog({
     )
   ) : null;
 
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-131.25" data-testid="tx-edit-dialog">
-          <DialogHeader>
-            <DialogTitle className="text-left">{title}</DialogTitle>
-            <DialogDescription className="text-left">
-              {description}
-            </DialogDescription>
-          </DialogHeader>
-          {content}
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(nextOpen, eventDetails) => {
-        // Clicks inside nested popovers (category picker, calendar) portal
-        // outside the sheet's DOM tree, which Base UI treats as an outside
-        // press and would otherwise close the sheet. Ignore those.
-        if (!nextOpen && eventDetails?.reason === "outside-press") return;
-        onOpenChange(nextOpen);
-      }}
-    >
-      <SheetContent
-        side="bottom"
-        className="max-h-[90svh] overflow-y-auto rounded-t-xl"
-        data-testid="tx-edit-dialog"
-      >
-        <SheetHeader>
-          <SheetTitle className="text-left">{title}</SheetTitle>
-          <SheetDescription className="text-left">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-131.25" data-testid="tx-edit-dialog">
+        <DialogHeader>
+          <DialogTitle className="text-left">{title}</DialogTitle>
+          <DialogDescription className="text-left">
             {description}
-          </SheetDescription>
-        </SheetHeader>
-        <div className="px-6 pb-2">{content}</div>
-        <SheetFooter className="pt-2">
-          <SheetClose
-            render={
-              <Button variant="outline" data-testid="tx-edit-cancel">
-                Cancel
-              </Button>
-            }
-          />
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          </DialogDescription>
+        </DialogHeader>
+        {content}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -418,27 +368,7 @@ function EditIncomeExpenseForm({
       </FieldGroup>
 
       {/* Actions */}
-      <div className="flex justify-between gap-2 md:hidden">
-        {onDelete && (
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={onDelete}
-            data-testid="tx-edit-delete"
-          >
-            Delete
-          </Button>
-        )}
-        <Button
-          type="submit"
-          disabled={updateTransaction.isPending}
-          className="flex-1"
-          data-testid="tx-edit-save"
-        >
-          {updateTransaction.isPending ? "Saving..." : "Save"}
-        </Button>
-      </div>
-      <div className="hidden justify-end gap-2 md:flex">
+      <div className="flex justify-end gap-2">
         {onDelete && (
           <Button
             type="button"
@@ -693,27 +623,7 @@ function EditTransferForm({
       </FieldGroup>
 
       {/* Actions */}
-      <div className="flex justify-between gap-2 md:hidden">
-        {onDelete && (
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={onDelete}
-            data-testid="tx-edit-delete"
-          >
-            Delete
-          </Button>
-        )}
-        <Button
-          type="submit"
-          disabled={updateTransaction.isPending}
-          className="flex-1"
-          data-testid="tx-edit-save"
-        >
-          {updateTransaction.isPending ? "Saving..." : "Save"}
-        </Button>
-      </div>
-      <div className="hidden justify-end gap-2 md:flex">
+      <div className="flex justify-end gap-2">
         {onDelete && (
           <Button
             type="button"

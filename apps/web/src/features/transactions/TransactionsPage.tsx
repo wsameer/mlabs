@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
+import React, { useMemo, useState } from "react";
 import type { Transaction } from "@workspace/types";
 
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
@@ -17,10 +16,7 @@ import { EmptyTransactions } from "./components/EmptyTransactions";
 import { FilteredEmpty } from "./components/FilteredEmpty";
 import { EditTransactionDialog } from "./edit-transaction";
 import { DeleteTransactionDialog } from "./delete-transaction";
-import {
-  TransactionsSummaryContent,
-  TransactionsSummaryMobile,
-} from "./summary";
+import { TransactionsSummaryContent } from "./summary";
 import {
   Item,
   ItemActions,
@@ -39,15 +35,12 @@ import { useDateRange } from "@/hooks/use-filters";
 import { parseDateString, toDateString } from "@/lib/timezone";
 import {
   AccountScopeBanner,
-  SearchInput,
   TransactionFilters,
-  TransactionFiltersDrawer,
   toApiQuery,
   useTransactionFilters,
 } from "./filters";
 
 export function TransactionsPage() {
-  const router = useRouter();
   const { to, from } = useDateRange();
   const { setOpenCreateTransaction } = useUiActions();
   const {
@@ -107,22 +100,12 @@ export function TransactionsPage() {
 
   const isAccountScoped = (filterState.accountIds?.length ?? 0) > 0;
 
-  const handleMobileBack = useCallback(() => {
-    if (window.history.length > 1) {
-      router.history.back();
-    } else {
-      void router.navigate({ to: ACCOUNTS_ROUTE });
-    }
-  }, [router]);
-
   useLayoutConfig({
     pageTitle: "Transactions",
     actions: <TimeGrainSelect />,
     breadcrumbs: isAccountScoped
       ? [{ label: "Accounts", to: ACCOUNTS_ROUTE }, { label: "Transactions" }]
       : null,
-    mobileBackPath: isAccountScoped ? ACCOUNTS_ROUTE : null,
-    onMobileBack: isAccountScoped ? handleMobileBack : null,
   });
 
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
@@ -155,30 +138,12 @@ export function TransactionsPage() {
         {/* Row 1: global date range */}
         <DateRangeFilter />
 
-        <Card className="hidden lg:block">
+        <Card>
           <CardContent>
             {/* Row 2: desktop filters */}
             <TransactionFilters disabled={filtersDisabled} />
           </CardContent>
         </Card>
-
-        {/* Row 2 (mobile): search + Filters sheet + summary */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <SearchInput
-            value={filterState.q ?? ""}
-            onDebouncedChange={(next) =>
-              setFilters({ q: next.length > 0 ? next : undefined })
-            }
-            disabled={filtersDisabled}
-            className="min-w-0 flex-1"
-          />
-          <TransactionFiltersDrawer disabled={filtersDisabled} />
-          <TransactionsSummaryMobile
-            transactions={transactions}
-            categoryMap={categoryMap}
-            accountMap={accountMap}
-          />
-        </div>
 
         <AccountScopeBanner
           accountIds={filterState.accountIds}
@@ -199,7 +164,7 @@ export function TransactionsPage() {
           <Card className="p-0">
             <CardContent className="p-0">
               <ScrollArea className="h-[70svh]">
-                <div className="pb-12 sm:pb-0">
+                <div>
                   {sortedDates.map((date) => {
                     const groupedTransactions = grouped[date];
                     const totals = totalsByDate[date] ?? {
@@ -328,7 +293,7 @@ export function TransactionsPage() {
         />
       </div>
 
-      <div className="hidden shrink-0 lg:block">
+      <div className="shrink-0">
         <TransactionsSummaryContent
           transactions={transactions}
           categoryMap={categoryMap}

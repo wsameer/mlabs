@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ChartNoAxesCombinedIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { Transaction } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
@@ -13,13 +13,6 @@ import {
   ItemFooter,
   ItemGroup,
 } from "@workspace/ui/components/item";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@workspace/ui/components/drawer";
 import { formatCurrency } from "@/features/accounts/lib/format-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import {
@@ -129,7 +122,7 @@ function useSummaryData(
 }
 
 // ---------------------------------------------------------------------------
-// Shared content — rendered inside both the desktop sidebar and mobile drawer
+// Shared content
 // ---------------------------------------------------------------------------
 
 function SummaryContent({
@@ -298,7 +291,7 @@ function SummaryRow({
 }
 
 // ---------------------------------------------------------------------------
-// Desktop sidebar content (rendered inside layout's left sidebar)
+// Sidebar content
 // ---------------------------------------------------------------------------
 
 export function TransactionsSummaryContent({
@@ -320,52 +313,5 @@ export function TransactionsSummaryContent({
       categories={categories}
       accounts={accounts}
     />
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Mobile summary button + drawer (< lg)
-// ---------------------------------------------------------------------------
-
-export function TransactionsSummaryMobile({
-  transactions,
-  categoryMap,
-  accountMap,
-}: TransactionsSummaryProps) {
-  const { income, expenses, net, categories, accounts } = useSummaryData(
-    transactions,
-    categoryMap,
-    accountMap
-  );
-
-  return (
-    <>
-      <Drawer>
-        <DrawerTrigger asChild>
-          <Button
-            variant="outline"
-            className="lg:hidden"
-            title="View summary"
-            data-testid="tx-summary-mobile-trigger"
-          >
-            <ChartNoAxesCombinedIcon className="size-3" />
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Summary</DrawerTitle>
-          </DrawerHeader>
-          <div className="no-scrollbar overflow-y-auto px-4">
-            <SummaryContent
-              income={income}
-              expenses={expenses}
-              net={net}
-              categories={categories}
-              accounts={accounts}
-            />
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </>
   );
 }
