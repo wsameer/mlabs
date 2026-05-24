@@ -14,14 +14,14 @@ import {
 import { AddAccount } from "@/features/add-accounts/AddAccount";
 import { NetWorthChart } from "@/features/net-worth-chart";
 
-import { useAccounts } from "../api/use-accounts";
-import { calculateAccountTotals } from "../lib/account-calculations";
-import { formatCurrency } from "../lib/format-utils";
+import { useAccounts } from "./api/use-accounts";
+import { calculateAccountTotals } from "./lib/account-calculations";
+import { formatCurrency } from "./lib/format-utils";
 
-import { EmptyAccounts } from "./EmptyAccounts";
-import { AccountsView } from "./AccountsView";
-import { AccountKpis } from "./AccountKpis";
-import { AccountsRail } from "./AccountsRail";
+import { EmptyAccounts } from "./components/EmptyAccounts";
+import { AccountsView } from "./components/AccountsView";
+import { AccountKpis } from "./components/AccountKpis";
+import { AccountsRail } from "./components/AccountsRail";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();

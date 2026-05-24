@@ -1,4 +1,4 @@
-export { AccountsPage } from "./components/AccountsPage";
+export { AccountsPage } from "./AccountsPage";
 export {
   calculateAccountTotals,
   calculateGroupTotal,
