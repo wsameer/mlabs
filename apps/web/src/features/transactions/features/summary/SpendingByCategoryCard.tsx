@@ -11,7 +11,6 @@ import {
   Item,
   ItemContent,
   ItemDescription,
-  ItemFooter,
   ItemGroup,
 } from "@workspace/ui/components/item";
 import { Progress } from "@workspace/ui/components/progress";

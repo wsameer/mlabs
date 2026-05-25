@@ -1,26 +1,15 @@
-import { useMemo } from "react";
-import { Pie, PieChart } from "recharts";
-
 import type { Account } from "@workspace/types";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@workspace/ui/components/chart";
 
 import { ACCOUNT_GROUP_METADATA } from "../lib/account-groups";
 import {
   calculateAccountTotals,
   calculateCashOnHand,
-  calculateGroupTotals,
 } from "../lib/account-calculations";
 import { formatCurrency } from "../lib/format-utils";
 import {
