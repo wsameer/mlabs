@@ -9,7 +9,6 @@ export const TRANSACTIONS_ROUTE = "/transactions" as keyof FileRoutesByPath;
 export const ACCOUNTS_ROUTE = "/accounts" as keyof FileRoutesByPath;
 export const SETTINGS_ROUTE = "/settings" as keyof FileRoutesByPath;
 export const BUDGET_ROUTE = "/budget" as keyof FileRoutesByPath;
-export const NET_WORTH_ROUTE = "/net-worth" as keyof FileRoutesByPath;
 export const GOALS_ROUTE = "/goals" as keyof FileRoutesByPath;
 export const SUBSCRIPTIONS_ROUTE = "/subscriptions" as keyof FileRoutesByPath;
 export const CATEGORIES_ROUTE = "/categories" as keyof FileRoutesByPath;

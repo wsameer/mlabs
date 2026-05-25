@@ -158,7 +158,6 @@ In the browser, with the dev server running:
 - `/dashboard` → header shows a single crumb reading `Dashboard`.
 - `/accounts` → `Accounts`.
 - `/budget` → `Budget`.
-- `/net-worth` → `Net Worth`.
 - `/goals` → `Goals`.
 - `/subscriptions` → `Subscriptions`.
 - `/categories` → `Categories`.
@@ -425,7 +424,6 @@ With both `pnpm dev:api` and `pnpm dev:web` running, walk every authenticated ro
 | `/transactions` (account-scoped) | `Accounts` › `Transactions` | First crumb is a TanStack Router `Link` |
 | `/accounts` | `Accounts` | |
 | `/budget` | `Budget` | |
-| `/net-worth` | `Net Worth` | |
 | `/goals` | `Goals` | |
 | `/subscriptions` | `Subscriptions` | |
 | `/categories` | `Categories` | |
