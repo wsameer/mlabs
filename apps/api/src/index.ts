@@ -67,7 +67,7 @@ app.use(
   "/api/*",
   rateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100, // limit each IP to 100 requests per windowMs
+    limit: 500, // limit each IP to 100 requests per windowMs
     standardHeaders: "draft-6",
     keyGenerator: (c) => {
       return (
