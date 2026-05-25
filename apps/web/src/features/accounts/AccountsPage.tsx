@@ -12,7 +12,6 @@ import {
 } from "@workspace/ui/components/alert";
 
 import { AddAccount } from "@/features/add-accounts/AddAccount";
-import { NetWorthChart } from "@/features/net-worth-chart";
 
 import { useAccounts } from "./api/use-accounts";
 
@@ -73,10 +72,7 @@ export function AccountsPage() {
     <div className="flex w-full gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div className="grid items-stretch gap-4 md:grid-cols-12">
-          <div className="flex flex-col md:col-span-7">
-            <NetWorthChart />
-          </div>
-          <div className="flex flex-col md:col-span-5">
+          <div className="flex flex-col md:col-span-8">
             <AccountKpis accounts={accounts} currency={currency} />
           </div>
         </div>

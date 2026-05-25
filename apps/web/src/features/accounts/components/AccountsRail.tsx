@@ -37,7 +37,7 @@ export function AccountsRail({ accounts, currency }: AccountsRailProps) {
   return (
     <Card className="m-1 mt-2">
       <CardHeader>
-        <CardTitle>Accounts</CardTitle>
+        <CardTitle>Accounts Groups</CardTitle>
       </CardHeader>
       <CardContent>
         <ItemGroup>

@@ -11,6 +11,7 @@ import type {
   TransactionAccountLookup,
   TransactionCategoryLookup,
 } from "../types";
+import { useMemo } from "react";
 
 export function TransactionListItem({
   transaction,
@@ -47,8 +48,6 @@ export function TransactionListItem({
     accountIdFilter,
   });
 
-  console.log("🚀 categoryName ~ :", categoryName);
-
   const subcategoryName =
     transaction.type === "TRANSFER" || isPendingTransfer
       ? undefined
@@ -58,6 +57,18 @@ export function TransactionListItem({
     accountName,
     linkedAccountName,
   });
+
+  const displayType = useMemo(() => {
+    if (!accountIdFilter) {
+      return transaction.type;
+    }
+
+    if (transaction.direction === "INFLOW") return "INCOME";
+
+    if (transaction.direction === "OUTFLOW") return "EXPENSE";
+
+    return transaction.type;
+  }, [transaction, accountIdFilter]);
 
   return (
     <Fragment>
@@ -69,7 +80,7 @@ export function TransactionListItem({
         merchant={transaction.description || transaction.type.toLowerCase()}
         accountsInvolved={accountsInvolved}
         amount={formattedAmount}
-        type={transaction.type}
+        type={displayType}
         onClick={() => onEditTransaction(transaction)}
         aria-label={`${transaction.type} ${transaction.description ?? ""} ${formattedAmount}`}
       />
