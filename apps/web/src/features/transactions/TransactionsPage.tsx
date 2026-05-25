@@ -92,7 +92,49 @@ export function TransactionsPage() {
     return map;
   }, [categories]);
 
-  const transactions = useMemo(() => data?.transactions ?? [], [data]);
+  const transactions = useMemo(() => {
+    const raw = data?.transactions ?? [];
+
+    // Separate transfers from non-transfers
+    const transfers = raw.filter(
+      (t) => t.type === "TRANSFER" && t.transferId != null
+    );
+    const nonTransfers = raw.filter((t) => t.type !== "TRANSFER");
+
+    // Group transfers by transferId, then merge each pair into one
+    const transferMap = transfers.reduce<Record<string, typeof transfers>>(
+      (acc, t) => {
+        (acc[t.transferId!] ??= []).push(t);
+        return acc;
+      },
+      {}
+    );
+
+    const mergedTransfers = Object.values(transferMap).map((pair) => {
+      if (pair.length !== 2) return pair[0]; // malformed pair, return as-is
+
+      const filterAccountId = queryFilters?.accountId;
+
+      if (filterAccountId) {
+        // Keep whichever leg belongs to the filtered account
+        const match = pair.find((t) => t.accountId === filterAccountId);
+        const base = match ?? pair[0];
+        return {
+          ...base,
+          type: (base.direction === "INFLOW" ? "INCOME" : "EXPENSE") as
+            | "INCOME"
+            | "EXPENSE",
+        };
+      } else {
+        // No accountId filter — keep the INFLOW leg
+        const inflow = pair.find((t) => t.direction === "INFLOW") ?? pair[0];
+        return { ...inflow, type: "TRANSFER" as const };
+      }
+    });
+
+    return [...nonTransfers, ...mergedTransfers];
+  }, [data, queryFilters]);
+
   const summary = useTransactionSummaryData({
     transactions,
     categoryMap,
@@ -161,6 +203,7 @@ export function TransactionsPage() {
                 categoryMap={categoryMap}
                 accountMap={accountMap}
                 onEditTransaction={setEditTx}
+                accountIdFilter={queryFilters.accountId}
               />
             )}
           </div>
