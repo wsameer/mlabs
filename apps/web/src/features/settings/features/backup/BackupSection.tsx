@@ -171,9 +171,7 @@ function FindTransfersPanel() {
               toast.success(`Merged ${apply.merged} transfers`);
             }
             if (apply.errors.length > 0) {
-              toast.error(
-                `${apply.errors.length} pair(s) could not be merged`
-              );
+              toast.error(`${apply.errors.length} pair(s) could not be merged`);
             }
             setResult(null);
           },
@@ -196,8 +194,8 @@ function FindTransfersPanel() {
         <h3 className="text-base font-semibold">Find transfers</h3>
         <p className="text-sm text-muted-foreground">
           Scan all your transactions for likely transfer pairs — same amount,
-          opposite direction, on different accounts, within ±1 day. Useful
-          after importing bank CSVs that don&apos;t mark transfers explicitly.
+          opposite direction, on different accounts, within ±1 day. Useful after
+          importing bank CSVs that don&apos;t mark transfers explicitly.
         </p>
       </div>
 
@@ -239,9 +237,7 @@ function FindTransfersPanel() {
                 variant="ghost"
                 size="sm"
                 onClick={handleScan}
-                disabled={
-                  detectMutation.isPending || applyMutation.isPending
-                }
+                disabled={detectMutation.isPending || applyMutation.isPending}
               >
                 <RefreshCwIcon className="size-3.5" />
                 Re-scan

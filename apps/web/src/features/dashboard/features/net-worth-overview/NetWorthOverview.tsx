@@ -23,7 +23,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const MONTH_INITIAL = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+const MONTH_INITIAL = [
+  "J",
+  "F",
+  "M",
+  "A",
+  "M",
+  "J",
+  "J",
+  "A",
+  "S",
+  "O",
+  "N",
+  "D",
+];
 const MONTH_LABEL = [
   "January",
   "February",

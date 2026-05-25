@@ -430,7 +430,9 @@ export const DetectTransfersRequestSchema = z.object({
   ids: z.array(z.uuid()).optional(),
   dateToleranceDays: z.number().int().min(0).max(7).default(1),
 });
-export type DetectTransfersRequest = z.infer<typeof DetectTransfersRequestSchema>;
+export type DetectTransfersRequest = z.infer<
+  typeof DetectTransfersRequestSchema
+>;
 
 export const DetectTransfersResultSchema = z.object({
   pairs: z.array(DetectedTransferPairSchema),

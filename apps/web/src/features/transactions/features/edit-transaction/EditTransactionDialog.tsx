@@ -180,9 +180,7 @@ function applyTypeChange(
     // available so the user doesn't have to re-pick it.
     const counterAccountId = transaction.linkedAccountId ?? undefined;
     const fromAccountId =
-      current.type === "EXPENSE"
-        ? current.accountId
-        : counterAccountId;
+      current.type === "EXPENSE" ? current.accountId : counterAccountId;
     const toAccountId =
       current.type === "INCOME" ? current.accountId : counterAccountId;
 
@@ -365,13 +363,13 @@ function EditTransactionForm({
   const isPendingTransfer =
     transaction.type !== "TRANSFER" && !!transaction.transferId;
 
-  const showMergeTransferPanel = isPendingTransfer && currentType !== "TRANSFER";
+  const showMergeTransferPanel =
+    isPendingTransfer && currentType !== "TRANSFER";
 
   // Pending transfer rows must be promoted via the merge panel below — toggling
   // the type freehand would skip the pairing logic and risk orphaning the
   // counter leg. Lock the toggle until the user merges or removes the pair.
-  const isTypeToggleDisabled =
-    updateTransaction.isPending || isPendingTransfer;
+  const isTypeToggleDisabled = updateTransaction.isPending || isPendingTransfer;
 
   return (
     <form

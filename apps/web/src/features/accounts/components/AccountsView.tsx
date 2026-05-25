@@ -2,64 +2,44 @@ import { useMemo } from "react";
 import type { Account, AccountGroupType } from "@workspace/types";
 
 import { ACCOUNT_GROUP_METADATA } from "../lib/account-groups";
-import { AccountGroupSection } from "./AccountGroupSection";
-import { AccountCard } from "./AccountCard";
-import { calculateGroupTotal } from "../lib/account-calculations";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { AccountTile } from "./AccountTile";
 
 interface AccountsViewProps {
   accounts: Account[];
 }
 
+// Stable order — we want active tiles to flow in a deterministic group order
+// regardless of insertion timing.
+const GROUP_ORDER: AccountGroupType[] = [
+  "chequing",
+  "savings",
+  "cash",
+  "credit_card",
+  "investment",
+  "loan",
+  "mortgage",
+  "asset",
+  "other",
+];
+
 export function AccountsView({ accounts }: AccountsViewProps) {
-  const groupedAccounts = useMemo(() => {
-    const groups: Partial<Record<AccountGroupType, Account[]>> = {};
-
-    accounts.forEach((account) => {
-      if (!groups[account.group]) {
-        groups[account.group] = [];
-      }
-      groups[account.group]!.push(account);
+  const sortedAccounts = useMemo(() => {
+    const orderIndex = new Map(GROUP_ORDER.map((g, i) => [g, i]));
+    return [...accounts].sort((a, b) => {
+      const ga = orderIndex.get(a.group) ?? Infinity;
+      const gb = orderIndex.get(b.group) ?? Infinity;
+      if (ga !== gb) return ga - gb;
+      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+      return a.name.localeCompare(b.name);
     });
-
-    Object.keys(groups).forEach((key) => {
-      groups[key as AccountGroupType]!.sort((a, b) => {
-        if (a.sortOrder !== b.sortOrder) {
-          return a.sortOrder - b.sortOrder;
-        }
-        return a.name.localeCompare(b.name);
-      });
-    });
-
-    return groups;
   }, [accounts]);
 
-  const currency = accounts[0]?.currency ?? "CAD";
-
   return (
-    <div className="flex w-1/3 flex-col gap-1">
-      {Object.entries(groupedAccounts).map(([group, groupAccounts], index) => {
-        const metadata = ACCOUNT_GROUP_METADATA[group as AccountGroupType];
-        const groupTotal = calculateGroupTotal(groupAccounts);
-
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2">
+      {sortedAccounts.map((account) => {
+        const meta = ACCOUNT_GROUP_METADATA[account.group];
         return (
-          <Card key={group} size="sm" className="mb-1">
-            <CardContent>
-              <AccountGroupSection
-                id={group}
-                label={metadata.label}
-                icon={metadata.icon}
-                accountCount={groupAccounts.length}
-                total={Math.abs(groupTotal)}
-                currency={currency}
-                defaultOpen={index === 0}
-              >
-                {groupAccounts.map((account) => (
-                  <AccountCard key={account.id} account={account} />
-                ))}
-              </AccountGroupSection>
-            </CardContent>
-          </Card>
+          <AccountTile key={account.id} account={account} groupMeta={meta} />
         );
       })}
     </div>

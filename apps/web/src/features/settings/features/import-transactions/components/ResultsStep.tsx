@@ -40,9 +40,7 @@ export function ResultsStep({
               <p className="text-2xl font-bold text-sky-600">
                 {result.mergedTransfers}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Transfers merged
-              </p>
+              <p className="text-xs text-muted-foreground">Transfers merged</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-destructive">

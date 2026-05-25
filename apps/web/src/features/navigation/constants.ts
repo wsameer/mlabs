@@ -6,7 +6,6 @@ import {
   SettingsIcon,
   TagsIcon,
   TargetIcon,
-  TrendingUpIcon,
   WalletCardsIcon,
 } from "lucide-react";
 

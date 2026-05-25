@@ -82,10 +82,7 @@ export function TransferDetectionReview({
     });
   };
 
-  const totalSelected = useMemo(
-    () => Object.keys(selected).length,
-    [selected]
-  );
+  const totalSelected = useMemo(() => Object.keys(selected).length, [selected]);
 
   const handleConfirm = () => {
     onConfirm(Object.values(selected));
@@ -97,9 +94,9 @@ export function TransferDetectionReview({
         <div>
           <h3 className="text-base font-semibold">No transfers detected</h3>
           <p className="text-sm text-muted-foreground">
-            Scanned {result.scanned} transactions. Nothing matched the
-            heuristic (same amount, opposite direction, on different accounts,
-            within ±1 day).
+            Scanned {result.scanned} transactions. Nothing matched the heuristic
+            (same amount, opposite direction, on different accounts, within ±1
+            day).
           </p>
         </div>
         {onCancel && (
@@ -140,7 +137,7 @@ export function TransferDetectionReview({
 
           {result.ambiguous.length > 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium uppercase text-muted-foreground">
+              <p className="text-xs font-medium text-muted-foreground uppercase">
                 Needs your help
               </p>
               {result.ambiguous.map((a) => (
@@ -158,11 +155,7 @@ export function TransferDetectionReview({
 
       <div className="flex justify-end gap-2">
         {onCancel && (
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            disabled={isApplying}
-          >
+          <Button variant="outline" onClick={onCancel} disabled={isApplying}>
             {cancelLabel}
           </Button>
         )}
@@ -170,9 +163,7 @@ export function TransferDetectionReview({
           onClick={handleConfirm}
           disabled={isApplying || totalSelected === 0}
         >
-          {isApplying
-            ? "Merging…"
-            : `${confirmLabel} (${totalSelected})`}
+          {isApplying ? "Merging…" : `${confirmLabel} (${totalSelected})`}
         </Button>
       </div>
     </div>
@@ -236,8 +227,7 @@ function AmbiguousCard({
               Multiple candidates
             </Badge>
             <span className="text-muted-foreground">
-              ${match.row.amount} on {match.row.date} —{" "}
-              {match.row.accountName}
+              ${match.row.amount} on {match.row.date} — {match.row.accountName}
             </span>
           </div>
           <p className="text-xs text-muted-foreground">

@@ -139,9 +139,7 @@ export function ImportSection() {
               toast.success(`Merged ${apply.merged} transfers`);
             }
             if (apply.errors.length > 0) {
-              toast.error(
-                `${apply.errors.length} pair(s) could not be merged`
-              );
+              toast.error(`${apply.errors.length} pair(s) could not be merged`);
             }
             setStep("results");
           },
