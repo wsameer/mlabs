@@ -130,12 +130,14 @@ export class TransactionsService {
       .limit(limit)
       .offset(offset);
 
+    // Collect every transferId in the page (real TRANSFER rows AND pending
+    // legs) so we can hydrate linkedAccountId for both. Without this, pending
+    // rows lose their counter leg pointer and the edit dialog can't pre-fill
+    // both sides when toggling to TRANSFER.
     const transferIds = [
       ...new Set(
         rows
-          .map((row) =>
-            row.type === "TRANSFER" && row.transferId ? row.transferId : null
-          )
+          .map((row) => (row.transferId ? row.transferId : null))
           .filter((transferId): transferId is string => transferId !== null)
       ),
     ];
@@ -191,10 +193,13 @@ export class TransactionsService {
 
     const categoryParentMap = await loadCategoryParentMap(profileId);
 
-    if (transaction.type !== "TRANSFER" || !transaction.transferId) {
+    if (!transaction.transferId) {
       return serializeTransaction(transaction, { categoryParentMap });
     }
 
+    // Both real transfers and pending pairs share a transferId — fetch the
+    // group so the response carries linkedAccountId/linkedTransactionId, which
+    // the edit dialog uses to pre-fill the other side when toggling type.
     const pairedRows = await db
       .select()
       .from(transactions)
@@ -203,20 +208,17 @@ export class TransactionsService {
           eq(transactions.transferId, transaction.transferId),
           eq(transactions.profileId, profileId)
         )
-      )
-      .limit(2);
+      );
 
-    const [serialized] = serializeTransactions(
+    const [serialized] = serializeTransactionsWithContext(
+      [transaction],
       pairedRows,
       categoryParentMap
-    ).filter((row) => row.id === transaction.id);
+    );
 
     return (
       serialized ??
-      serializeTransaction(transaction, {
-        direction: "OUTFLOW",
-        categoryParentMap,
-      })
+      serializeTransaction(transaction, { categoryParentMap })
     );
   }
 
@@ -1131,21 +1133,40 @@ export class TransactionsService {
       }
 
       // Gather every row affected by the existing transaction so we can reverse
-      // balances cleanly. For a transfer, that's both legs.
-      const existingRows =
-        existing.type === "TRANSFER" && existing.transferId
-          ? await tx
-              .select()
-              .from(transactions)
-              .where(
-                and(
-                  eq(transactions.transferId, existing.transferId),
-                  eq(transactions.profileId, profileId)
-                )
+      // balances cleanly. A real TRANSFER has both legs sharing transferId; a
+      // pending pair (two INCOME/EXPENSE rows imported as transfer halves) also
+      // shares transferId and must be unwound together — otherwise the
+      // untouched counter leg keeps its IE balance effect after the type
+      // change and the destination account double-books.
+      const existingRows = existing.transferId
+        ? await tx
+            .select()
+            .from(transactions)
+            .where(
+              and(
+                eq(transactions.transferId, existing.transferId),
+                eq(transactions.profileId, profileId)
               )
-          : [existing];
+            )
+        : [existing];
 
-      // Reverse balance effects of the existing rows.
+      if (existingRows.length > 2) {
+        throw new BadRequestError(
+          `Found ${existingRows.length} transactions sharing this transferId. Remove duplicates before changing type.`,
+          "AMBIGUOUS_TRANSFER_GROUP"
+        );
+      }
+
+      // Reverse balance effects of the existing rows. For a real TRANSFER use
+      // the outflow/inflow direction; for a pending pair each leg still
+      // carries its own IE balance effect, so reverse it accordingly.
+      const isRealTransfer =
+        existingRows.length === 2 &&
+        existingRows.every((r) => r.type === "TRANSFER");
+      const minCreated = isRealTransfer
+        ? Math.min(...existingRows.map((r) => r.createdAt.getTime()))
+        : 0;
+
       for (const row of existingRows) {
         const [account] = await tx
           .select()
@@ -1162,10 +1183,6 @@ export class TransactionsService {
         } else if (row.type === "EXPENSE") {
           reversal = Number(row.amount);
         } else if (row.type === "TRANSFER") {
-          // The earliest-created leg is the outflow; reverse accordingly.
-          const minCreated = Math.min(
-            ...existingRows.map((r) => r.createdAt.getTime())
-          );
           const isOutflow = row.createdAt.getTime() === minCreated;
           reversal = isOutflow ? Number(row.amount) : -Number(row.amount);
         }

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
 
 const TEST_DB = path.join(
   os.tmpdir(),
@@ -97,5 +98,37 @@ describe("getCategoryTotals", () => {
     expect(result.grandTotal).toBe("350");
     expect(result.items).toHaveLength(1);
     expect(result.items[0]?.transactionCount).toBe(2);
+  });
+
+  it("excludes pending transfer legs (rows with transferId set)", async () => {
+    // Tag a row as a pending transfer leg and confirm it drops out of the
+    // income totals — otherwise transfers between own accounts inflate income.
+    await dbMod.db.insert(schemaMod.transactions).values({
+      id: "10000000-0000-0000-0000-000000000299",
+      profileId: PROFILE_ID,
+      accountId: ACCOUNT_ID,
+      categoryId: CATEGORY_ID,
+      type: "INCOME",
+      amount: "999.00",
+      description: "pending transfer in",
+      date: "2026-05-20",
+      transferId: "XFER-REPORT-EXCLUDE",
+    });
+
+    const result = await service.getCategoryTotals(PROFILE_ID, {
+      type: "INCOME",
+    });
+
+    expect(result.grandTotal).toBe("350");
+    expect(result.items[0]?.transactionCount).toBe(2);
+
+    await dbMod.db
+      .delete(schemaMod.transactions)
+      .where(
+        eq(
+          schemaMod.transactions.id,
+          "10000000-0000-0000-0000-000000000299"
+        )
+      );
   });
 });

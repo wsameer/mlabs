@@ -1,3 +1,5 @@
+import { isNull } from "drizzle-orm";
+
 import { categories, transactions } from "@workspace/db";
 import type {
   CashflowMonthlyResponse,
@@ -15,6 +17,9 @@ export class ReportsService {
     const conditions = [
       eq(transactions.profileId, profileId),
       eq(transactions.type, filters.type),
+      // Pending transfer legs are still tagged INCOME/EXPENSE but represent
+      // money in flight — exclude them so they don't inflate category totals.
+      isNull(transactions.transferId),
     ];
 
     if (filters.startDate) {
@@ -86,6 +91,8 @@ export class ReportsService {
         and(
           eq(transactions.profileId, profileId),
           inArray(transactions.type, ["INCOME", "EXPENSE"]),
+          // Skip pending transfer legs — they aren't real income/expense.
+          isNull(transactions.transferId),
           gte(transactions.date, startDate)
         )
       )

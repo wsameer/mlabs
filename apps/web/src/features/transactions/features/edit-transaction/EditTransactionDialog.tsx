@@ -38,7 +38,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { DollarSignIcon } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@workspace/ui/components/alert";
+import { AlertTriangleIcon, DollarSignIcon } from "lucide-react";
 
 import { CategoryPicker } from "../create-transaction/components/category-picker";
 import { MergeTransferPanel } from "./MergeTransferPanel";
@@ -156,7 +161,8 @@ function buildInitialDefaults(transaction: Transaction): EditFormValues {
 
 function applyTypeChange(
   current: EditFormValues,
-  nextType: TransactionType
+  nextType: TransactionType,
+  transaction: Transaction
 ): EditFormValues {
   if (current.type === nextType) return current;
 
@@ -169,11 +175,16 @@ function applyTypeChange(
   };
 
   if (nextType === "TRANSFER") {
-    // Coming from INCOME/EXPENSE: route current account into the matching leg.
+    // Coming from INCOME/EXPENSE: route current account into the matching leg
+    // and pre-fill the counter from the pending pair's linkedAccountId when
+    // available so the user doesn't have to re-pick it.
+    const counterAccountId = transaction.linkedAccountId ?? undefined;
     const fromAccountId =
-      current.type === "EXPENSE" ? current.accountId : undefined;
+      current.type === "EXPENSE"
+        ? current.accountId
+        : counterAccountId;
     const toAccountId =
-      current.type === "INCOME" ? current.accountId : undefined;
+      current.type === "INCOME" ? current.accountId : counterAccountId;
 
     return {
       ...shared,
@@ -303,7 +314,7 @@ function EditTransactionForm({
 
   function handleTypeChange(nextType: TransactionType) {
     if (nextType === currentType) return;
-    const next = applyTypeChange(form.getValues(), nextType);
+    const next = applyTypeChange(form.getValues(), nextType, transaction);
     setCurrentType(nextType);
     form.reset(next, { keepDirty: true, keepTouched: true });
   }
@@ -351,10 +362,16 @@ function EditTransactionForm({
     );
   }
 
-  const showMergeTransferPanel =
-    currentType !== "TRANSFER" &&
-    transaction.type !== "TRANSFER" &&
-    !!transaction.transferId;
+  const isPendingTransfer =
+    transaction.type !== "TRANSFER" && !!transaction.transferId;
+
+  const showMergeTransferPanel = isPendingTransfer && currentType !== "TRANSFER";
+
+  // Pending transfer rows must be promoted via the merge panel below — toggling
+  // the type freehand would skip the pairing logic and risk orphaning the
+  // counter leg. Lock the toggle until the user merges or removes the pair.
+  const isTypeToggleDisabled =
+    updateTransaction.isPending || isPendingTransfer;
 
   return (
     <form
@@ -370,7 +387,7 @@ function EditTransactionForm({
             if (!next.length) return;
             handleTypeChange(next[0] as TransactionType);
           }}
-          disabled={updateTransaction.isPending}
+          disabled={isTypeToggleDisabled}
           spacing={2}
           variant="outline"
           size="sm"
@@ -401,12 +418,22 @@ function EditTransactionForm({
             Transfer
           </ToggleGroupItem>
         </ToggleGroup>
-        {currentType === "TRANSFER" && (
+        {currentType === "TRANSFER" && !isPendingTransfer && (
           <span className="text-xs text-muted-foreground">
             Both sides will be updated
           </span>
         )}
       </div>
+
+      {isPendingTransfer && (
+        <Alert variant="destructive">
+          <AlertTriangleIcon />
+          <AlertTitle>Type locked for pending transfer</AlertTitle>
+          <AlertDescription>
+            Use “Merge as transfer” below to promote this pending leg.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <FieldGroup>
         {showMergeTransferPanel && (
