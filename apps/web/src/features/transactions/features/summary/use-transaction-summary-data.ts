@@ -19,25 +19,24 @@ export function useTransactionSummaryData({
     const accountTotals = new Map<string, number>();
 
     for (const tx of transactions) {
-      if (tx.type === "TRANSFER") continue;
-
       const amount = Number(tx.amount);
       const magnitude = Number.isFinite(amount)
         ? amount
         : Math.abs(Number(tx.signedAmount));
-
       if (!Number.isFinite(magnitude)) continue;
 
       if (tx.direction === "INFLOW") {
         income += magnitude;
       } else {
         expenses += magnitude;
-
-        const categoryKey = tx.categoryId ?? "uncategorized";
-        categoryTotals.set(
-          categoryKey,
-          (categoryTotals.get(categoryKey) ?? 0) + magnitude
-        );
+        // Only categorize non-transfer expenses (transfers have no meaningful category)
+        if (tx.type !== "TRANSFER") {
+          const categoryKey = tx.categoryId ?? "uncategorized";
+          categoryTotals.set(
+            categoryKey,
+            (categoryTotals.get(categoryKey) ?? 0) + magnitude
+          );
+        }
       }
 
       accountTotals.set(
