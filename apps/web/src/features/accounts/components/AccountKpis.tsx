@@ -35,7 +35,7 @@ export function AccountKpis({ accounts, currency }: AccountKpisProps) {
   ).length;
 
   return (
-    <Card>
+    <Card size="sm">
       <CardHeader>
         <CardTitle>Allocation</CardTitle>
       </CardHeader>
@@ -72,7 +72,7 @@ function KpiCard({
   subLabel?: string;
 }) {
   return (
-    <Item variant="muted" className="flex-col items-stretch">
+    <Item variant="muted" size="xs" className="flex-col items-stretch">
       <ItemContent className="gap-1">
         <ItemDescription className="text-xs tracking-wider text-muted-foreground uppercase">
           {label}

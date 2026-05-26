@@ -135,6 +135,11 @@ export function TransactionsPage() {
     return [...nonTransfers, ...mergedTransfers];
   }, [data, queryFilters]);
 
+  console.log("🚀 transactions ~ :", transactions);
+
+  console.log("🚀 categoryMap ~ :", categoryMap);
+  console.log("🚀 accountMap ~ :", accountMap);
+
   const summary = useTransactionSummaryData({
     transactions,
     categoryMap,

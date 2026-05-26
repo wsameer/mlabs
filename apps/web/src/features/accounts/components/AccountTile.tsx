@@ -8,6 +8,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { TRANSACTIONS_ROUTE } from "@/constants";
 import type { AccountGroupMetadata } from "../lib/account-groups";
 import { formatCurrency, getInitials } from "../lib/format-utils";
+import { Badge } from "@workspace/ui/components/badge";
 
 interface AccountTileProps {
   account: Account;
@@ -15,7 +16,12 @@ interface AccountTileProps {
 }
 
 export function AccountTile({ account, groupMeta }: AccountTileProps) {
-  const balance = parseFloat(account.balance);
+  let balance = parseFloat(account.balance);
+
+  console.log("🚀 account ~ :", { name: account.name, balance });
+  if (balance === 0) {
+    balance = 0;
+  }
   const accentColor = account.color ?? groupMeta.color;
 
   return (
@@ -24,9 +30,11 @@ export function AccountTile({ account, groupMeta }: AccountTileProps) {
       search={{ accountIds: [account.id] }}
       aria-label={`View transactions for ${account.name}, balance ${formatCurrency(balance, account.currency)}`}
       className={cn(
-        "group/tile relative flex flex-col gap-2 rounded-md border bg-card p-3",
-        "transition-colors hover:border-foreground/15 hover:bg-muted/40",
-        "focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none"
+        "group/item relative flex w-full flex-col flex-wrap gap-2 rounded-md border text-xs/relaxed transition-colors duration-100 outline-none",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "[a]:transition-colors [a]:hover:bg-muted",
+        "border-border bg-card",
+        "gap-2.5 px-2.5 py-2 in-data-[slot=dropdown-menu-content]:p-0"
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -45,24 +53,23 @@ export function AccountTile({ account, groupMeta }: AccountTileProps) {
             )}
           </AvatarFallback>
         </Avatar>
-        <span
-          className="rounded-sm border px-1.5 py-0.5 text-[9px] font-medium tracking-wide uppercase"
-          style={{ borderColor: `${accentColor}33`, color: accentColor }}
-        >
+        <Badge variant="outline" style={{ color: accentColor }}>
           {groupMeta.label}
-        </span>
+        </Badge>
       </div>
 
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium">{account.name}</p>
+        <p className="overflow-hidden text-xs tracking-wider text-wrap uppercase">
+          {account.name}
+        </p>
         {account.institutionName && (
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="w-11/12 truncate text-xs text-ellipsis text-muted-foreground">
             {account.institutionName}
           </p>
         )}
       </div>
 
-      <p className="mt-auto text-base font-semibold tabular-nums">
+      <p className="cn-font-heading mt-auto text-lg tabular-nums">
         {formatCurrency(balance, account.currency)}
       </p>
     </Link>

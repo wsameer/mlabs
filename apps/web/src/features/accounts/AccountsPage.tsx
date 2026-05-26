@@ -19,6 +19,7 @@ import { EmptyAccounts } from "./components/EmptyAccounts";
 import { AccountsView } from "./components/AccountsView";
 import { AccountKpis } from "./components/AccountKpis";
 import { AccountsRail } from "./components/AccountsRail";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 
 export function AccountsPage() {
   const { data: accounts, isPending, isError } = useAccounts();
@@ -69,23 +70,17 @@ export function AccountsPage() {
   }
 
   return (
-    <div className="flex w-full gap-4">
-      <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <div className="grid items-stretch gap-4 md:grid-cols-12">
-          <div className="flex flex-col md:col-span-8">
-            <AccountKpis accounts={accounts} currency={currency} />
-          </div>
-        </div>
-
-        <section>
+    <div className="grid grid-cols-3 gap-4">
+      <div className="col-span-2 flex flex-col p-1">
+        <AccountKpis accounts={accounts} currency={currency} />
+        <section className="mt-4">
           <h2 className="mb-2 text-sm font-medium text-foreground">Accounts</h2>
           <AccountsView accounts={accounts} />
         </section>
       </div>
-
-      <aside className="w-72">
+      <div>
         <AccountsRail accounts={accounts} currency={currency} />
-      </aside>
+      </div>
     </div>
   );
 }
