@@ -18,7 +18,6 @@ interface AccountTileProps {
 export function AccountTile({ account, groupMeta }: AccountTileProps) {
   let balance = parseFloat(account.balance);
 
-  console.log("🚀 account ~ :", { name: account.name, balance });
   if (balance === 0) {
     balance = 0;
   }

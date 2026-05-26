@@ -70,10 +70,11 @@ export function AccountsPage() {
   }
 
   return (
+    // <div className="grid h-[calc(100svh-4.5rem)] w-full min-w-0 grid-cols-3 gap-3 overflow-hidden p-0.5">
     <div className="grid grid-cols-3 gap-4">
       <div className="col-span-2 flex flex-col p-1">
         <AccountKpis accounts={accounts} currency={currency} />
-        <section className="mt-4">
+        <section className="mt-4 min-h-0">
           <h2 className="mb-2 text-sm font-medium text-foreground">Accounts</h2>
           <AccountsView accounts={accounts} />
         </section>
