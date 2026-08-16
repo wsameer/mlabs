@@ -163,7 +163,7 @@ const renderDesktopHeader = () => (
 
 Manual, since the layout feature has no existing tests:
 
-1. **Fallback crumbs:** visit `/dashboard`, `/accounts`, `/budget`, `/net-worth`, `/goals`, `/subscriptions`, `/categories`, `/settings`. Each shows a single crumb matching its `pageTitle`. No more "Build Your Application / Data Fetching".
+1. **Fallback crumbs:** visit `/dashboard`, `/accounts`, `/budget`, `/goals`, `/subscriptions`, `/categories`, `/settings`. Each shows a single crumb matching its `pageTitle`. No more "Build Your Application / Data Fetching".
 2. **Multi-level crumbs:** on `/transactions` filtered by an account, the desktop crumb reads `Accounts › Transactions`, and clicking `Accounts` navigates back via TanStack Router (no full reload).
 3. **Search:** clicking the search button opens the existing `CommandDialog`. `⌘K` still works (already wired in `__root.tsx`).
 4. **Add transaction:** clicking the button opens the existing `AddTransactionPopover` (Dialog). The `headerActions` slot (e.g. `TimeGrainSelect` on `/transactions`) still renders.

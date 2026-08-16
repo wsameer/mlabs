@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import type { Transaction } from "@workspace/types";
 
 import { TimeGrainSelect } from "@/components/TimeGrainSelect";
@@ -8,46 +7,34 @@ import { useUiActions } from "@/hooks/use-ui-store";
 import { useLayoutConfig } from "@/features/layout";
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
-import { formatCurrency } from "@/features/accounts/lib/format-utils";
 
 import { useTransactions } from "./api/use-transactions";
-import { TransactionItem } from "./components/TransactionItem";
 import { TListLoader } from "./components/TListLoader";
 import { EmptyTransactions } from "./components/EmptyTransactions";
 import { FilteredEmpty } from "./components/FilteredEmpty";
-import { EditTransactionDialog } from "./edit-transaction";
-import { DeleteTransactionDialog } from "./delete-transaction";
 import {
-  TransactionsSummaryContent,
-  TransactionsSummaryMobile,
-} from "./summary";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-} from "@workspace/ui/components/item";
-import { format } from "date-fns";
-import { Badge } from "@workspace/ui/components/badge";
-import { groupByDate } from "./lib/group-by-date";
-import { calculateTransactionGroupTotals } from "./lib/calculate-transaction-group-totals";
+  AccountActivityCard,
+  DeleteTransactionDialog,
+  EditTransactionDialog,
+  SpendingByCategoryCard,
+  TransactionTotals,
+  useTransactionSummaryData,
+} from "./features";
 import { DateRangeFilter } from "@/features/filters/DateRangeFilter";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import { Separator } from "@workspace/ui/components/separator";
+import { useAppProfile } from "@/hooks/use-app";
 import { useDateRange } from "@/hooks/use-filters";
-import { parseDateString, toDateString } from "@/lib/timezone";
+import { toDateString } from "@/lib/timezone";
 import {
   AccountScopeBanner,
-  SearchInput,
   TransactionFilters,
-  TransactionFiltersDrawer,
   toApiQuery,
   useTransactionFilters,
 } from "./filters";
+import { TransactionList } from "./features/list/TransactionList";
+import { FinancialHealthCard } from "../dashboard/components/FinancialHealthCard";
 
 export function TransactionsPage() {
-  const router = useRouter();
   const { to, from } = useDateRange();
   const { setOpenCreateTransaction } = useUiActions();
   const {
@@ -69,6 +56,8 @@ export function TransactionsPage() {
   const { data, isLoading } = useTransactions(queryFilters);
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
+  const profile = useAppProfile();
+  const currency = profile?.currency ?? "CAD";
 
   const [editTx, setEditTx] = useState<Transaction | null>(null);
   const [deleteTx, setDeleteTx] = useState<Transaction | null>(null);
@@ -103,17 +92,61 @@ export function TransactionsPage() {
     return map;
   }, [categories]);
 
-  const transactions = useMemo(() => data?.transactions ?? [], [data]);
+  const transactions = useMemo(() => {
+    const raw = data?.transactions ?? [];
+
+    // Separate transfers from non-transfers
+    const transfers = raw.filter(
+      (t) => t.type === "TRANSFER" && t.transferId != null
+    );
+    const nonTransfers = raw.filter((t) => t.type !== "TRANSFER");
+
+    // Group transfers by transferId, then merge each pair into one
+    const transferMap = transfers.reduce<Record<string, typeof transfers>>(
+      (acc, t) => {
+        (acc[t.transferId!] ??= []).push(t);
+        return acc;
+      },
+      {}
+    );
+
+    const mergedTransfers = Object.values(transferMap).map((pair) => {
+      if (pair.length !== 2) return pair[0]; // malformed pair, return as-is
+
+      const filterAccountId = queryFilters?.accountId;
+
+      if (filterAccountId) {
+        // Keep whichever leg belongs to the filtered account
+        const match = pair.find((t) => t.accountId === filterAccountId);
+        const base = match ?? pair[0];
+        return {
+          ...base,
+          type: (base.direction === "INFLOW" ? "INCOME" : "EXPENSE") as
+            | "INCOME"
+            | "EXPENSE",
+        };
+      } else {
+        // No accountId filter — keep the INFLOW leg
+        const inflow = pair.find((t) => t.direction === "INFLOW") ?? pair[0];
+        return { ...inflow, type: "TRANSFER" as const };
+      }
+    });
+
+    return [...nonTransfers, ...mergedTransfers];
+  }, [data, queryFilters]);
+
+  console.log("🚀 transactions ~ :", transactions);
+
+  console.log("🚀 categoryMap ~ :", categoryMap);
+  console.log("🚀 accountMap ~ :", accountMap);
+
+  const summary = useTransactionSummaryData({
+    transactions,
+    categoryMap,
+    accountMap,
+  });
 
   const isAccountScoped = (filterState.accountIds?.length ?? 0) > 0;
-
-  const handleMobileBack = useCallback(() => {
-    if (window.history.length > 1) {
-      router.history.back();
-    } else {
-      void router.navigate({ to: ACCOUNTS_ROUTE });
-    }
-  }, [router]);
 
   useLayoutConfig({
     pageTitle: "Transactions",
@@ -121,22 +154,7 @@ export function TransactionsPage() {
     breadcrumbs: isAccountScoped
       ? [{ label: "Accounts", to: ACCOUNTS_ROUTE }, { label: "Transactions" }]
       : null,
-    mobileBackPath: isAccountScoped ? ACCOUNTS_ROUTE : null,
-    onMobileBack: isAccountScoped ? handleMobileBack : null,
   });
-
-  const grouped = useMemo(() => groupByDate(transactions), [transactions]);
-  const totalsByDate = useMemo(() => {
-    const totals: Record<string, { income: number; debit: number }> = {};
-    for (const dateKey of Object.keys(grouped)) {
-      totals[dateKey] = calculateTransactionGroupTotals(grouped[dateKey]);
-    }
-    return totals;
-  }, [grouped]);
-  const sortedDates = useMemo(
-    () => Object.keys(grouped).sort((a, b) => b.localeCompare(a)),
-    [grouped]
-  );
 
   if (isLoading) {
     return (
@@ -146,195 +164,98 @@ export function TransactionsPage() {
     );
   }
 
+  const hasNoTransaction = transactions.length === 0;
   const hasActiveFilters = activeFilterCount > 0;
-  const filtersDisabled = transactions.length === 0 && !hasActiveFilters;
+  const filtersDisabled = hasNoTransaction && !hasActiveFilters;
 
   return (
-    <div className="flex w-full gap-4">
-      <div className="flex w-full max-w-2xl flex-col gap-4 md:max-w-xl">
-        {/* Row 1: global date range */}
-        <DateRangeFilter />
-
-        <Card className="hidden lg:block">
-          <CardContent>
-            {/* Row 2: desktop filters */}
-            <TransactionFilters disabled={filtersDisabled} />
-          </CardContent>
-        </Card>
-
-        {/* Row 2 (mobile): search + Filters sheet + summary */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <SearchInput
-            value={filterState.q ?? ""}
-            onDebouncedChange={(next) =>
-              setFilters({ q: next.length > 0 ? next : undefined })
-            }
-            disabled={filtersDisabled}
-            className="min-w-0 flex-1"
-          />
-          <TransactionFiltersDrawer disabled={filtersDisabled} />
-          <TransactionsSummaryMobile
-            transactions={transactions}
-            categoryMap={categoryMap}
-            accountMap={accountMap}
-          />
-        </div>
-
-        <AccountScopeBanner
-          accountIds={filterState.accountIds}
-          onClear={() => setFilters({ accountIds: undefined })}
-        />
-
-        {transactions.length === 0 ? (
-          <div className="mx-auto my-auto mt-32 flex w-full flex-col gap-3">
-            {hasActiveFilters ? (
-              <FilteredEmpty onReset={resetFilters} />
+    <>
+      {/* Root: 2-column grid. Left takes 2/3, right takes 1/3 */}
+      <div className="grid h-[calc(100svh-4.5rem)] w-full min-w-0 grid-cols-[2fr_1fr] gap-3 overflow-hidden p-0.5">
+        {/* LEFT: inner 60/40 grid */}
+        <div className="grid min-h-0 grid-cols-[3fr_2fr] gap-3 overflow-hidden">
+          {/* LEFT-LEFT: 60% — filters + transaction list */}
+          <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+            <div className="shrink-0">
+              <DateRangeFilter />
+            </div>
+            <Card className="min-w-0 shrink-0">
+              <CardContent>
+                <TransactionFilters disabled={filtersDisabled} />
+              </CardContent>
+            </Card>
+            <AccountScopeBanner
+              accountIds={filterState.accountIds}
+              onClear={() => setFilters({ accountIds: undefined })}
+            />
+            {hasNoTransaction ? (
+              <div className="flex w-full min-w-0 flex-col gap-3">
+                <Card>
+                  <CardContent>
+                    {hasActiveFilters ? (
+                      <FilteredEmpty onReset={resetFilters} />
+                    ) : (
+                      <EmptyTransactions
+                        openCreateTransaction={setOpenCreateTransaction}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             ) : (
-              <EmptyTransactions
-                openCreateTransaction={setOpenCreateTransaction}
+              <TransactionList
+                transactions={transactions}
+                categoryMap={categoryMap}
+                accountMap={accountMap}
+                onEditTransaction={setEditTx}
+                accountIdFilter={queryFilters.accountId}
               />
             )}
           </div>
-        ) : (
-          <Card className="p-0">
-            <CardContent className="p-0">
-              <ScrollArea className="h-[70svh]">
-                <div className="pb-12 sm:pb-0">
-                  {sortedDates.map((date) => {
-                    const groupedTransactions = grouped[date];
-                    const totals = totalsByDate[date] ?? {
-                      income: 0,
-                      debit: 0,
-                    };
 
-                    return (
-                      <section key={date}>
-                        <Item
-                          id={`summary-${date}`}
-                          className="sticky top-0 h-12 items-center justify-between gap-4 rounded-none border-b-border bg-muted px-3"
-                        >
-                          <ItemContent className="flex flex-row items-center gap-2">
-                            <Badge className="rounded-sm" variant="default">
-                              {format(parseDateString(date), "EEE")}
-                            </Badge>
-                            <p className="text-xs">
-                              {format(parseDateString(date), "dd MMM, y")}
-                            </p>
-                          </ItemContent>
-                          <ItemActions>
-                            <small className="w-16 truncate text-xs text-foreground">
-                              {formatCurrency(totals.income)}
-                            </small>
-                            <small className="w-16 truncate text-right text-xs text-foreground">
-                              {formatCurrency(totals.debit)}
-                            </small>
-                          </ItemActions>
-                        </Item>
+          {/* LEFT-RIGHT: 40% — totals + spending */}
+          <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+            <TransactionTotals
+              income={summary.income}
+              expenses={summary.expenses}
+              net={summary.net}
+            />
+            <SpendingByCategoryCard categories={summary.categories} />
+          </div>
+        </div>
 
-                        <ItemGroup className="flex flex-col gap-0">
-                          {groupedTransactions.map((tx, index) => {
-                            const cat = tx.categoryId
-                              ? categoryMap.get(tx.categoryId)
-                              : undefined;
-                            const sub = tx.subcategoryId
-                              ? categoryMap.get(tx.subcategoryId)
-                              : undefined;
-
-                            const accountName =
-                              accountMap.get(tx.accountId) ?? "Unknown";
-                            const linkedAccountName = tx.linkedAccountId
-                              ? (accountMap.get(tx.linkedAccountId) ??
-                                "Unknown")
-                              : undefined;
-                            const isPendingTransfer =
-                              tx.type !== "TRANSFER" && !!tx.transferId;
-                            const typeFallback =
-                              tx.type === "INCOME" ? "Income" : "Expense";
-                            const categoryName = isPendingTransfer
-                              ? tx.type === "INCOME"
-                                ? "Transfer in"
-                                : "Transfer out"
-                              : tx.type === "TRANSFER"
-                                ? tx.direction === "OUTFLOW"
-                                  ? "Transfer out"
-                                  : "Transfer in"
-                                : (cat?.name ?? typeFallback);
-                            const subcategoryName =
-                              tx.type === "TRANSFER" || isPendingTransfer
-                                ? undefined
-                                : sub?.name;
-                            const formattedAmount = formatCurrency(
-                              Number(tx.signedAmount)
-                            );
-                            const merchantSub =
-                              tx.type === "TRANSFER" && linkedAccountName
-                                ? tx.direction === "OUTFLOW"
-                                  ? `${accountName} -> ${linkedAccountName}`
-                                  : `${linkedAccountName} -> ${accountName}`
-                                : accountName;
-
-                            return (
-                              <React.Fragment key={tx.id}>
-                                <TransactionItem
-                                  className={
-                                    groupedTransactions.length - 1 === index
-                                      ? "rounded-t-none! rounded-b-sm"
-                                      : "rounded-none!"
-                                  }
-                                  id={Number(tx.id) || 0}
-                                  category={categoryName}
-                                  categorySub={subcategoryName}
-                                  merchant={
-                                    tx.description || tx.type.toLowerCase()
-                                  }
-                                  merchantSub={merchantSub}
-                                  amount={formattedAmount}
-                                  type={tx.type}
-                                  onClick={() => setEditTx(tx)}
-                                  aria-label={`${tx.type} ${tx.description ?? ""} ${formattedAmount}`}
-                                />
-                                <Separator className="m-0" />
-                              </React.Fragment>
-                            );
-                          })}
-                        </ItemGroup>
-                      </section>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        )}
-
-        <EditTransactionDialog
-          open={!!editTx}
-          onOpenChange={(open) => {
-            if (!open) setEditTx(null);
-          }}
-          transaction={editTx}
-          onDelete={(tx) => {
-            setEditTx(null);
-            setDeleteTx(tx);
-          }}
-        />
-
-        <DeleteTransactionDialog
-          open={!!deleteTx}
-          onOpenChange={(open) => {
-            if (!open) setDeleteTx(null);
-          }}
-          transaction={deleteTx}
-        />
+        {/* RIGHT: 1fr — financial health + account activity, content-sized with scroll cap */}
+        <div className="flex max-h-[calc(100svh-4.5rem-1rem)] w-full min-w-0 flex-col gap-3 self-start overflow-y-auto p-0.5">
+          <FinancialHealthCard
+            income={summary.income}
+            expenses={summary.expenses}
+            currency={currency}
+            className="min-w-0 shrink-0"
+            disclaimer="Based on income and expenses in this transaction view."
+          />
+          <AccountActivityCard accounts={summary.accounts} />
+        </div>
       </div>
 
-      <div className="hidden shrink-0 lg:block">
-        <TransactionsSummaryContent
-          transactions={transactions}
-          categoryMap={categoryMap}
-          accountMap={accountMap}
-        />
-      </div>
-    </div>
+      <EditTransactionDialog
+        open={!!editTx}
+        onOpenChange={(open) => {
+          if (!open) setEditTx(null);
+        }}
+        transaction={editTx}
+        onDelete={(tx) => {
+          setEditTx(null);
+          setDeleteTx(tx);
+        }}
+      />
+
+      <DeleteTransactionDialog
+        open={!!deleteTx}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTx(null);
+        }}
+        transaction={deleteTx}
+      />
+    </>
   );
 }

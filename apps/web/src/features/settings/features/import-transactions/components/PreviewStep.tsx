@@ -69,6 +69,7 @@ export function PreviewStep({ rows, onBack, onImport }: PreviewStepProps) {
               <TableHead className="text-right">Amount</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Transfer ID</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -110,6 +111,12 @@ export function PreviewStep({ rows, onBack, onImport }: PreviewStepProps) {
                   {row.subcategory
                     ? `${row.category || "—"} / ${row.subcategory}`
                     : row.category || "—"}
+                </TableCell>
+                <TableCell
+                  className="max-w-24 truncate font-mono text-[0.65rem] text-muted-foreground"
+                  title={row.transferId}
+                >
+                  {row.transferId ?? "—"}
                 </TableCell>
                 <TableCell>
                   <StatusBadge validation={row.validation} />

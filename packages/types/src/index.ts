@@ -29,12 +29,21 @@ export {
   UpdateTransactionSchema,
   UpdateIncomeExpenseSchema,
   UpdateTransferSchema,
+  ChangeTransactionTypePayloadSchema,
   UpdateProfileSchema,
   CreateOnboardingProfileSchema,
   // Bulk import
   BulkCreateIncomeExpenseSchema,
   BulkCreateTransactionsSchema,
   BulkImportResultSchema,
+  // Transfer auto-detect
+  DetectedTransferRowSchema,
+  DetectedTransferPairSchema,
+  AmbiguousTransferMatchSchema,
+  DetectTransfersRequestSchema,
+  DetectTransfersResultSchema,
+  ApplyTransferMergesRequestSchema,
+  ApplyTransferMergesResultSchema,
   // Query schemas
   AccountQuerySchema,
   CategoryQuerySchema,
@@ -48,6 +57,8 @@ export {
   CategoryTotalsQuerySchema,
   CategoryTotalSchema,
   CategoryTotalsResponseSchema,
+  CashflowMonthlyItemSchema,
+  CashflowMonthlyResponseSchema,
   // Balance history
   BalanceHistoryQuerySchema,
   BalanceHistoryPointSchema,
@@ -88,6 +99,7 @@ export type {
   UpdateTransaction,
   UpdateIncomeExpense,
   UpdateTransfer,
+  ChangeTransactionTypePayload,
   UpdateProfile,
   CreateOnboardingProfile,
   OnboardingAccount,
@@ -95,6 +107,14 @@ export type {
   BulkCreateIncomeExpense,
   BulkCreateTransactions,
   BulkImportResult,
+  // Transfer auto-detect types
+  DetectedTransferRow,
+  DetectedTransferPair,
+  AmbiguousTransferMatch,
+  DetectTransfersRequest,
+  DetectTransfersResult,
+  ApplyTransferMergesRequest,
+  ApplyTransferMergesResult,
   // Query types
   AccountQuery,
   CategoryQuery,
@@ -107,6 +127,8 @@ export type {
   CategoryTotalsQuery,
   CategoryTotal,
   CategoryTotalsResponse,
+  CashflowMonthlyItem,
+  CashflowMonthlyResponse,
   // Balance history
   BalanceHistoryQuery,
   BalanceHistoryPoint,

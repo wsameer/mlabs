@@ -14,7 +14,6 @@ import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as NetWorthRouteImport } from './routes/net-worth'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -47,11 +46,6 @@ const ProfilesRoute = ProfilesRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NetWorthRoute = NetWorthRouteImport.update({
-  id: '/net-worth',
-  path: '/net-worth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
@@ -104,7 +98,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
-  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
@@ -120,7 +113,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
-  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
@@ -137,7 +129,6 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/goals': typeof GoalsRoute
   '/maintenance': typeof MaintenanceRoute
-  '/net-worth': typeof NetWorthRoute
   '/onboarding': typeof OnboardingRoute
   '/profiles': typeof ProfilesRoute
   '/settings': typeof SettingsRoute
@@ -155,7 +146,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/goals'
     | '/maintenance'
-    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
@@ -171,7 +161,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/goals'
     | '/maintenance'
-    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
@@ -187,7 +176,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/goals'
     | '/maintenance'
-    | '/net-worth'
     | '/onboarding'
     | '/profiles'
     | '/settings'
@@ -204,7 +192,6 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   GoalsRoute: typeof GoalsRoute
   MaintenanceRoute: typeof MaintenanceRoute
-  NetWorthRoute: typeof NetWorthRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfilesRoute: typeof ProfilesRoute
   SettingsRoute: typeof SettingsRoute
@@ -247,13 +234,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/net-worth': {
-      id: '/net-worth'
-      path: '/net-worth'
-      fullPath: '/net-worth'
-      preLoaderRoute: typeof NetWorthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -324,7 +304,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   GoalsRoute: GoalsRoute,
   MaintenanceRoute: MaintenanceRoute,
-  NetWorthRoute: NetWorthRoute,
   OnboardingRoute: OnboardingRoute,
   ProfilesRoute: ProfilesRoute,
   SettingsRoute: SettingsRoute,

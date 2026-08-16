@@ -7,6 +7,7 @@ import type { TransactionFilterPreset } from "../filter-types";
 const PRESETS: Array<{ value: TransactionFilterPreset; label: string }> = [
   { value: "all", label: "All" },
   { value: "uncategorized", label: "Uncategorized" },
+  { value: "pending-transfer", label: "Pending Transfer" },
   { value: "income", label: "Income" },
   { value: "expenses", label: "Expenses" },
 ];

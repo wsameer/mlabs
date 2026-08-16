@@ -379,6 +379,8 @@ export type BulkCreateTransactions = z.infer<
 export const BulkImportResultSchema = z.object({
   imported: z.number(),
   failed: z.number(),
+  mergedTransfers: z.number().default(0),
+  importedIds: z.array(z.uuid()).default([]),
   errors: z.array(
     z.object({
       index: z.number(),
@@ -389,9 +391,89 @@ export const BulkImportResultSchema = z.object({
 
 export type BulkImportResult = z.infer<typeof BulkImportResultSchema>;
 
-// Update payloads — type cannot be changed
+// ============================================================================
+// Transfer auto-detect
+// ============================================================================
+
+export const DetectedTransferRowSchema = z.object({
+  id: z.uuid(),
+  accountId: z.uuid(),
+  accountName: z.string(),
+  type: z.enum(["INCOME", "EXPENSE"]),
+  amount: z.string(),
+  date: z.string(),
+  description: z.string().nullable().optional(),
+});
+export type DetectedTransferRow = z.infer<typeof DetectedTransferRowSchema>;
+
+export const DetectedTransferPairSchema = z.object({
+  id: z.string(),
+  confidence: z.enum(["explicit", "high"]),
+  rows: z.tuple([DetectedTransferRowSchema, DetectedTransferRowSchema]),
+});
+export type DetectedTransferPair = z.infer<typeof DetectedTransferPairSchema>;
+
+export const AmbiguousTransferMatchSchema = z.object({
+  id: z.string(),
+  row: DetectedTransferRowSchema,
+  candidates: z.array(DetectedTransferRowSchema),
+});
+export type AmbiguousTransferMatch = z.infer<
+  typeof AmbiguousTransferMatchSchema
+>;
+
+export const DetectTransfersRequestSchema = z.object({
+  // "ids" restricts the matcher to a specific set of recently-imported rows
+  // (their counter candidates can still be any non-TRANSFER row in the
+  // profile). "all" runs across the whole profile.
+  scope: z.enum(["all", "ids"]),
+  ids: z.array(z.uuid()).optional(),
+  dateToleranceDays: z.number().int().min(0).max(7).default(1),
+});
+export type DetectTransfersRequest = z.infer<
+  typeof DetectTransfersRequestSchema
+>;
+
+export const DetectTransfersResultSchema = z.object({
+  pairs: z.array(DetectedTransferPairSchema),
+  ambiguous: z.array(AmbiguousTransferMatchSchema),
+  scanned: z.number(),
+});
+export type DetectTransfersResult = z.infer<typeof DetectTransfersResultSchema>;
+
+export const ApplyTransferMergesRequestSchema = z.object({
+  pairs: z
+    .array(
+      z.object({
+        leftId: z.uuid(),
+        rightId: z.uuid(),
+      })
+    )
+    .min(1)
+    .max(500),
+});
+export type ApplyTransferMergesRequest = z.infer<
+  typeof ApplyTransferMergesRequestSchema
+>;
+
+export const ApplyTransferMergesResultSchema = z.object({
+  merged: z.number(),
+  errors: z.array(
+    z.object({
+      pairIndex: z.number(),
+      message: z.string(),
+    })
+  ),
+});
+export type ApplyTransferMergesResult = z.infer<
+  typeof ApplyTransferMergesResultSchema
+>;
+
+// Update payloads — `type` may be present when the caller wants to change the
+// transaction's type. When omitted, the existing type is preserved.
 export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
   {
+    type: z.enum(["INCOME", "EXPENSE"]).optional(),
     accountId: z.uuid().optional(),
     categoryId: z.uuid().optional(),
     subcategoryId: z.uuid().nullable().optional(),
@@ -399,18 +481,33 @@ export const UpdateIncomeExpenseSchema = TransactionBaseSchema.partial().extend(
 );
 
 export const UpdateTransferSchema = TransactionBaseSchema.partial().extend({
+  type: z.literal("TRANSFER").optional(),
   fromAccountId: z.uuid().optional(),
   toAccountId: z.uuid().optional(),
 });
 
+export const ChangeTransactionTypePayloadSchema =
+  TransactionBaseSchema.partial().extend({
+    type: TransactionTypeSchema,
+    accountId: z.uuid().optional(),
+    categoryId: z.uuid().optional(),
+    subcategoryId: z.uuid().nullable().optional(),
+    fromAccountId: z.uuid().optional(),
+    toAccountId: z.uuid().optional(),
+  });
+
 export const UpdateTransactionSchema = z.union([
   UpdateIncomeExpenseSchema,
   UpdateTransferSchema,
+  ChangeTransactionTypePayloadSchema,
 ]);
 
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
 export type UpdateIncomeExpense = z.infer<typeof UpdateIncomeExpenseSchema>;
 export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>;
+export type ChangeTransactionTypePayload = z.infer<
+  typeof ChangeTransactionTypePayloadSchema
+>;
 
 // ============================================================================
 // Query Schemas (API endpoint parameters)
@@ -438,6 +535,7 @@ export const TransactionQuerySchema = z.object({
   accountId: z.uuid().optional(),
   categoryIds: z.array(z.uuid()).optional(),
   uncategorizedOnly: z.boolean().optional(),
+  pendingTransfersOnly: z.boolean().optional(),
   type: TransactionTypeSchema.optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -459,8 +557,8 @@ export type TransactionQuery = z.input<typeof TransactionQuerySchema>;
 // ============================================================================
 
 export const CategoryTotalsQuerySchema = z.object({
-  startDate: z.string(),
-  endDate: z.string(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
   type: z.enum(["INCOME", "EXPENSE"]),
   accountId: z.uuid().optional(),
 });
@@ -486,6 +584,22 @@ export const CategoryTotalsResponseSchema = z.object({
 
 export type CategoryTotalsResponse = z.infer<
   typeof CategoryTotalsResponseSchema
+>;
+
+export const CashflowMonthlyItemSchema = z.object({
+  month: z.string(), // "YYYY-MM"
+  income: z.string(),
+  expense: z.string(),
+});
+
+export type CashflowMonthlyItem = z.infer<typeof CashflowMonthlyItemSchema>;
+
+export const CashflowMonthlyResponseSchema = z.object({
+  items: z.array(CashflowMonthlyItemSchema),
+});
+
+export type CashflowMonthlyResponse = z.infer<
+  typeof CashflowMonthlyResponseSchema
 >;
 
 // ============================================================================

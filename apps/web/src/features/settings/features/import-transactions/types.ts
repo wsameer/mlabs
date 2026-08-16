@@ -1,4 +1,10 @@
-export type ImportStep = "upload" | "map" | "preview" | "importing" | "results";
+export type ImportStep =
+  | "upload"
+  | "map"
+  | "preview"
+  | "importing"
+  | "transfer-review"
+  | "results";
 
 export type TransactionField =
   | "date"
@@ -45,5 +51,6 @@ export type ValidatedRow = {
 export type ImportResult = {
   imported: number;
   failed: number;
+  mergedTransfers: number;
   errors: { index: number; message: string }[];
 };

@@ -41,4 +41,5 @@ export {
   isNull,
   gte,
   lte,
+  inArray,
 } from "drizzle-orm";

@@ -82,17 +82,25 @@ export function serializeTransactionsWithContext(
   categoryParentMap?: CategoryParentMap
 ): Transaction[] {
   const directionById = new Map<string, TransactionDirection>();
+  // Group by transferId regardless of TYPE so pending pairs (two IE rows
+  // tagged with the same transferId) also expose their counter leg via
+  // linkedAccountId. Direction is only inferred for real TRANSFER rows.
   const transferGroups = new Map<string, TransactionRow[]>();
+  const realTransferGroups = new Map<string, TransactionRow[]>();
 
   for (const row of transferContextRows) {
-    if (row.type === "TRANSFER" && row.transferId) {
-      const group = transferGroups.get(row.transferId) ?? [];
-      group.push(row);
-      transferGroups.set(row.transferId, group);
+    if (!row.transferId) continue;
+    const group = transferGroups.get(row.transferId) ?? [];
+    group.push(row);
+    transferGroups.set(row.transferId, group);
+    if (row.type === "TRANSFER") {
+      const realGroup = realTransferGroups.get(row.transferId) ?? [];
+      realGroup.push(row);
+      realTransferGroups.set(row.transferId, realGroup);
     }
   }
 
-  for (const group of transferGroups.values()) {
+  for (const group of realTransferGroups.values()) {
     const sortedGroup = [...group].sort((left, right) => {
       const createdAtDiff =
         left.createdAt.getTime() - right.createdAt.getTime();
@@ -107,13 +115,15 @@ export function serializeTransactionsWithContext(
   }
 
   return rows.map((row) => {
-    const transferGroup =
-      row.type === "TRANSFER" && row.transferId
-        ? transferGroups.get(row.transferId)
+    const transferGroup = row.transferId
+      ? transferGroups.get(row.transferId)
+      : undefined;
+    // Only expose a linked leg when the group is exactly two distinct rows;
+    // ambiguous (>2) groups are left for the user to clean up manually.
+    const linkedRow =
+      transferGroup && transferGroup.length === 2
+        ? transferGroup.find((candidate) => candidate.id !== row.id)
         : undefined;
-    const linkedRow = transferGroup?.find(
-      (candidate) => candidate.id !== row.id
-    );
 
     return serializeTransaction(row, {
       direction: directionById.get(row.id),

@@ -59,6 +59,16 @@ describe("toApiQuery", () => {
     expect(q.categoryIds).toBeUndefined();
   });
 
+  it("maps preset=pending-transfer to pendingTransfersOnly=true and drops categoryIds", () => {
+    const q = toApiQuery(
+      { preset: "pending-transfer", categoryIds: ["id-1"] },
+      range
+    );
+    expect(q.pendingTransfersOnly).toBe(true);
+    expect(q.categoryIds).toBeUndefined();
+    expect(q.type).toBeUndefined();
+  });
+
   it("maps preset=income to type=INCOME", () => {
     expect(toApiQuery({ preset: "income" }, range).type).toBe("INCOME");
   });

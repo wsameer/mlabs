@@ -11,7 +11,7 @@ export interface TransactionItemProps {
   /** Merchant / payee name */
   merchant: string;
   /** Account + date line (e.g. "TD Chequing Bank") */
-  merchantSub?: string;
+  accountsInvolved?: string;
   /** Formatted amount string (e.g. "$600.00") */
   amount: string;
   type: TransactionType;
@@ -53,7 +53,7 @@ export const TransactionItem = React.forwardRef<
       category,
       categorySub,
       merchant,
-      merchantSub,
+      accountsInvolved,
       amount,
       type,
       className = "",
@@ -71,7 +71,8 @@ export const TransactionItem = React.forwardRef<
         return "text-emerald-600 dark:text-emerald-400";
       }
 
-      return "text-foreground";
+      // TRANSFER
+      return "text-muted-foreground";
     }
 
     return (
@@ -94,7 +95,7 @@ export const TransactionItem = React.forwardRef<
             secondary={categorySub ? [categorySub] : undefined}
           />
 
-          <Cell primary={merchant} secondary={[merchantSub ?? ""]} />
+          <Cell primary={merchant} secondary={[accountsInvolved ?? ""]} />
 
           <div className="flex min-w-0 flex-col items-end max-[360px]:items-start">
             <span

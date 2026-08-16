@@ -4,7 +4,7 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { SETTINGS_SECTIONS, type SettingsSectionId } from "../constants";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Card } from "@workspace/ui/components/card";
 
 type SettingsNavProps = {
   activeSection: SettingsSectionId | undefined;

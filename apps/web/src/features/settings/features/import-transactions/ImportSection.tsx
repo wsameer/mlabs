@@ -1,9 +1,17 @@
 import { useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
-import type { CategoryWithSubcategories } from "@workspace/types";
+import type {
+  CategoryWithSubcategories,
+  DetectTransfersResult,
+} from "@workspace/types";
 
 import { useAccounts } from "@/features/accounts/api/use-accounts";
 import { useCategories } from "@/features/categories/api/use-categories";
+import {
+  TransferDetectionReview,
+  useDetectTransfers,
+  useApplyTransferMerges,
+} from "@/features/transactions/features/detect-transfers";
 
 import { useCsvParser } from "./hooks/use-csv-parser";
 import { useColumnMapping } from "./hooks/use-column-mapping";
@@ -23,14 +31,17 @@ export function ImportSection() {
   const [accountId, setAccountId] = useState("");
   const [fileName, setFileName] = useState("");
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [detectionResult, setDetectionResult] =
+    useState<DetectTransfersResult | null>(null);
 
   const { data: accounts } = useAccounts({ isActive: true });
   const { data: categories } = useCategories();
   const csvParser = useCsvParser();
   const columnMapping = useColumnMapping(csvParser.headers);
   const importMutation = useImportTransactions();
+  const detectMutation = useDetectTransfers();
+  const applyMergesMutation = useApplyTransferMerges();
 
-  // Transform rows whenever mapping changes
   const validatedRows: ValidatedRow[] = useMemo(() => {
     if (csvParser.rows.length === 0) return [];
     return transformRows(
@@ -67,21 +78,91 @@ export function ImportSection() {
     importMutation.mutate(payload, {
       onSuccess: (result) => {
         setImportResult(result);
-        setStep("results");
         toast.success(`Imported ${result.imported} transactions`);
+
+        if (result.imported === 0 || result.importedIds.length === 0) {
+          setStep("results");
+          return;
+        }
+
+        detectMutation.mutate(
+          {
+            scope: "ids",
+            ids: result.importedIds,
+            dateToleranceDays: 1,
+          },
+          {
+            onSuccess: (detection) => {
+              if (
+                detection.pairs.length === 0 &&
+                detection.ambiguous.length === 0
+              ) {
+                setStep("results");
+                return;
+              }
+              setDetectionResult(detection);
+              setStep("transfer-review");
+            },
+            onError: () => {
+              // Detection is optional polish — skip to results on failure.
+              setStep("results");
+            },
+          }
+        );
       },
       onError: (error) => {
         toast.error(error.message || "Import failed");
         setStep("preview");
       },
     });
-  }, [validatedRows, accountId, importMutation]);
+  }, [validatedRows, accountId, importMutation, detectMutation]);
+
+  const handleConfirmTransfers = useCallback(
+    (pairs: { leftId: string; rightId: string }[]) => {
+      if (pairs.length === 0) {
+        setStep("results");
+        return;
+      }
+      applyMergesMutation.mutate(
+        { pairs },
+        {
+          onSuccess: (apply) => {
+            setImportResult((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    mergedTransfers: prev.mergedTransfers + apply.merged,
+                  }
+                : prev
+            );
+            if (apply.merged > 0) {
+              toast.success(`Merged ${apply.merged} transfers`);
+            }
+            if (apply.errors.length > 0) {
+              toast.error(`${apply.errors.length} pair(s) could not be merged`);
+            }
+            setStep("results");
+          },
+          onError: (err) => {
+            toast.error(err.message || "Failed to apply merges");
+            setStep("results");
+          },
+        }
+      );
+    },
+    [applyMergesMutation]
+  );
+
+  const handleSkipTransfers = useCallback(() => {
+    setStep("results");
+  }, []);
 
   const handleReset = useCallback(() => {
     setStep("upload");
     setAccountId("");
     setFileName("");
     setImportResult(null);
+    setDetectionResult(null);
     csvParser.reset();
   }, [csvParser]);
 
@@ -123,6 +204,17 @@ export function ImportSection() {
       )}
 
       {step === "importing" && <ImportingStep />}
+
+      {step === "transfer-review" && detectionResult && (
+        <TransferDetectionReview
+          result={detectionResult}
+          onConfirm={handleConfirmTransfers}
+          onCancel={handleSkipTransfers}
+          isApplying={applyMergesMutation.isPending}
+          cancelLabel="Skip"
+          confirmLabel="Merge selected"
+        />
+      )}
 
       {step === "results" && importResult && (
         <ResultsStep

@@ -268,6 +268,59 @@ describe("transformRows — subcategory resolution", () => {
   });
 });
 
+describe("transformRows — transfer ID generation", () => {
+  it("generates a UUID and warns when a transfer leg is missing a Transfer ID", () => {
+    const [r] = transformRows(
+      [
+        row(
+          "2026-05-02",
+          "EQ Bank",
+          "-100.00",
+          "Transfer-Out",
+          "to savings",
+          "",
+          "",
+          "CAD",
+          ""
+        ),
+      ],
+      MAPPING,
+      "signed",
+      CATEGORIES
+    );
+    expect(r?.isTransferLeg).toBe(true);
+    expect(r?.transferId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    );
+    expect(r?.validation.warnings).toContainEqual(
+      expect.stringContaining("Transfer ID was missing")
+    );
+  });
+
+  it("does not generate a UUID for non-transfer rows missing a Transfer ID", () => {
+    const [r] = transformRows(
+      [
+        row(
+          "2026-05-02",
+          "EQ Bank",
+          "-100.00",
+          "Expense",
+          "groceries",
+          "",
+          "",
+          "CAD",
+          ""
+        ),
+      ],
+      MAPPING,
+      "signed",
+      CATEGORIES
+    );
+    expect(r?.isTransferLeg).toBe(false);
+    expect(r?.transferId).toBeUndefined();
+  });
+});
+
 describe("toApiPayload", () => {
   it("includes transferId and omits categoryId on transfer legs", () => {
     const rows = transformRows(

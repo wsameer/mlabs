@@ -1,10 +1,15 @@
-import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  FlaskConicalIcon,
+  PlusIcon,
+} from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAppProfile, useAppProfiles } from "@/hooks/use-app";
 import { setProfileId } from "@/lib/api-client";
 import { useAppStore } from "@/stores";
-import { DASHBOARD_ROUTE, PROFILES_ROUTE } from "@/constants";
+import { DASHBOARD_ROUTE } from "@/constants";
 import type { Profile } from "@workspace/types";
 
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
@@ -77,12 +82,8 @@ export function TeamSwitcher() {
               />
             }
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-sidebar-primary-foreground">
-              <img
-                src="/mlabs-icon.png"
-                alt="mlabs"
-                className="size-6 object-contain"
-              />
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-foreground text-background">
+              <FlaskConicalIcon className="size-4" aria-hidden="true" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">mLabs</span>
@@ -123,10 +124,7 @@ export function TeamSwitcher() {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              className="gap-2 p-2"
-              onClick={() => void navigate({ to: PROFILES_ROUTE })}
-            >
+            <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <PlusIcon className="size-4" />
               </div>

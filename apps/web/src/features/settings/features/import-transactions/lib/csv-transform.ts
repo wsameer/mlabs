@@ -176,7 +176,13 @@ export function transformRows(
       : resolveCategory(categoryRaw, subcategoryRaw, parentByName, subIndex);
     if (catRes.warning) validation.warnings.push(catRes.warning);
 
-    const transferId = transferIdRaw.trim() || undefined;
+    let transferId = transferIdRaw.trim() || undefined;
+    if (typeRes.isTransferLeg && !transferId) {
+      transferId = crypto.randomUUID();
+      validation.warnings.push(
+        "Transfer ID was missing — generated a new one (this leg will not auto-pair)"
+      );
+    }
 
     return {
       index,

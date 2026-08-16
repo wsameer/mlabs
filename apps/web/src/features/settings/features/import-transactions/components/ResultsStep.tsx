@@ -29,12 +29,18 @@ export function ResultsStep({
 
       <Card>
         <CardContent className="py-4">
-          <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-emerald-600">
                 {result.imported}
               </p>
               <p className="text-xs text-muted-foreground">Imported</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-sky-600">
+                {result.mergedTransfers}
+              </p>
+              <p className="text-xs text-muted-foreground">Transfers merged</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-destructive">

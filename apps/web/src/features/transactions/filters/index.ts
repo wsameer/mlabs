@@ -1,5 +1,4 @@
 export { TransactionFilters } from "./TransactionFilters";
-export { TransactionFiltersDrawer } from "./TransactionFiltersDrawer";
 export { SearchInput } from "./components/SearchInput";
 export { AccountScopeBanner } from "./components/AccountScopeBanner";
 export { useTransactionFilters } from "./use-transaction-filters";

@@ -37,7 +37,7 @@ export function AccountsRail({ accounts, currency }: AccountsRailProps) {
   return (
     <Card className="m-1 mt-2">
       <CardHeader>
-        <CardTitle>Accounts</CardTitle>
+        <CardTitle>Accounts Groups</CardTitle>
       </CardHeader>
       <CardContent>
         <ItemGroup>
@@ -46,7 +46,7 @@ export function AccountsRail({ accounts, currency }: AccountsRailProps) {
             const Icon = meta.icon;
 
             return (
-              <Item variant={"muted"} size="xs">
+              <Item variant={"muted"} size="xs" key={group}>
                 <ItemMedia variant="icon">
                   <Icon
                     className="size-3.5 shrink-0 text-muted-foreground"

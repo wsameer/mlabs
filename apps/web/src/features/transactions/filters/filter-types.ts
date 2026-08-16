@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 export const TRANSACTION_FILTER_PRESETS = [
   "all",
   "uncategorized",
+  "pending-transfer",
   "income",
   "expenses",
 ] as const;

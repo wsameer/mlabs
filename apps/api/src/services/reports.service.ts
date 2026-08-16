@@ -1,10 +1,13 @@
+import { isNull } from "drizzle-orm";
+
 import { categories, transactions } from "@workspace/db";
 import type {
+  CashflowMonthlyResponse,
   CategoryTotalsQuery,
   CategoryTotalsResponse,
 } from "@workspace/types";
 
-import { and, db, eq, gte, lte, sql } from "../libs/db.js";
+import { and, db, eq, gte, inArray, lte, sql } from "../libs/db.js";
 
 export class ReportsService {
   async getCategoryTotals(
@@ -14,9 +17,18 @@ export class ReportsService {
     const conditions = [
       eq(transactions.profileId, profileId),
       eq(transactions.type, filters.type),
-      gte(transactions.date, filters.startDate),
-      lte(transactions.date, filters.endDate),
+      // Pending transfer legs are still tagged INCOME/EXPENSE but represent
+      // money in flight — exclude them so they don't inflate category totals.
+      isNull(transactions.transferId),
     ];
+
+    if (filters.startDate) {
+      conditions.push(gte(transactions.date, filters.startDate));
+    }
+
+    if (filters.endDate) {
+      conditions.push(lte(transactions.date, filters.endDate));
+    }
 
     if (filters.accountId) {
       conditions.push(eq(transactions.accountId, filters.accountId));
@@ -57,6 +69,57 @@ export class ReportsService {
       items,
       grandTotal: String(grandTotal),
     };
+  }
+
+  async getCashflowMonthly(
+    profileId: string
+  ): Promise<CashflowMonthlyResponse> {
+    const now = new Date();
+    const startYear = now.getUTCFullYear();
+    const startMonth = now.getUTCMonth() - 11;
+    const start = new Date(Date.UTC(startYear, startMonth, 1));
+    const startDate = start.toISOString().slice(0, 10); // YYYY-MM-DD
+
+    const rows = await db
+      .select({
+        month: sql<string>`strftime('%Y-%m', ${transactions.date})`,
+        type: transactions.type,
+        total: sql<string>`CAST(SUM(CAST(${transactions.amount} AS REAL)) AS TEXT)`,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.profileId, profileId),
+          inArray(transactions.type, ["INCOME", "EXPENSE"]),
+          // Skip pending transfer legs — they aren't real income/expense.
+          isNull(transactions.transferId),
+          gte(transactions.date, startDate)
+        )
+      )
+      .groupBy(sql`strftime('%Y-%m', ${transactions.date})`, transactions.type);
+
+    const buckets = new Map<string, { income: number; expense: number }>();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(Date.UTC(startYear, startMonth + i, 1));
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+      buckets.set(key, { income: 0, expense: 0 });
+    }
+
+    for (const row of rows) {
+      const bucket = buckets.get(row.month);
+      if (!bucket) continue;
+      const value = Number(row.total) || 0;
+      if (row.type === "INCOME") bucket.income = value;
+      else if (row.type === "EXPENSE") bucket.expense = value;
+    }
+
+    const items = Array.from(buckets.entries()).map(([month, b]) => ({
+      month,
+      income: String(b.income),
+      expense: String(b.expense),
+    }));
+
+    return { items };
   }
 }
 

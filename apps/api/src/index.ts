@@ -63,33 +63,33 @@ app.use(
 );
 
 // Rate limiting for API routes
-app.use(
-  "/api/*",
-  rateLimiter({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100, // limit each IP to 100 requests per windowMs
-    standardHeaders: "draft-6",
-    keyGenerator: (c) => {
-      return (
-        c.req.header("X-Forwarded-For") ??
-        c.req.header("X-Real-Ip") ??
-        "unknown"
-      );
-    },
-    handler: (c) => {
-      return c.json(
-        {
-          success: false,
-          error: {
-            message: "Too many requests, please try again later.",
-            code: "RATE_LIMIT_EXCEEDED",
-          },
-        },
-        429
-      );
-    },
-  })
-);
+// app.use(
+//   "/api/*",
+//   rateLimiter({
+//     windowMs: 15 * 60 * 1000, // 15 minutes
+//     limit: 500, // limit each IP to 100 requests per windowMs
+//     standardHeaders: "draft-6",
+//     keyGenerator: (c) => {
+//       return (
+//         c.req.header("X-Forwarded-For") ??
+//         c.req.header("X-Real-Ip") ??
+//         "unknown"
+//       );
+//     },
+//     handler: (c) => {
+//       return c.json(
+//         {
+//           success: false,
+//           error: {
+//             message: "Too many requests, please try again later.",
+//             code: "RATE_LIMIT_EXCEEDED",
+//           },
+//         },
+//         429
+//       );
+//     },
+//   })
+// );
 
 // Public Routes
 // API root endpoint - useful for discovery and documentation

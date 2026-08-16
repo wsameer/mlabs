@@ -29,4 +29,5 @@ export {
   sum,
   gte,
   lte,
+  inArray,
 } from "@workspace/db";
